@@ -1,7 +1,13 @@
 {
-  "name" : "beestream",
-  "version" : "0.0.1",
+  "name" : "MEAN",
+  "version" : "0.0.3",
   "dependencies" : {
-    "express" : "4.16.2"
+    "body-parser" : "1.15.2",
+    "compression" : "1.6.0",
+    "ejs" : "2.5.2",
+    "express" : "4.16.2",
+    "express-session" : "1.14.1",
+    "method-override" : "2.3.6",
+    "morgan" : "1.7.0"
   }
 }
