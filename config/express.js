@@ -7,6 +7,7 @@ const methodOverride = require('method-override');
 const session = require('express-session');
 const flash = require('connect-flash');
 const passport = require('passport');
+const path = require('path');
 
 module.exports = function() {
   const app = express();
@@ -34,5 +35,6 @@ module.exports = function() {
   require('../app/routes/index.server.routes.js')(app);
   require('../app/routes/users.server.routes.js')(app);
   app.use(express.static('./public'));
+  app.use('/lib', express.static(path.resolve('./node_modules')));
   return app;
 };
