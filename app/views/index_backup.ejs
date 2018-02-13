@@ -5,16 +5,16 @@
     <base href="/">
   </head>
   <body>
-    <mean-app>
+    <greet>
       <h1>Loading...</h1>
-    </mean-app>
+    </greet>
     <script src="lib/core-js/client/shim.min.js"></script>
     <script src="lib/zone.js/dist/zone.js"></script>
     <script src="lib/reflect-metadata/Reflect.js"></script>
     <script src="lib/systemjs/dist/system.js"></script>
-    <script src="systemjs.config.js"></script>
+    <script src="public/systemjs.config.js"></script>
     <script>
-      System.import('app').catch(function(err) {console.log(err);});
+      System.import('app').catch(function(err)) {console.error(err);});
     </script>
   </body>
 </html>
