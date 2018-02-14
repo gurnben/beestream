@@ -1,7 +1,7 @@
 const User = require('mongoose').model('User');
 const passport = require('passport');
 
-function getErrorMessage(err) {
+const getErrorMessage = function getErrorMessage(err) {
   var message = '';
 
   if (err.code) {
@@ -24,48 +24,48 @@ function getErrorMessage(err) {
   return message;
 };
 
-exports.renderSignin = function(req, res, next) {
-  if (!req.user) {
-    res.render('signin', {
-      title: 'Sign-in Form',
-      messages: req.flash('error') || req.flash(info)
-    });
-  } else {
-    return res.redirect('/');
-  }
-};
+exports.signin = function(req, res, next) {
+  passport.authenticate('local', function(err, user, info) {
+    if (err || !user) {
+      res.status(400).send(info);
+    } else {
+      // Remove sensative data before login
+      user.password = undefined;
+      user.salt = undefined;
 
-exports.renderSignup = function(req, res, next) {
-  if (!req.user) {
-    res.render('signup', {
-      title: 'Sign-up Form',
-      messages: req.flash('error')
-    });
-  } else {
-    return res.redirect('/');
-  }
-};
-
-exports.signup = function(req, res, next) {
-  if (!req.user) {
-    console.log(req.body.email)
-    const user = new User(req.body);
-    user.provider = 'local';
-    user.save((err) => {
-      if (err) {
-        console.log(err);
-        const message = getErrorMessage(err);
-        req.flash('error', message);
-        return res.redirect('/signup');
-      }
-      req.login(user, (err) => {
-        if (err) return next(err);
-        return res.redirect('/');
+      req.login(user, function(err) {
+        if (err) {
+          res.status(400).send(err);
+        } else {
+          res.json(user);
+        }
       });
-    });
-  } else {
-    return res.redirect('/');
-  }
+    }
+  })(req, res, next);
+};
+
+exports.signup = function(req, res) {
+  const user = new User(req.body);
+  user.provider = 'local';
+  user.save((err) => {
+    if (err) {
+      return res.status(400).send({
+        message: getErrorMessage(err)
+      });
+    } else {
+      // Remove sensative data before login
+      user.password = undefined;
+      user.salt = undefined;
+
+      req.login(user, function(err) {
+        if (err) {
+          res.status(400).send(err);
+        } else {
+          res.json(user);
+        }
+      });
+    }
+  });
 };
 
 exports.signout = function(req, res) {
@@ -73,63 +73,31 @@ exports.signout = function(req, res) {
   res.redirect('/');
 };
 
-exports.create = function(req, res, next) {
-  const user = new User(req.body);
-  user.save((err) => {
-    if (err) {
-      return next(err);
-    } else {
-      res.status(200).json(user);
-    }
-  });
-};
-
-exports.list = function(req, res, next) {
-  User.find({}, (err, users) => {
-    if (err) {
-      return next(err);
-    } else {
-      res.status(200).json(users);
-    }
-  });
-};
-
-exports.read = function(req, res, next, id) {
-  res.json(req.user);
-};
-
-exports.userByID = function(req, res, next, id) {
+exports.saveOAuthUserProfile = function(req, profile, done) {
   User.findOne({
-    _id : id
-  }, (err, user) => {
+    provider: profile.provider,
+    providerId: profile.providerId
+  }, function(err, user) {
     if (err) {
-      return next(err);
+      return done(err);
     } else {
-      console.log(user);
-      req.user = user;
-      next();
+      if (!user) {
+        const possibleUsername = profile.username || ((profile.email) ? profile.email.split('@')[0] : '');
+        User.findUniqueUsername(possibleUsername, null, function(avaliableUsername) {
+          profile.username = avaliableUsername;
+          user = new User(profile);
+          user.save((err) => {
+            if (err) {
+              const message = _this.getErrorMessage(err);
+              req.flash('error', message);
+              return res.redirect('/signup');
+            }
+            return done(err, user);
+          });
+        });
+      } else {
+        return done(err, user);
+      }
     }
   });
-};
-
-exports.update = function(req, res, next) {
-  User.findByIdAndUpdate(req.user.id, req.body, {
-    'new' : true
-  }, (err, user) => {
-    if (err) {
-      return next(err);
-    } else {
-      res.status(200).json(user);
-    }
-  });
-};
-
-exports.delete = function(req, res, next) {
-  req.user.remove(err => {
-    if (err) {
-      return next(err);
-    } else {
-      res.status(200).json(req.user);
-    }
-  })
 };
