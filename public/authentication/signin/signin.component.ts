@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthenticationService } from '../authentication.service';
+import { AuthenticationService } from '../authentication.service.js';
 
 @Component({
   selector: 'signin',
-  templateUrl: 'app/authentication/signin/signin.template.html'
+  templateUrl: 'authentication/signin/signin.template.html'
 })
 export class SigninComponent {
   errorMessage: string;

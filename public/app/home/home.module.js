@@ -1,4 +1,4 @@
-System.register(["@angular/core", "@angular/common", "@angular/router", "./home.routes", "./home.component"], function (exports_1, context_1) {
+System.register(["@angular/core", "@angular/common", "@angular/router", "./home.routes.js", "./home.component.js"], function (exports_1, context_1) {
     "use strict";
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -7,7 +7,7 @@ System.register(["@angular/core", "@angular/common", "@angular/router", "./home.
         return c > 3 && r && Object.defineProperty(target, key, r), r;
     };
     var __moduleName = context_1 && context_1.id;
-    var core_1, common_1, router_1, home_routes_1, home_component_1, HomeModule;
+    var core_1, common_1, router_1, home_routes_js_1, home_component_js_1, HomeModule;
     return {
         setters: [
             function (core_1_1) {
@@ -19,11 +19,11 @@ System.register(["@angular/core", "@angular/common", "@angular/router", "./home.
             function (router_1_1) {
                 router_1 = router_1_1;
             },
-            function (home_routes_1_1) {
-                home_routes_1 = home_routes_1_1;
+            function (home_routes_js_1_1) {
+                home_routes_js_1 = home_routes_js_1_1;
             },
-            function (home_component_1_1) {
-                home_component_1 = home_component_1_1;
+            function (home_component_js_1_1) {
+                home_component_js_1 = home_component_js_1_1;
             }
         ],
         execute: function () {
@@ -33,10 +33,10 @@ System.register(["@angular/core", "@angular/common", "@angular/router", "./home.
                 core_1.NgModule({
                     imports: [
                         common_1.CommonModule,
-                        router_1.RouterModule.forChild(home_routes_1.HomeRoutes),
+                        router_1.RouterModule.forChild(home_routes_js_1.HomeRoutes),
                     ],
                     declarations: [
-                        home_component_1.HomeComponent
+                        home_component_js_1.HomeComponent
                     ]
                 })
             ], HomeModule);

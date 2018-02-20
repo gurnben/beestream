@@ -7,7 +7,7 @@ System.register([], function (exports_1, context_1) {
         execute: function () {
             exports_1("AppRoutes", AppRoutes = [{
                     path: '**',
-                    redirectTo: '/'
+                    redirectTo: '/',
                 }]);
         }
     };

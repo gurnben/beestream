@@ -1,4 +1,4 @@
-System.register(["@angular/core", "../authentication/authentication.service"], function (exports_1, context_1) {
+System.register(["@angular/core", "../../authentication/authentication.service.js"], function (exports_1, context_1) {
     "use strict";
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -10,14 +10,14 @@ System.register(["@angular/core", "../authentication/authentication.service"], f
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
     var __moduleName = context_1 && context_1.id;
-    var core_1, authentication_service_1, HomeComponent;
+    var core_1, authentication_service_js_1, HomeComponent;
     return {
         setters: [
             function (core_1_1) {
                 core_1 = core_1_1;
             },
-            function (authentication_service_1_1) {
-                authentication_service_1 = authentication_service_1_1;
+            function (authentication_service_js_1_1) {
+                authentication_service_js_1 = authentication_service_js_1_1;
             }
         ],
         execute: function () {
@@ -32,7 +32,7 @@ System.register(["@angular/core", "../authentication/authentication.service"], f
                     selector: 'home',
                     templateUrl: './app/home/home.template.html'
                 }),
-                __metadata("design:paramtypes", [authentication_service_1.AuthenticationService])
+                __metadata("design:paramtypes", [authentication_service_js_1.AuthenticationService])
             ], HomeComponent);
             exports_1("HomeComponent", HomeComponent);
         }

@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { AuthenticationRoutes } from './authentication.routes';
-import { AuthenticationComponent } from './authentication.component';
-import { SigninComponent } from './signin/signin.component';
-import { SignupComponent } from './signup/signup.component';
+import { AuthenticationRoutes } from './authentication.routes.js';
+import { AuthenticationComponent } from './authentication.component.js';
+import { SigninComponent } from './signin/signin.component.js';
+import { SignupComponent } from './signup/signup.component.js';
 
 @NgModule({
   imports: [

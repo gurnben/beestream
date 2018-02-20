@@ -1,4 +1,4 @@
-System.register(["@angular/core", "@angular/router", "../authentication.service"], function (exports_1, context_1) {
+System.register(["@angular/core", "@angular/router", "../authentication.service.js"], function (exports_1, context_1) {
     "use strict";
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -10,7 +10,7 @@ System.register(["@angular/core", "@angular/router", "../authentication.service"
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
     var __moduleName = context_1 && context_1.id;
-    var core_1, router_1, authentication_service_1, SigninComponent;
+    var core_1, router_1, authentication_service_js_1, SigninComponent;
     return {
         setters: [
             function (core_1_1) {
@@ -19,8 +19,8 @@ System.register(["@angular/core", "@angular/router", "../authentication.service"
             function (router_1_1) {
                 router_1 = router_1_1;
             },
-            function (authentication_service_1_1) {
-                authentication_service_1 = authentication_service_1_1;
+            function (authentication_service_js_1_1) {
+                authentication_service_js_1 = authentication_service_js_1_1;
             }
         ],
         execute: function () {
@@ -37,9 +37,9 @@ System.register(["@angular/core", "@angular/router", "../authentication.service"
             SigninComponent = __decorate([
                 core_1.Component({
                     selector: 'signin',
-                    templateUrl: 'app/authentication/signin/signin.template.html'
+                    templateUrl: 'authentication/signin/signin.template.html'
                 }),
-                __metadata("design:paramtypes", [authentication_service_1.AuthenticationService, router_1.Router])
+                __metadata("design:paramtypes", [authentication_service_js_1.AuthenticationService, router_1.Router])
             ], SigninComponent);
             exports_1("SigninComponent", SigninComponent);
         }

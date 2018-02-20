@@ -19,7 +19,7 @@ export class AuthenticationService {
 
   signin(credentials: any): Observable<any> {
     let body = JSON.stringify(credentials);
-    let headers = new Headers({ 'Content-Type' : 'applicaiton/json' });
+    let headers = new Headers({ 'Content-Type' : 'application/json' });
     let options = new RequestOptions({headers: headers});
     return this.http.post(this._signinURL, body, options)
       .map(res => this.user = res.json())
@@ -28,7 +28,7 @@ export class AuthenticationService {
 
   signup(user: any): Observable<any> {
     let body = JSON.stringify(user);
-    let headers = new Headers({ 'Content-Type' : 'applicaiton/json'});
+    let headers = new Headers({ 'Content-Type': 'application/json' });
     let options = new RequestOptions({ headers: headers });
     return this.http.post(this._signupURL, body, options)
       .map(res => this.user = res.json())

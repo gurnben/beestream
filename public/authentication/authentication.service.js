@@ -38,7 +38,7 @@ System.register(["rxjs/Rx", "@angular/core", "@angular/http", "rxjs/Observable"]
                 }
                 signin(credentials) {
                     let body = JSON.stringify(credentials);
-                    let headers = new http_1.Headers({ 'Content-Type': 'applicaiton/json' });
+                    let headers = new http_1.Headers({ 'Content-Type': 'application/json' });
                     let options = new http_1.RequestOptions({ headers: headers });
                     return this.http.post(this._signinURL, body, options)
                         .map(res => this.user = res.json())
@@ -46,7 +46,7 @@ System.register(["rxjs/Rx", "@angular/core", "@angular/http", "rxjs/Observable"]
                 }
                 signup(user) {
                     let body = JSON.stringify(user);
-                    let headers = new http_1.Headers({ 'Content-Type': 'applicaiton/json' });
+                    let headers = new http_1.Headers({ 'Content-Type': 'application/json' });
                     let options = new http_1.RequestOptions({ headers: headers });
                     return this.http.post(this._signupURL, body, options)
                         .map(res => this.user = res.json())

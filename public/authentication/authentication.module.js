@@ -1,4 +1,4 @@
-System.register(["@angular/core", "@angular/forms", "@angular/router", "./authentication.routes", "./authentication.component", "./signin/signin.component", "./signup/signup.component"], function (exports_1, context_1) {
+System.register(["@angular/core", "@angular/forms", "@angular/router", "./authentication.routes.js", "./authentication.component.js", "./signin/signin.component.js", "./signup/signup.component.js"], function (exports_1, context_1) {
     "use strict";
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -7,7 +7,7 @@ System.register(["@angular/core", "@angular/forms", "@angular/router", "./authen
         return c > 3 && r && Object.defineProperty(target, key, r), r;
     };
     var __moduleName = context_1 && context_1.id;
-    var core_1, forms_1, router_1, authentication_routes_1, authentication_component_1, signin_component_1, signup_component_1, AuthenticationModule;
+    var core_1, forms_1, router_1, authentication_routes_js_1, authentication_component_js_1, signin_component_js_1, signup_component_js_1, AuthenticationModule;
     return {
         setters: [
             function (core_1_1) {
@@ -19,17 +19,17 @@ System.register(["@angular/core", "@angular/forms", "@angular/router", "./authen
             function (router_1_1) {
                 router_1 = router_1_1;
             },
-            function (authentication_routes_1_1) {
-                authentication_routes_1 = authentication_routes_1_1;
+            function (authentication_routes_js_1_1) {
+                authentication_routes_js_1 = authentication_routes_js_1_1;
             },
-            function (authentication_component_1_1) {
-                authentication_component_1 = authentication_component_1_1;
+            function (authentication_component_js_1_1) {
+                authentication_component_js_1 = authentication_component_js_1_1;
             },
-            function (signin_component_1_1) {
-                signin_component_1 = signin_component_1_1;
+            function (signin_component_js_1_1) {
+                signin_component_js_1 = signin_component_js_1_1;
             },
-            function (signup_component_1_1) {
-                signup_component_1 = signup_component_1_1;
+            function (signup_component_js_1_1) {
+                signup_component_js_1 = signup_component_js_1_1;
             }
         ],
         execute: function () {
@@ -39,12 +39,12 @@ System.register(["@angular/core", "@angular/forms", "@angular/router", "./authen
                 core_1.NgModule({
                     imports: [
                         forms_1.FormsModule,
-                        router_1.RouterModule.forChild(authentication_routes_1.AuthenticationRoutes)
+                        router_1.RouterModule.forChild(authentication_routes_js_1.AuthenticationRoutes)
                     ],
                     declarations: [
-                        authentication_component_1.AuthenticationComponent,
-                        signin_component_1.SigninComponent,
-                        signup_component_1.SignupComponent
+                        authentication_component_js_1.AuthenticationComponent,
+                        signin_component_js_1.SigninComponent,
+                        signup_component_js_1.SignupComponent
                     ]
                 })
             ], AuthenticationModule);

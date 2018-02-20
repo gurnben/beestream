@@ -45,10 +45,12 @@ exports.signin = function(req, res, next) {
 };
 
 exports.signup = function(req, res) {
+  console.log(req.body);
   const user = new User(req.body);
   user.provider = 'local';
   user.save((err) => {
     if (err) {
+      console.log('Errored on line 52 of user.server.controller');
       return res.status(400).send({
         message: getErrorMessage(err)
       });
