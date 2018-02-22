@@ -35,6 +35,7 @@ module.exports = function() {
   app.use('/', express.static(path.resolve('./public')));
   app.use('/lib', express.static(path.resolve('./node_modules')));
   require('../app/routes/users.server.routes.js')(app);
+  require('../app/routes/articles.server.routes.js')(app);
   require('../app/routes/index.server.routes.js')(app);
   app.use(express.static('./public'));
   return app;
