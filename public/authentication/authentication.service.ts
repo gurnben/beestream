@@ -13,8 +13,8 @@ export class AuthenticationService {
 
   }
 
-  isloggedIn(): boolean {
-    return (!this.user);
+  isLoggedIn(): boolean {
+    return (!!this.user);
   }
 
   signin(credentials: any): Observable<any> {

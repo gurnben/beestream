@@ -33,8 +33,8 @@ System.register(["rxjs/Rx", "@angular/core", "@angular/http", "rxjs/Observable"]
                     this._signinURL = 'api/auth/signin';
                     this._signupURL = 'api/auth/signup';
                 }
-                isloggedIn() {
-                    return (!this.user);
+                isLoggedIn() {
+                    return (!!this.user);
                 }
                 signin(credentials) {
                     let body = JSON.stringify(credentials);

@@ -1,4 +1,4 @@
-System.register(["@angular/core", "@angular/platform-browser", "@angular/router", "@angular/http", "./app.component", "./app.routes", "./home/home.module.js", "../authentication/authentication.service.js", "../authentication/authentication.module.js", "./articles/articles.module.js"], function (exports_1, context_1) {
+System.register(["@angular/core", "@angular/platform-browser", "@angular/router", "@angular/http", "./app.component", "./app.routes", "./home/home.module.js", "../authentication/authentication.service.js", "../authentication/authentication.module.js", "./articles/articles.module.js", "./chat/chat.module.js"], function (exports_1, context_1) {
     "use strict";
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -7,7 +7,7 @@ System.register(["@angular/core", "@angular/platform-browser", "@angular/router"
         return c > 3 && r && Object.defineProperty(target, key, r), r;
     };
     var __moduleName = context_1 && context_1.id;
-    var core_1, platform_browser_1, router_1, http_1, app_component_1, app_routes_1, home_module_js_1, authentication_service_js_1, authentication_module_js_1, articles_module_js_1, AppModule;
+    var core_1, platform_browser_1, router_1, http_1, app_component_1, app_routes_1, home_module_js_1, authentication_service_js_1, authentication_module_js_1, articles_module_js_1, chat_module_js_1, AppModule;
     return {
         setters: [
             function (core_1_1) {
@@ -39,6 +39,9 @@ System.register(["@angular/core", "@angular/platform-browser", "@angular/router"
             },
             function (articles_module_js_1_1) {
                 articles_module_js_1 = articles_module_js_1_1;
+            },
+            function (chat_module_js_1_1) {
+                chat_module_js_1 = chat_module_js_1_1;
             }
         ],
         execute: function () {
@@ -52,6 +55,7 @@ System.register(["@angular/core", "@angular/platform-browser", "@angular/router"
                         authentication_module_js_1.AuthenticationModule,
                         home_module_js_1.HomeModule,
                         articles_module_js_1.ArticlesModule,
+                        chat_module_js_1.ChatModule,
                         router_1.RouterModule.forRoot(app_routes_1.AppRoutes)
                     ],
                     declarations: [

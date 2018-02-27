@@ -14,10 +14,10 @@ export class SignupComponent {
 
   signup() {
     console.log(this.user);
-    this._authenticationService.signup(this.user);
-    // .subscribe(
-    //   result => this._router.navigate(['/']),
-    //   error => this.errorMessage = error
-    // );
+    this._authenticationService.signup(this.user)
+    .subscribe(
+      result => this._router.navigate(['/']),
+      error => this.errorMessage = error
+    );
   }
 }

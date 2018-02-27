@@ -32,11 +32,8 @@ System.register(["@angular/core", "@angular/router", "../authentication.service.
                 }
                 signup() {
                     console.log(this.user);
-                    this._authenticationService.signup(this.user);
-                    // .subscribe(
-                    //   result => this._router.navigate(['/']),
-                    //   error => this.errorMessage = error
-                    // );
+                    this._authenticationService.signup(this.user)
+                        .subscribe(result => this._router.navigate(['/']), error => this.errorMessage = error);
                 }
             };
             SignupComponent = __decorate([

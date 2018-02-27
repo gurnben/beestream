@@ -8,6 +8,7 @@ import { HomeModule } from './home/home.module.js';
 import { AuthenticationService } from '../authentication/authentication.service.js';
 import { AuthenticationModule } from '../authentication/authentication.module.js';
 import { ArticlesModule } from './articles/articles.module.js';
+import { ChatModule } from './chat/chat.module.js';
 
 @NgModule({
   imports: [
@@ -16,6 +17,7 @@ import { ArticlesModule } from './articles/articles.module.js';
     AuthenticationModule,
     HomeModule,
     ArticlesModule,
+    ChatModule,
     RouterModule.forRoot(AppRoutes)
   ],
   declarations: [

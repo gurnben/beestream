@@ -1,16 +1,22 @@
 const config = require('./config');
+const http = require('http');
+const socketio = require('socket.io');
 const express = require('express');
 const morgan = require('morgan');
 const compress = require('compression');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 const flash = require('connect-flash');
 const passport = require('passport');
 const path = require('path');
+const configureSocket = require('./socketio.js');
 
-module.exports = function() {
+module.exports = function(db) {
   const app = express();
+  const server = http.createServer(app);
+  const io = socketio.listen(server);
   if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
   }
@@ -22,6 +28,15 @@ module.exports = function() {
   }));
   app.use(bodyParser.json());
   app.use(methodOverride());
+  const mongoStore = new MongoStore({
+    mongooseConnection: db.connection
+  });
+  app.use(session({
+    saveUninitialized: true,
+    resave: true,
+    secret: config.sessionSecret,
+    store: mongoStore
+  }));
   app.use(session({
     saveUninitialized : true,
     resave : true,
@@ -37,6 +52,6 @@ module.exports = function() {
   require('../app/routes/users.server.routes.js')(app);
   require('../app/routes/articles.server.routes.js')(app);
   require('../app/routes/index.server.routes.js')(app);
-  app.use(express.static('./public'));
-  return app;
+  configureSocket(server, io, mongoStore);
+  return server;
 };
