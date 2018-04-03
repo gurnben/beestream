@@ -2,10 +2,10 @@
   "name": "Beestream",
   "version": "0.0.1",
   "scripts": {
-    "tsc": "tsc",
-    "tsc:w": "tsc -w",
     "app": "node server",
-    "start": "concurrently \"webpack --watch \" \"npm run app\" "
+    "start": "concurrently \"npm run watch:build\" \"npm run watch:server\"",
+    "watch:build": "webpack --watch",
+    "watch:server": "nodemon \"./server.js\" --watch \"./public/build\""
   },
   "dependencies": {
     "@angular/common": "5.2.4",
@@ -25,26 +25,30 @@
     "ejs": "2.5.7",
     "express": "4.16.2",
     "express-session": "1.15.6",
+    "ls": "^0.2.1",
     "method-override": "2.3.10",
     "mongoose": "4.6.5",
     "morgan": "1.9.0",
     "reflect-metadata": "0.1.12",
     "rxjs": "5.5.6",
-    "socket.io": "2.0.4",
-    "webpack": "^4.2.0",
     "zone.js": "0.8.20"
   },
   "devDependencies": {
-    "@types/core-js": "^0.9.46",
+    "@types/core-js": "0.9.35",
     "@types/jasmine": "^2.8.6",
-    "@types/node": "^9.4.5",
+    "@types/node": "^9.6.0",
     "@types/socket.io-client": "^1.4.32",
-    "awesome-typescript-loader": "4.0.1",
     "concurrently": "3.1.0",
+    "css-loader": "^0.28.11",
+    "html-loader": "^0.5.5",
     "nodemon": "1.17.2",
+    "socket.io": "^2.0.4",
+    "style-loader": "^0.20.3",
     "traceur": "0.0.111",
-    "typescript": "^2.7.1",
-    "webpack": "^4.2.0",
-    "webpack-cli": "^2.0.12"
+    "ts-loader": "^4.1.0",
+    "typescript": "^2.8.1",
+    "webpack": "^4.3.0",
+    "webpack-cli": "^2.0.13",
+    "webpack-dev-server": "^3.1.1"
   }
 }

@@ -1,0 +1,18 @@
+<div>
+  <h1>The Archive</h1>
+  <form #hiveForm="ngForm">
+    <select name="hiveSelect" [(ngModel)]="hiveSelect" (ngModelChange)="respondHive()">
+      <option *ngFor="let hive of hives" [ngValue]="hive">{{hive}}</option>
+    </select>
+    <select name="dateSelect" [(ngModel)]="dateSelect" (ngModelChange)="respondDate()">
+      <option *ngFor="let date of dates" [ngValue]="date">{{date}}</option>
+    </select>
+    <select name="timeSelect" [(ngModel)]="timeSelect" (ngModelChange)="respondTime()">
+      <option *ngFor="let time of times" [ngValue]="time">{{time}}</option>
+    </select>
+  </form>
+</div>
+<div *ngIf="vidInfo != null">
+  <p>File name: {{vidInfo.name}}</p>
+  <p>File Size: {{vidInfo.fsStats.size}} bytes</p>
+</div>
