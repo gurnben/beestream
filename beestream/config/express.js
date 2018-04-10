@@ -65,6 +65,7 @@ module.exports = function(db) {
   app.use('/', express.static(path.resolve('./public')));
   app.use('/lib', express.static(path.resolve('./node_modules')));
 
+  require('../app/routes/video.server.routes.js')(app);
   require('../app/routes/index.server.routes.js')(app);
   /* TODO: Add other module routes here. */
 

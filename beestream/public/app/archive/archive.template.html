@@ -7,12 +7,17 @@
     <select name="dateSelect" [(ngModel)]="dateSelect" (ngModelChange)="respondDate()">
       <option *ngFor="let date of dates" [ngValue]="date">{{date}}</option>
     </select>
-    <select name="timeSelect" [(ngModel)]="timeSelect" (ngModelChange)="respondTime()">
+    <select name="timeSelect" [(ngModel)]="timeSelect">
       <option *ngFor="let time of times" [ngValue]="time">{{time}}</option>
     </select>
+    <button (click)="onSubmit()">View</button>
   </form>
 </div>
-<div *ngIf="vidInfo != null">
-  <p>File name: {{vidInfo.name}}</p>
-  <p>File Size: {{vidInfo.fsStats.size}} bytes</p>
+<div *ngIf="videoLoading">
+  <p>Video Loading</p>
+</div>
+<div *ngIf="videoUrl != null">
+  <video [src] = "videoUrl" controls>
+    Your browser doesn't support HTML5 video.
+  </video>
 </div>

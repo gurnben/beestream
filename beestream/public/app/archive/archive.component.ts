@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms'
 import { ArchiveService } from './archive.service';
 
@@ -11,7 +11,7 @@ import { ArchiveService } from './archive.service';
   templateUrl: './app/archive/archive.template.html',
   providers: [ArchiveService]
 })
-export class ArchiveComponent {
+export class ArchiveComponent implements OnDestroy{
   /* Fields for the current state of the hive/date/time selection */
   hiveSelect: string;
   dateSelect: string;
@@ -21,7 +21,8 @@ export class ArchiveComponent {
   dates: Array<any>;
   times: Array<any>;
 
-  vidInfo: any;
+  videoLoading: boolean;
+  videoUrl: any;
 
   /*Constructor for ArchiveComponent
   *
@@ -40,6 +41,8 @@ export class ArchiveComponent {
     this.hives = new Array();
     this.dates = new Array();
     this.times = new Array();
+    this.videoLoading = false;
+    this.videoUrl = null;
 
     this._archiveService.on('hiveList', (hvlst) => {
       this.hives = hvlst.hiveNames;
@@ -53,8 +56,13 @@ export class ArchiveComponent {
     this._archiveService.on('timeList', (tilst) => {
       this.times = tilst.times;
     });
-    this._archiveService.on('serveVideo', (vidInfo) => {
-      this.vidInfo = vidInfo;
+    this._archiveService.on('videoRequestRecieved', (data) => {
+      this.videoLoading = true;
+      console.log(data);
+    });
+    this._archiveService.on('videoReady', (vidURL) => {
+      this.videoLoading = false;
+      this.videoUrl = vidURL.url;
     })
     this._archiveService.emit('getHive', {})
   }
@@ -86,13 +94,23 @@ export class ArchiveComponent {
   *
   * The timeSelect field's current status is sent.
   */
-  respondTime() {
+  onSubmit() {
     var message = {
       hive: this.hiveSelect,
       date: this.dateSelect,
-      time: this.timeSelect
+      time: this.timeSelect,
+      previous: this.videoUrl
     };
-    this._archiveService.emit('sendTime', message);
+    this._archiveService.emit('getVideo', message);
+  }
+
+  /*This function handles the user closing the window.  It sends the
+  * 'closeSession' signal to make sure that the server cleans up the video
+  * that the client was streaming.
+  */
+  @HostListener('window:beforeunload', ['$event'])
+  beforeunloadHandler(event) {
+    this._archiveService.emit('closeSession', {video: this.videoUrl});
   }
 
   /*This function makes sure that our socket removes its listeners when the
@@ -101,8 +119,11 @@ export class ArchiveComponent {
   * Have to stop listening for 'hiveList', 'dateList', and 'timeList'.
   */
   ngOnDestroy() {
+    this._archiveService.emit('closeSession', {video: this.videoUrl});
     this._archiveService.removeListener('hiveList');
     this._archiveService.removeListener('dateList');
     this._archiveService.removeListener('timeList');
+    this._archiveService.removeListener('videoRequestRecieved');
+    this._archiveService.removeListener('videoReady');
   }
 }
