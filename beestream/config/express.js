@@ -9,7 +9,6 @@ const methodOverride = require('method-override');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const flash = require('connect-flash');
-const passport = require('passport');
 const path = require('path');
 const configureSocket = require('./socketio.js');
 
