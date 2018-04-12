@@ -17,7 +17,7 @@
   <p>Video Loading</p>
 </div>
 <div *ngIf="videoUrl != null">
-  <video [src] = "videoUrl" controls>
+  <video [src] = "videoUrl" controls autoplay>
     Your browser doesn't support HTML5 video.
   </video>
 </div>

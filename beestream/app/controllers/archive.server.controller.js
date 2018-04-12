@@ -1,6 +1,7 @@
 const config = require('../../config/config.js');
 const fs = require('fs');
 const {spawn} = require('child_process');
+const {join} = require('path');
 
 /*This file handles all socket.io configurations for the article service.
 * This includes creating the listeners and sending the appropriate emit
@@ -45,13 +46,14 @@ module.exports = function(io, socket) {
   socket.on('getHive', (message) => {
     var files = [];
     if (fs.existsSync(config.videoPath)) {
-      fs.readdirSync(config.videoPath).forEach(file => {
+      //Note: We're making sure we only respond with directories.
+      fs.readdirSync(config.videoPath).filter(file => fs.statSync(join(config.videoPath, file)).isDirectory()).forEach(file => {
         if (config.avaliableHives.includes(file)) {
           files.push(file);
         }
       });
     }
-    io.emit('hiveList', {hiveNames: files});
+    socket.emit('hiveList', {hiveNames: files});
   });
 
   /*getDate: The request for a list of avaliable dates based on the selected
@@ -64,13 +66,14 @@ module.exports = function(io, socket) {
     var files = []
     var requestPath = config.videoPath + '/' + message.text;
     if ((message.text != null) && (fs.existsSync(requestPath))) {
-      fs.readdirSync(requestPath).forEach(file => {
+      //Note: We're making sure we only respond with directories.
+      fs.readdirSync(requestPath).filter(file => fs.statSync(join(requestPath, file)).isDirectory()).forEach(file => {
         if (config.avaliableHives.includes(message.text)) {
           files.push(file);
         }
       });
     }
-    io.emit('dateList', {dates: files});
+    socket.emit('dateList', {dates: files});
   });
 
   /*getTime: The request for a list of avaliable times based on the selected
@@ -90,7 +93,7 @@ module.exports = function(io, socket) {
         }
       });
     }
-    io.emit('timeList', {times: files});
+    socket.emit('timeList', {times: files});
   });
 
   /*closeSession: The request sent when a user closes the browser window. This
@@ -123,20 +126,21 @@ module.exports = function(io, socket) {
     if ((message.hive != null) && (message.date != null) &&
         (message.time != null) && fs.existsSync(requestPath)) {
       //Tell the client their request was recieved and is processing.
-      io.emit('videoRequestRecieved', {
+      socket.emit('videoRequestRecieved', {
         text: `Peparing to serve ${message.time}`
       });
       //If the file is already there, you don't have to convert it.
       if (fs.existsSync(`./video/${message.hive}@${message.date}@${message.time}.mp4`)) {
-        io.emit('videoReady', {
+        socket.emit('videoReady', {
           url: `/video/${message.hive}@${message.date}@${message.time}`
         });
       }
       //Otherwise you have to convert the file and serve.
       else {
-        const convert = spawn('ffmpeg', ['-i', `${requestPath}`, '-c', 'copy', `./video/${message.hive}@${message.date}@${message.time}.mp4`]);
+        const convert = spawn('ffmpeg', ['-i', `${requestPath}`, '-c', 'copy',
+                              `./video/${message.hive}@${message.date}@${message.time}.mp4`]);
         convert.on('close', (code) => {
-          io.emit('videoReady', {
+          socket.emit('videoReady', {
             url: `/video/${message.hive}@${message.date}@${message.time}`
           });
         });

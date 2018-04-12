@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 
 import { ArchiveRoutes } from './archive.routes';
 import { ArchiveComponent } from './archive.component';
-import { ArchiveService } from './archive.service'
+import { VideoService } from '../video/video.service'
 
 @NgModule({
   imports: [
@@ -17,7 +17,7 @@ import { ArchiveService } from './archive.service'
     ArchiveComponent
   ],
   providers: [
-    ArchiveService
+    VideoService
   ]
 })
 export class ArchiveModule {}

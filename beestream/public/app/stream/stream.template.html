@@ -1,3 +1,17 @@
 <div>
-  <h1>The Streaming Page will go here.</h1>
+  <h1>Stream</h1>
+  <form>
+    <select name="streamHiveSelect" [(ngModel)]="streamHiveSelect">
+      <option *ngFor="let hive of hives" [ngValue]="hive">{{hive}}</option>
+    </select>
+    <button (click)="onSubmit()">View</button>
+  </form>
+</div>
+<div *ngIf="videoLoading">
+  <p>Video Loading</p>
+</div>
+<div *ngIf="videoUrl != null">
+  <video #VideoStream (canplay)="onSubmit()" (ended)="onSubmit()" [src] = "videoUrl" controls autoplay loop>
+    Your browser doesn't support HTML5 video.
+  </video>
 </div>
