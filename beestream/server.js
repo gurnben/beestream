@@ -12,4 +12,4 @@ const db = configureMongoose();
 const app = configureExpress(db);
 app.listen(3000);
 module.exports = app; //Export the running application.
-console.log('Beestream running at http://localhost:3000/'); //TODO: edit to reflect the address of the server host.
+console.log(`Beestream running at http://localhost:3000/ in ${process.env.NODE_ENV} mode.`); //TODO: edit to reflect the address of the server host.

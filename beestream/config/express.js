@@ -7,7 +7,6 @@ const compress = require('compression');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
 const flash = require('connect-flash');
 const path = require('path');
 const configureSocket = require('./socketio.js');
@@ -37,22 +36,6 @@ module.exports = function(db) {
   /*Add methodOverride middlewear to allow us to override some methods.*/
   app.use(methodOverride());
 
-  /*Configure and enable mongoStore to pass info using MongoDB for our socketio*/
-  const mongoStore = new MongoStore({
-    mongooseConnection: db.connection
-  });
-  app.use(session({
-    saveUninitialized: true,
-    resave: true,
-    secret: config.sessionSecret,
-    store: mongoStore
-  }));
-  app.use(session({
-    saveUninitialized : true,
-    resave : true,
-    secret : config.sessionSecret
-  }));
-
   /* Configure our app with our views. */
   app.set('views', './app/views');
   app.set('view engine', 'ejs');
@@ -69,6 +52,6 @@ module.exports = function(db) {
   /* TODO: Add other module routes here. */
 
   /* Configure our socketio instance with our server and mongoStore instance. */
-  configureSocket(server, io, mongoStore);
+  configureSocket(server, io);
   return server;
 };
