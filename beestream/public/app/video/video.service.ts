@@ -26,7 +26,6 @@ export class VideoService {
   /* This method will respond to all socket.emit calls and pass them through. */
   emit(eventName, data) {
     if (this.socket) {
-      console.log('Emitting ' + eventName + ' with data ' + data);
       this.socket.emit(eventName, data);
     }
   };

@@ -58,7 +58,6 @@ export class ArchiveComponent implements OnDestroy{
     });
     this._videoService.on('videoRequestRecieved', (data) => {
       this.videoLoading = true;
-      console.log(data);
     });
     this._videoService.on('videoReady', (vidURL) => {
       this.videoLoading = false;
