@@ -26,7 +26,6 @@ module.exports = function(db) {
     app.use(compress()); //Compress in production.
     /* add other produciton middlewear here */
   }
-
   /*Add bodyParser middlewear to handle POST, GET, JSON, etc.*/
   app.use(bodyParser.urlencoded({
     extended : true
