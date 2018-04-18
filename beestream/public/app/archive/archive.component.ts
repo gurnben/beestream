@@ -43,6 +43,9 @@ export class ArchiveComponent implements OnDestroy{
     this.times = new Array();
     this.videoLoading = false;
     this.videoUrl = null;
+    this.hiveSelect = null;
+    this.dateSelect = null;
+    this.timeSelect = null;
 
     this._videoService.on('hiveList', (hvlst) => {
       this.hives = hvlst.hiveNames;
@@ -71,10 +74,12 @@ export class ArchiveComponent implements OnDestroy{
   * The hiveSelect field's current status is sent.
   */
   respondHive() {
-    var message = {
-      text: this.hiveSelect
-    };
-    this._videoService.emit('getDate', message);
+    if (this.hiveSelect != null) {
+      var message = {
+        text: this.hiveSelect
+      };
+      this._videoService.emit('getDate', message);
+    }
   }
 
   /*This function sends the date choice as a socket.io getTime message.
@@ -82,11 +87,13 @@ export class ArchiveComponent implements OnDestroy{
   * The dateSelect field's current status is sent.
   */
   respondDate() {
-    var message = {
-      hive: this.hiveSelect,
-      date: this.dateSelect
-    };
-    this._videoService.emit('getTime', message);
+    if ((this.hiveSelect != null) && (this.dateSelect != null)) {
+      var message = {
+        hive: this.hiveSelect,
+        date: this.dateSelect
+      };
+      this._videoService.emit('getTime', message);
+    }
   }
 
   /*This function sends the video choice as a socket.io getVideo message.
@@ -95,13 +102,15 @@ export class ArchiveComponent implements OnDestroy{
   * video url so since we are done with that video.
   */
   onSubmit() {
-    var message = {
-      hive: this.hiveSelect,
-      date: this.dateSelect,
-      time: this.timeSelect,
-      previous: this.videoUrl
-    };
-    this._videoService.emit('getVideo', message);
+    if ((this.hiveSelect != null) && (this.dateSelect != null) && (this.timeSelect != null)) {
+      var message = {
+        hive: this.hiveSelect,
+        date: this.dateSelect,
+        time: this.timeSelect,
+        previous: this.videoUrl
+      };
+      this._videoService.emit('getVideo', message);
+    }
   }
 
   /*This function handles the user closing the window.  It sends the

@@ -81,61 +81,66 @@ module.exports = function(io, socket) {
   * This will convert the video if necessary.
   */
   socket.on('getStreamVideo', (message) => {
-    //Get today's date for use in the path.
-    var today = getDate();
-    //Variable to hold our video name.
-    var time = null;
+    if (message.hive != null) {
+      //Get today's date for use in the path.
+      var today = getDate();
+      //Variable to hold our video name.
+      var time = null;
 
-    //Build the path of the requested video
-    var requestPath = `${config.videoPath}/${message.hive}/${today}/video/`;
-    if ((message.hive != null) && fs.existsSync(config.videoPath)) {
-      var videos = fs.readdirSync(requestPath)
-                     .filter(file => fs.statSync(join(requestPath, file))
-                     .isFile());
-      if (videos.length > 0) {
-        time = videos[videos.length - 1];
-        requestPath += time;
+      //Build the path of the requested video
+      var requestPath = `${config.videoPath}/${message.hive}/${today}/video/`;
+      if ((message.hive != null) && fs.existsSync(config.videoPath)) {
+        var videos = fs.readdirSync(requestPath)
+                       .filter(file => fs.statSync(join(requestPath, file))
+                       .isFile());
+        if (videos.length > 0) {
+          time = videos[videos.length - 1];
+          requestPath += time;
+        }
+        else {
+          console.log(`[ERROR]: a hive: ${message.hive} was requested for ` +
+                      'streaming that doesn\'t have videos for today.');
+          socket.emit('error', {message: `No videos for today on ${message.hive}`});
+          return;
+        }
       }
-      else {
-        console.log(`[ERROR]: a hive: ${message.hive} was requested for ` +
-                    'streaming that doesn\'t have videos for today.');
-        socket.emit('error', {message: `No videos for today on ${message.hive}`});
-        return;
-      }
-    }
 
-    //If we've made it here, we have a video to convert and serve!
-    socket.emit('streamRequestRecieved', {
-      text: `Preparing to serve stream for ${message.hive}`
-    });
-
-    var url = `/video/${message.hive}@${today}@${time.slice(0, -5)}`;
-
-    //If it's already converted, we don't need to convert it.
-    if(fs.existsSync(`./video/${message.hive}@${today}@${time.slice(0, -5)}.mp4`)) {
-      socket.emit('streamReady', {
-        url: `/video/${message.hive}@${today}@${time.slice(0, -5)}`
+      //If we've made it here, we have a video to convert and serve!
+      socket.emit('streamRequestRecieved', {
+        text: `Preparing to serve stream for ${message.hive}`
       });
-    }
 
-    //If it hasn't been converted, convert and serve.
-    else {
-      const convert = spawn('ffmpeg', ['-i', `${requestPath}`, '-c',
-                                       'copy', `./video/${message.hive}@${today}@${time.slice(0, -5)}.mp4`]);
-      convert.on('close', (code) => {
+      var url = `/video/${message.hive}@${today}@${time.slice(0, -5)}`;
+
+      //If it's already converted, we don't need to convert it.
+      if(fs.existsSync(`./video/${message.hive}@${today}@${time.slice(0, -5)}.mp4`)) {
         socket.emit('streamReady', {
           url: `/video/${message.hive}@${today}@${time.slice(0, -5)}`
         });
-      });
-    }
+      }
 
-    //Delete the old file if there was one.
-    if ((message.previous != null) && (message.previous != url)) {
-      fs.unlink(`\.${message.previous}.mp4`, (err) => {
-        if (err) {
-          console.log(`Unable to delete ${message.previous}.`)
-        }
-      })
+      //If it hasn't been converted, convert and serve.
+      else {
+        const convert = spawn('/usr/local/apache2/htdocs/cs/bee/ffmpeg-3.4.2/ffmpeg', ['-i', `${requestPath}`, '-c',
+                                         'copy', `./video/${message.hive}@${today}@${time.slice(0, -5)}.mp4`]);
+        convert.on('close', (code) => {
+          socket.emit('streamReady', {
+            url: `/video/${message.hive}@${today}@${time.slice(0, -5)}`
+          });
+        });
+      }
+
+      //Delete the old file if there was one.
+      if ((message.previous != null) && (message.previous != url)) {
+        fs.unlink(`\.${message.previous}.mp4`, (err) => {
+          if (err) {
+            console.log(`Unable to delete ${message.previous}.`)
+          }
+        })
+      }
+    }
+    else {
+      socket.emit('error', {message: `Safari is not yet supported, sorry!`});
     }
   });
 

@@ -31,6 +31,7 @@ export class StreamComponent {
   ngOnInit() {
     this.hives = new Array();
     this.videoLoading = false;
+    this.streamHiveSelect = null;
 
     this._videoService.on('streamHiveList', (hvlst) => {
       this.hives = hvlst.hiveNames;
@@ -50,11 +51,13 @@ export class StreamComponent {
   * The selection for the hives comes from the input box.
   */
   onSubmit() {
-    var message = {
-      hive: this.streamHiveSelect,
-      previous: this.videoUrl
-    };
-    this._videoService.emit('getStreamVideo', message);
+    if (this.streamHiveSelect != null) {
+      var message = {
+        hive: this.streamHiveSelect,
+        previous: this.videoUrl
+      };
+      this._videoService.emit('getStreamVideo', message);
+    }
   }
 
   /*This function handles the user closing the window.  It sends the

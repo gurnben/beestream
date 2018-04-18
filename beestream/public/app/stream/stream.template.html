@@ -2,6 +2,7 @@
   <h1>Stream</h1>
   <form>
     <select name="streamHiveSelect" [(ngModel)]="streamHiveSelect">
+      <option [ngValue]="null">Choose a Hive</option>
       <option *ngFor="let hive of hives" [ngValue]="hive">{{hive}}</option>
     </select>
     <button (click)="onSubmit()">View</button>
