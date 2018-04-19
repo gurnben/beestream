@@ -5,11 +5,11 @@
       <option [ngValue]="null">Choose a Hive</option>
       <option *ngFor="let hive of hives" [ngValue]="hive">{{hive}}</option>
     </select>
-    <select [disabled]="dates.length < 1" name="dateSelect" [(ngModel)]="dateSelect" (ngModelChange)="respondDate()">
+    <select [disabled]="hiveSelect == null" name="dateSelect" [(ngModel)]="dateSelect" (ngModelChange)="respondDate()">
       <option [ngValue]="null">Choose a Date</option>
       <option *ngFor="let date of dates" [ngValue]="date">{{date}}</option>
     </select>
-    <select [disabled]="times.length < 1" name="timeSelect" [(ngModel)]="timeSelect">
+    <select [disabled]="dateSelect == null" name="timeSelect" [(ngModel)]="timeSelect">
       <option [ngValue]="null">Choose a Time</option>
       <option *ngFor="let time of times" [ngValue]="time">{{time}}</option>
     </select>
