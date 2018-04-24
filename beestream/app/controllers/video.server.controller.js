@@ -4,12 +4,16 @@ const fs = require('fs');
 
 /* This function will serve the requested video. */
 exports.serve = function(req, res) {
-  if (req.video) {
+  if (req.video && fs.existsSync(`./video/${req.video}.mp4`)) {
     var readStream = fs.createReadStream(`./video/${req.video}.mp4`);
     res.writeHead(200, {
       'Content-Type': 'video/mp4'
     });
     readStream.pipe(res);
+  }
+  else {
+    res.writeHead(404, {});
+    res.end();
   }
 };
 

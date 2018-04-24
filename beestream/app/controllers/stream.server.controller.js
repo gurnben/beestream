@@ -89,7 +89,7 @@ module.exports = function(io, socket) {
 
       //Build the path of the requested video
       var requestPath = `${config.videoPath}/${message.hive}/${today}/video/`;
-      if ((message.hive != null) && fs.existsSync(config.videoPath)) {
+      if ((message.hive != null) && fs.existsSync(requestPath)) {
         var videos = fs.readdirSync(requestPath)
                        .filter(file => fs.statSync(join(requestPath, file))
                        .isFile());
@@ -98,11 +98,15 @@ module.exports = function(io, socket) {
           requestPath += time;
         }
         else {
-          console.log(`[ERROR]: a hive: ${message.hive} was requested for ` +
+          console.log(`error: a hive: ${message.hive} was requested for ` +
                       'streaming that doesn\'t have videos for today.');
-          socket.emit('error', {message: `No videos for today on ${message.hive}`});
+          socket.emit('novideo', {message: `No videos for today from ${message.hive}`});
           return;
         }
+      }
+      else {
+    	  socket.emit('novideo', {message: `No videos for today from ${message.hive}.  Videos usually start at 8AM so check back then!`});
+    	  return;
       }
 
       //If we've made it here, we have a video to convert and serve!
@@ -121,22 +125,30 @@ module.exports = function(io, socket) {
 
       //If it hasn't been converted, convert and serve.
       else {
-        const convert = spawn('/usr/local/apache2/htdocs/cs/bee/ffmpeg-3.4.2/ffmpeg', ['-i', `${requestPath}`, '-c',
-                                         'copy', `./video/${message.hive}@${today}@${time.slice(0, -5)}.mp4`]);
+        const convert = spawn('ffmpeg', ['-i', `${requestPath}`, '-c',
+                                         'copy', `./videotmp/${message.hive}@${today}@${time.slice(0, -5)}.mp4`]);
         convert.on('close', (code) => {
-          socket.emit('streamReady', {
-            url: `/video/${message.hive}@${today}@${time.slice(0, -5)}`
+          if (code != 0) {
+            socket.emit('novideo', 'Something went wrong when serving the video.  Wait for a second or refresh the page!');
+          }
+          const mv = spawn('mv', [`./videotmp/${message.hive}@${today}@${time.slice(0, -5)}.mp4`,
+                                  `./video/${message.hive}@${today}@${time.slice(0, -5)}.mp4`]);
+          mv.on('close', (code) => {
+            if (code != 0) {
+              socket.emit('novideo', 'Something went wrong when serving the video.  Wait for a second or refresh the page!');
+            }
+            else {
+              socket.emit('streamReady', {
+                url: `/video/${message.hive}@${today}@${time.slice(0, -5)}`
+              });
+            }
           });
         });
       }
 
       //Delete the old file if there was one.
       if ((message.previous != null) && (message.previous != url)) {
-        fs.unlink(`\.${message.previous}.mp4`, (err) => {
-          if (err) {
-            console.log(`Unable to delete ${message.previous}.`)
-          }
-        })
+        fs.unlink(`\.${message.previous}.mp4`, (err) => {});
       }
     }
     else {
@@ -154,9 +166,6 @@ module.exports = function(io, socket) {
     //Delete the old file if there was one.
     if (message.previous != null) {
       fs.unlink(`\.${message.previous}.mp4`, (err) => {
-        if (err) {
-          console.log(`Unable to delete ${message.previous}.`)
-        }
       });
     }
   });

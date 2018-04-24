@@ -23,6 +23,7 @@ export class ArchiveComponent implements OnDestroy{
 
   videoLoading: boolean;
   videoUrl: any;
+  error: string;
 
   /*Constructor for ArchiveComponent
   *
@@ -46,6 +47,7 @@ export class ArchiveComponent implements OnDestroy{
     this.hiveSelect = null;
     this.dateSelect = null;
     this.timeSelect = null;
+    this.error = null;
 
     this._videoService.on('hiveList', (hvlst) => {
       // this.hiveSelect = null;
@@ -69,6 +71,9 @@ export class ArchiveComponent implements OnDestroy{
     this._videoService.on('videoReady', (vidURL) => {
       this.videoLoading = false;
       this.videoUrl = vidURL.url;
+    });
+    this._videoService.on('novideo', (data) => {
+      this.error = data.message;
     })
     this._videoService.emit('getHive', {})
   }

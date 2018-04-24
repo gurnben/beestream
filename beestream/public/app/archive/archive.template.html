@@ -1,5 +1,6 @@
 <div>
   <h1>The Archive</h1>
+  <p *ngIf="error != null">Uh oh, we ran into an issue!  {{error}}</p>
   <form #hiveForm="ngForm">
     <select name="hiveSelect" [(ngModel)]="hiveSelect" (ngModelChange)="respondHive()">
       <option [ngValue]="null">Choose a Hive</option>
@@ -16,10 +17,10 @@
     <button (click)="onSubmit()">View</button>
   </form>
 </div>
-<div *ngIf="videoLoading">
+<div *ngIf="videoLoading && error == null">
   <p>Video Loading</p>
 </div>
-<div *ngIf="videoUrl != null">
+<div *ngIf="videoUrl != null && error == null">
   <video [src] = "videoUrl" controls autoplay>
     Your browser doesn't support HTML5 video.
   </video>

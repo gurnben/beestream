@@ -1,10 +1,10 @@
 const webpack = require('webpack');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const path = require('path');
 
 module.exports = {
 	entry: {
     polyfills: './public/polyfills.ts',
-    vendor: './public/vendor.ts',
     bootstrap: './public/bootstrap.ts'
 	},
   resolve: {
@@ -37,6 +37,10 @@ module.exports = {
 			}
 		]
 	},
-	plugins: [],
-  mode: 'development'
+	optimization: {
+		splitChunks: {}
+	},
+	plugins: [
+		new UglifyJsPlugin()
+	]
 };

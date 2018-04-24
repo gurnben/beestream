@@ -16,6 +16,7 @@ export class StreamComponent {
   streamHiveSelect: string;
   videoLoading: boolean;
   hives: Array<any>;
+  error: string;
 
   /*Constructor for ArchiveComponent
   *
@@ -32,6 +33,7 @@ export class StreamComponent {
     this.hives = new Array();
     this.videoLoading = false;
     this.streamHiveSelect = null;
+    this.error = null;
 
     this._videoService.on('streamHiveList', (hvlst) => {
       this.hives = hvlst.hiveNames;
@@ -42,6 +44,10 @@ export class StreamComponent {
     this._videoService.on('streamReady', (data) => {
       this.videoLoading = false;
       this.videoUrl = data.url;
+      this.error = null;
+    });
+    this._videoService.on('novideo', (data) => {
+      this.error = data.message;
     });
     this._videoService.emit('getStreamHive', {});
   }

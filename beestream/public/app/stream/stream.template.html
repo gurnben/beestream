@@ -1,5 +1,6 @@
 <div>
   <h1>Stream</h1>
+  <p *ngIf="error != null">Uh oh, we ran into an issue!  {{error}}</p>
   <form>
     <select name="streamHiveSelect" [(ngModel)]="streamHiveSelect">
       <option [ngValue]="null">Choose a Hive</option>
@@ -8,10 +9,11 @@
     <button (click)="onSubmit()">View</button>
   </form>
 </div>
-<div *ngIf="videoLoading">
+<div *ngIf="videoLoading && error == null">
   <p>Video Loading</p>
 </div>
-<div *ngIf="videoUrl != null">
+<div *ngIf="videoUrl != null && error == null">
+  <h2>Video from {{videoUrl.substr(videoUrl.length - 8).replace('-', ':').replace('-', ':')}}</h2>
   <video #VideoStream (canplay)="onSubmit()" (ended)="onSubmit()" [src] = "videoUrl" controls autoplay loop>
     Your browser doesn't support HTML5 video.
   </video>

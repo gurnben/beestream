@@ -1,4 +1,6 @@
+const fs = require('fs');
 const config = require('./config');
+const https = require('https');
 const http = require('http');
 const socketio = require('socket.io');
 const express = require('express');
@@ -12,9 +14,15 @@ const path = require('path');
 const configureSocket = require('./socketio.js');
 
 module.exports = function(db) {
+  /* Read our ssl keys and cert */
+  // var privateKey = fs.readFileSync('/etc/letsencrypt/live/cs.appstate.edu-0002/privkey.pem', 'utf8');
+  // var certificate = fs.readFileSync('/etc/letsencrypt/live/cs.appstate.edu-0002/cert.pem', 'utf8');
+  // var credentials = {key: privateKey, cert: certificate};
+
   /* Create our express application, wrap it with http, and start socketio. */
   const app = express();
   const server = http.createServer(app);
+  // const server = https.createServer(credentials, app);
   const io = socketio.listen(server);
 
   /*Handle different NODE_ENV configurations. */

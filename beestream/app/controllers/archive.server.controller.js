@@ -69,7 +69,7 @@ module.exports = function(io, socket) {
       //Note: We're making sure we only respond with directories.
       fs.readdirSync(requestPath).filter(file => fs.statSync(join(requestPath, file)).isDirectory()).forEach(file => {
         if (config.avaliableHives.includes(message.text)) {
-          files.push(file);
+          files.unshift(file);
         }
       });
     }
@@ -89,7 +89,7 @@ module.exports = function(io, socket) {
         (fs.existsSync(requestPath))) {
       fs.readdirSync(requestPath).forEach(file => {
         if (config.avaliableHives.includes(message.hive)) {
-          files.push(file.slice(0, -5));
+          files.unshift(file.slice(0, -5));
         }
       });
     }
@@ -104,13 +104,9 @@ module.exports = function(io, socket) {
   */
   socket.on('closeSession', (message) => {
     if (message.video != null) {
-      fs.unlink(`\.${message.video}.mp4`, (err) => {
-        if (err) {
-          console.log(`Unable to delete ${message.video}`)
-        }
-      });
-    }
-  })
+      fs.unlink(`\.${message.video}.mp4`, (err) => {});
+    };
+  });
 
   /*videoRequestRecieved: The request for a video has been recieved and is being
   *                       processed.
@@ -138,10 +134,22 @@ module.exports = function(io, socket) {
       //Otherwise you have to convert the file and serve.
       else {
         const convert = spawn('ffmpeg', ['-i', `${requestPath}`, '-c', 'copy',
-                              `./video/${message.hive}@${message.date}@${message.time}.mp4`]);
+                              `./videotmp/${message.hive}@${message.date}@${message.time}.mp4`]);
         convert.on('close', (code) => {
-          socket.emit('videoReady', {
-            url: `/video/${message.hive}@${message.date}@${message.time}`
+          if (code != 0) {
+            socket.emit('novideo', 'Something went wrong when serving the video.  Wait for a second or refresh the page!');
+          }
+          const mv = spawn('mv', [`./videotmp/${message.hive}@${message.date}@${message.time}.mp4`,
+                                  `./video/${message.hive}@${message.date}@${message.time}.mp4`]);
+          mv.on('close', (code) => {
+            if (code != 0) {
+              socket.emit('novideo', 'Something went wrong when serving the video.  Wait for a second or refresh the page!');
+            }
+            else {
+              socket.emit('videoReady', {
+                url: `./video/${message.hive}@${message.date}@${message.time}`
+              });
+            }
           });
         });
         /**************For debugging purposes***********/
@@ -155,11 +163,7 @@ module.exports = function(io, socket) {
       }
       //Delete the old file if there was one.
       if (message.previous != null) {
-        fs.unlink(`\.${message.previous}.mp4`, (err) => {
-          if (err) {
-            console.log(`Unable to delete ${message.previous}`)
-          }
-        });
+        fs.unlink(`\.${message.previous}.mp4`, (err) => {});
       }
     }
   });
