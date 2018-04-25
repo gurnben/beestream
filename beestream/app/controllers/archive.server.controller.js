@@ -104,7 +104,11 @@ module.exports = function(io, socket) {
   */
   socket.on('closeSession', (message) => {
     if (message.video != null) {
-      fs.unlink(`\.${message.video}.mp4`, (err) => {});
+      fs.unlink(`\.${message.video}.mp4`, (err) => {
+      	if (err) {
+	  console.log(`Unable to delete file ${message.video}.mp4 in archive closeSession.`);
+	}
+      });
     };
   });
 
@@ -147,7 +151,7 @@ module.exports = function(io, socket) {
             }
             else {
               socket.emit('videoReady', {
-                url: `./video/${message.hive}@${message.date}@${message.time}`
+                url: `/video/${message.hive}@${message.date}@${message.time}`
               });
             }
           });
@@ -163,7 +167,11 @@ module.exports = function(io, socket) {
       }
       //Delete the old file if there was one.
       if (message.previous != null) {
-        fs.unlink(`\.${message.previous}.mp4`, (err) => {});
+        fs.unlink(`\.${message.previous}.mp4`, (err) => {
+	    if (err) {
+		console.log(`Unable to delete file ${message.previous}.mp4 in archive getVideo.`);
+	    }
+	});
       }
     }
   });

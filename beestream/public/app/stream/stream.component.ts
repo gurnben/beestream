@@ -1,4 +1,6 @@
+import { Inject } from '@angular/core';
 import { Component, HostListener, OnDestroy } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { NgForm } from '@angular/forms';
 import { VideoService } from '../video/video.service';
 
@@ -22,7 +24,7 @@ export class StreamComponent {
   *
   * Gets the videoService and puts it in the _videoService attribute
   */
-  constructor(private _videoService: VideoService) {}
+  constructor(private _videoService: VideoService, @Inject(DOCUMENT) private document: any) {}
 
   /*This overrides the ngOnInit function to add additional functionality.
   *
@@ -45,6 +47,20 @@ export class StreamComponent {
       this.videoLoading = false;
       this.videoUrl = data.url;
       this.error = null;
+      /*If the video is not at least 60 seconds we got a partial video and
+      * need to request that it be reconverted and served.  This corrects for
+      * a video that is still being uploaded.
+      */
+      var videoElements = document.getElementsByClassName('video');
+      if (videoElements.length > 0) {
+        var videoDuration = (<HTMLVideoElement>videoElements[0]).duration;
+        if (videoDuration < 60) {
+          //Emit closeSession to tell the server to delete our session's video
+          this._videoService.emit('closeSession', {video: this.videoUrl});
+          //Call onSubmit to re-request the video.
+          this.onSubmit();
+        }
+      }
     });
     this._videoService.on('novideo', (data) => {
       this.error = data.message;

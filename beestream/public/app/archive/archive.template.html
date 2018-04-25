@@ -2,26 +2,28 @@
   <h1>The Archive</h1>
   <p *ngIf="error != null">Uh oh, we ran into an issue!  {{error}}</p>
   <form #hiveForm="ngForm">
-    <select name="hiveSelect" [(ngModel)]="hiveSelect" (ngModelChange)="respondHive()">
-      <option [ngValue]="null">Choose a Hive</option>
-      <option *ngFor="let hive of hives" [ngValue]="hive">{{hive}}</option>
-    </select>
-    <select [disabled]="hiveSelect == null" name="dateSelect" [(ngModel)]="dateSelect" (ngModelChange)="respondDate()">
-      <option [ngValue]="null">Choose a Date</option>
-      <option *ngFor="let date of dates" [ngValue]="date">{{date}}</option>
-    </select>
-    <select [disabled]="dateSelect == null" name="timeSelect" [(ngModel)]="timeSelect">
-      <option [ngValue]="null">Choose a Time</option>
-      <option *ngFor="let time of times" [ngValue]="time">{{time}}</option>
-    </select>
-    <button (click)="onSubmit()">View</button>
+    <div class="dropdown-div">
+      <select class="dropdown" name="hiveSelect" [(ngModel)]="hiveSelect" (ngModelChange)="respondHive()">
+        <option [ngValue]="null">Choose a Hive</option>
+        <option *ngFor="let hive of hives" [ngValue]="hive">{{hive}}</option>
+      </select>
+      <select class="dropdown" [disabled]="hiveSelect == null" name="dateSelect" [(ngModel)]="dateSelect" (ngModelChange)="respondDate()">
+        <option [ngValue]="null">Choose a Date</option>
+        <option *ngFor="let date of dates" [ngValue]="date">{{date}}</option>
+      </select>
+      <select class="dropdown" [disabled]="dateSelect == null" name="timeSelect" [(ngModel)]="timeSelect">
+        <option [ngValue]="null">Choose a Time</option>
+        <option *ngFor="let time of times" [ngValue]="time">{{time}}</option>
+      </select>
+    </div>
+    <button class="main-button" (click)="onSubmit()">View</button>
   </form>
 </div>
 <div *ngIf="videoLoading && error == null">
   <p>Video Loading</p>
 </div>
 <div *ngIf="videoUrl != null && error == null">
-  <video [src] = "videoUrl" controls autoplay>
+  <video class="video"  id="video" [src] = "videoUrl" controls autoplay>
     Your browser doesn't support HTML5 video.
   </video>
 </div>

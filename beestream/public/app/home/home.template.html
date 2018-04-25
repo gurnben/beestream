@@ -1,40 +1,43 @@
-<br/>
-<div name="Under Construction" style="background-color:#ff9882; border-radius:25px;">
-  <br/>
-  <h2 style="text-align: center;">Site Under Construction.</h2>
-  <p style="text-align: center;">
-    Sorry for the mess!  Everything should work, but we're not done designing
-    everything yet!  Look for changes over the next few weeks!
-  </p>
-  <br/>
-</div>
-<div>
-  <h1>What is Beemon?</h1>
-  <p>
-    The Beemon project began in 2012 to work to idenify the causes and signs of
-    colony collapse disorder. Beemon, an abbreviation for Bee Monitoring,
-    started with the goal of being a low-cost way to record video at the
-    entrance of a honeybee hive. The project now includes video, audio, and
-    temperature/humidity recordings at a honeybee hive all in a low-cost system.
-    The project has also grown to include a number of analytics utilities that
-    allow us to automatically count bee arrivals/departures at the honeybee hive,
-    identify individual bees for analysis, and recognize oddities in audio files.
-    With this information we hope to predict and eventually diagnose colony
-    collapse disorder.
-  </p>
-</div>
-<div>
-  <h1 [routerLink]="['/stream']">Streaming</h1>
-  <p>
-    The Streaming system will allow you to view the newest video from one of our
-    hives all day long. Our data is avaliable to you!
-  </p>
-</div>
-<div>
-  <h1 [routerLink]="['/archive']">Archive</h1>
-  <p>
-    The Archive is here to provide you access to our backlog of 3+ years of data.
-    This data is organized by hive, date, and time.  We encourage you to follow
-    a hive throughout its life!
-  </p>
+<div id="body">
+  <div class="construction" name="Under Construction" style="background-color:#ff9882; border-radius:25px;">
+    <br/>
+    <h2 style="text-align: center;">Site Under Construction.</h2>
+    <p style="text-align: center;">
+      Sorry for the mess!  Everything should work, but we're not done designing
+      everything yet!  Look for changes over the next few weeks!
+    </p>
+    <br/>
+  </div>
+  <div>
+    <h1>What is Beemon?</h1>
+    <p>
+      The Beemon project began in 2012 to work to idenify the causes and signs of
+      colony collapse disorder. Beemon, an abbreviation for Bee Monitoring,
+      started with the goal of being a low-cost way to record video at the
+      entrance of a honeybee hive. The project now includes video, audio, and
+      temperature/humidity recordings at a honeybee hive all in a low-cost system.
+      The project has also grown to include a number of analytics utilities that
+      allow us to automatically count bee arrivals/departures at the honeybee hive,
+      identify individual bees for analysis, and recognize oddities in audio files.
+      With this information we hope to predict and eventually diagnose colony
+      collapse disorder.
+    </p>
+  </div>
+  <div class="streaming-block">
+    <h2>Streaming</h2>
+    <p class="block-text">
+      The Streaming system will allow you to view the newest video from one of our
+      hives all day long. Our data is avaliable to you!
+    </p>
+    <button class="main-button" [routerLink]="['/stream']">Check it out</button>
+  </div>
+  <div class="archive-block">
+    <h2>Archive</h2>
+    <p class="block-text">
+      The Archive is here to provide you access to our backlog of 3+ years of data.
+      This data is organized by hive, date, and time.  We encourage you to follow
+      a hive throughout its life!
+    </p>
+    <button class="main-button" [routerLink]="['/archive']">Check it out</button>
+  </div>
 </div>

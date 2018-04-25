@@ -148,7 +148,11 @@ module.exports = function(io, socket) {
 
       //Delete the old file if there was one.
       if ((message.previous != null) && (message.previous != url)) {
-        fs.unlink(`\.${message.previous}.mp4`, (err) => {});
+        fs.unlink(`\.${message.previous}.mp4`, (err) => {
+      	  if (err) {
+	    console.log(`Unable to delete file .${message.previous}.mp4 in streaming getStreamVideo.`);
+	  }
+	});
       }
     }
     else {
@@ -164,8 +168,11 @@ module.exports = function(io, socket) {
   */
   socket.on('closeSession', (message) => {
     //Delete the old file if there was one.
-    if (message.previous != null) {
-      fs.unlink(`\.${message.previous}.mp4`, (err) => {
+    if (message.video != null) {
+      fs.unlink(`\.${message.video}.mp4`, (err) => {
+      	if (err) {
+	  //console.log(`Unable to delete file .${message.video}.mp4 in streaming closeSession.`);
+	}
       });
     }
   });
