@@ -10,7 +10,7 @@ import { VideoService } from '../video/video.service';
 */
 @Component({
   selector: 'stream',
-  templateUrl: './app/stream/stream.template.html',
+  templateUrl: '/app/stream/stream.template.html',
   providers: [ VideoService ]
 })
 export class StreamComponent {
@@ -19,6 +19,7 @@ export class StreamComponent {
   videoLoading: boolean;
   hives: Array<any>;
   error: string;
+  correctLength: boolean;
 
   /*Constructor for ArchiveComponent
   *
@@ -36,6 +37,7 @@ export class StreamComponent {
     this.videoLoading = false;
     this.streamHiveSelect = null;
     this.error = null;
+    this.correctLength = false;
 
     this._videoService.on('streamHiveList', (hvlst) => {
       this.hives = hvlst.hiveNames;
@@ -44,7 +46,7 @@ export class StreamComponent {
       this.videoLoading = true;
     });
     this._videoService.on('streamReady', (data) => {
-      this.videoLoading = false;
+      this.correctLength = false;
       this.videoUrl = data.url;
       this.error = null;
       /*If the video is not at least 60 seconds we got a partial video and
@@ -58,8 +60,19 @@ export class StreamComponent {
           //Emit closeSession to tell the server to delete our session's video
           this._videoService.emit('closeSession', {video: this.videoUrl});
           //Call onSubmit to re-request the video.
+          this.videoUrl = null;
+          this.videoLoading = true;
+          this.correctLength = false;
           this.onSubmit();
         }
+        else {
+          this.videoLoading = false;
+          this.correctLength = true
+        }
+      }
+      else {
+        this.videoLoading = false;
+        this.correctLength = true;
       }
     });
     this._videoService.on('novideo', (data) => {

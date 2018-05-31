@@ -10,7 +10,7 @@ import { VideoService } from '../video/video.service';
 */
 @Component({
   selector: 'archive',
-  templateUrl: './app/archive/archive.template.html',
+  templateUrl: '/app/archive/archive.template.html',
   providers: [VideoService]
 })
 export class ArchiveComponent implements OnDestroy{
@@ -23,9 +23,15 @@ export class ArchiveComponent implements OnDestroy{
   dates: Array<any>;
   times: Array<any>;
 
+  /* Parameters to display about the CURRENT video.*/
+  hive: string;
+  date: string;
+  time: string;
+
   videoLoading: boolean;
   videoUrl: any;
   error: string;
+  correctLength: boolean;
 
   /*Constructor for ArchiveComponent
   *
@@ -45,6 +51,7 @@ export class ArchiveComponent implements OnDestroy{
     this.dates = new Array();
     this.times = new Array();
     this.videoLoading = false;
+    this.correctLength = false;
     this.videoUrl = null;
     this.hiveSelect = null;
     this.dateSelect = null;
@@ -64,9 +71,10 @@ export class ArchiveComponent implements OnDestroy{
       this.videoLoading = true;
     });
     this._videoService.on('videoReady', (vidURL) => {
-      this.videoLoading = false;
       this.videoUrl = vidURL.url;
-
+      this.error = null;
+      //process the date to display
+      [this.hive, this.date, this.time] = this.getVideoInfo(this.videoUrl);
       /*If the video is not at least 60 seconds we got a partial video and
       * need to request that it be reconverted and served.  This corrects for
       * a video that is still being uploaded.
@@ -78,14 +86,34 @@ export class ArchiveComponent implements OnDestroy{
           //Emit closeSession to tell the server to delete our session's video
           this._videoService.emit('closeSession', {video: this.videoUrl});
           //Call onSubmit to re-request the video.
+          this.videoUrl = null;
+          this.videoLoading = true;
+          this.correctLength = false;
           this.onSubmit();
         }
       }
+      this.videoLoading = false;
+      this.correctLength = true;
     });
     this._videoService.on('novideo', (data) => {
       this.error = data.message;
     })
     this._videoService.emit('getHive', {})
+  }
+
+  /*This function handles the formatting of the video's hive, date, and time
+  * into a human readable format to be displayed.
+  */
+  getVideoInfo(videoMetaData: string) {
+    var newVideo = videoMetaData.split('/')[2];
+    var hive, date, time;
+    [hive, date, time] = newVideo.split('@');
+    time = time.replace(/-/g, ':');
+    var displayTime = +time.substr(0, 2) > 12 ?
+      `${+time.substr(0, 2) - 12}${time.substr(2, 7)}PM` :
+      `${time}AM`;
+    date = `${date.substr(5, 2)}/${date.substr(8, 2)}/${date.substr(0, 4)}`;
+    return [hive, date, displayTime];
   }
 
   /*This function sends the hive choice as a socket.io getDate message.

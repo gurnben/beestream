@@ -1,29 +1,39 @@
 <div>
-  <h1>The Archive</h1>
-  <p *ngIf="error != null">Uh oh, we ran into an issue!  {{error}}</p>
-  <form #hiveForm="ngForm">
-    <div class="dropdown-div">
-      <select class="dropdown" name="hiveSelect" [(ngModel)]="hiveSelect" (ngModelChange)="respondHive()">
-        <option [ngValue]="null">Choose a Hive</option>
-        <option *ngFor="let hive of hives" [ngValue]="hive">{{hive}}</option>
-      </select>
-      <select class="dropdown" [disabled]="hiveSelect == null" name="dateSelect" [(ngModel)]="dateSelect" (ngModelChange)="respondDate()">
-        <option [ngValue]="null">Choose a Date</option>
-        <option *ngFor="let date of dates" [ngValue]="date">{{date}}</option>
-      </select>
-      <select class="dropdown" [disabled]="dateSelect == null" name="timeSelect" [(ngModel)]="timeSelect">
-        <option [ngValue]="null">Choose a Time</option>
-        <option *ngFor="let time of times" [ngValue]="time">{{time}}</option>
-      </select>
-    </div>
-    <button class="main-button" (click)="onSubmit()">View</button>
-  </form>
+  <div>
+    <h1>The Archive</h1>
+    <p *ngIf="error != null">Uh oh, we ran into an issue!  {{error}}</p>
+    <form #hiveForm="ngForm">
+      <div class="dropdown-div">
+        <select class="dropdown" name="hiveSelect" [(ngModel)]="hiveSelect" (ngModelChange)="respondHive()">
+          <option [ngValue]="null">Choose a Hive</option>
+          <option *ngFor="let hive of hives" [ngValue]="hive">{{hive}}</option>
+        </select>
+        <select class="dropdown" [disabled]="hiveSelect == null" name="dateSelect" [(ngModel)]="dateSelect" (ngModelChange)="respondDate()">
+          <option [ngValue]="null">Choose a Date</option>
+          <option *ngFor="let date of dates" [ngValue]="date">{{date}}</option>
+        </select>
+        <select class="dropdown" [disabled]="dateSelect == null" name="timeSelect" [(ngModel)]="timeSelect">
+          <option [ngValue]="null">Choose a Time</option>
+          <option *ngFor="let time of times" [ngValue]="time">{{time}}</option>
+        </select>
+      </div>
+      <button class="main-button" (click)="onSubmit()">View</button>
+    </form>
+  </div>
 </div>
-<div *ngIf="videoLoading && error == null">
-  <p>Video Loading</p>
+<div class="video-title-div" *ngIf="videoUrl != null && error == null && correctLength == true && hive != null && date != null && time != null">
+  <h2>Video from {{hive}} on {{date}} at {{time}}.</h2>
 </div>
-<div *ngIf="videoUrl != null && error == null">
-  <video class="video"  id="video" [src] = "videoUrl" controls autoplay>
-    Your browser doesn't support HTML5 video.
-  </video>
+<div class="video-div">
+  <div *ngIf="videoLoading && error == null">
+    <p>Video Loading</p>
+  </div>
+  <div *ngIf="videoUrl != null && error == null && correctLength == true">
+    <video id="video" [src] = "videoUrl" controls autoplay>
+      Your browser doesn't support HTML5 video.
+    </video>
+  </div>
 </div>
+<comments *ngIf="videoUrl != null && error == null && correctLength == true"
+  [video]="videoUrl">
+</comments>
