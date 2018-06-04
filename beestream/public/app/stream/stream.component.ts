@@ -21,6 +21,11 @@ export class StreamComponent {
   error: string;
   correctLength: boolean;
 
+  /* Parameters to display about the CURRENT video.*/
+  hive: string;
+  date: string;
+  time: string;
+
   /*Constructor for ArchiveComponent
   *
   * Gets the videoService and puts it in the _videoService attribute
@@ -49,6 +54,8 @@ export class StreamComponent {
       this.correctLength = false;
       this.videoUrl = data.url;
       this.error = null;
+      //process the date to display
+      [this.hive, this.date, this.time] = this.getVideoInfo(this.videoUrl);
       /*If the video is not at least 60 seconds we got a partial video and
       * need to request that it be reconverted and served.  This corrects for
       * a video that is still being uploaded.
@@ -93,6 +100,21 @@ export class StreamComponent {
       };
       this._videoService.emit('getStreamVideo', message);
     }
+  }
+
+  /*This function handles the formatting of the video's hive, date, and time
+  * into a human readable format to be displayed.
+  */
+  getVideoInfo(videoMetaData: string) {
+    var newVideo = videoMetaData.split('/')[2];
+    var hive, date, time;
+    [hive, date, time] = newVideo.split('@');
+    time = time.replace(/-/g, ':');
+    var displayTime = +time.substr(0, 2) > 12 ?
+      `${+time.substr(0, 2) - 12}${time.substr(2, 7)}PM` :
+      `${time}AM`;
+    date = `${date.substr(5, 2)}/${date.substr(8, 2)}/${date.substr(0, 4)}`;
+    return [hive, date, displayTime];
   }
 
   /*This function handles the user closing the window.  It sends the
