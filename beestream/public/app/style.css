@@ -25,13 +25,50 @@ p{
   padding-right: 8px;
   max-width: 1000px;
 }
+#help-heading{
+  box-shadow: none;
+  border: none;
+  border-radius: 5px;
+  background-color: white;
+  font-size: 20px;
+  margin-top: 10px;
+  color: #30a5ff;
+}
+#help-heading:hover{
+  box-shadow: none;
+  border: none;
+  border-radius: 5px;
+  background-color: white;
+  font-size: 20px;
+  margin-top: 10px;
+  color: black;
+  transition: .2s;
+}
+#help-icon{
+  vertical-align: text-bottom;
+}
+#help-content-heading{
+  font-size: 18px;
+  margin: 8px
+}
+#help-content{
+  text-align: center;
+  font-size:  18px;
+  line-height: 20px;
+  margin: 5px;
+}
 #comment-heading{
-
+  margin-bottom: 10px;
+  font-size: 18px;
 }
 #comment-content{
   text-align: center;
-  font-size:  20px;
-  line-height: 25px;
+  font-size:  18px;
+  line-height: 20px;
+  margin: 5px;
+}
+#example-title{
+  margin: 5px;
 }
 .header{
   margin-bottom: 35px;
@@ -142,6 +179,12 @@ p{
   margin: auto;
   margin-top: 5px;
   text-align: center;
+}
+.comment-form-item{
+  padding-bottom: 15px;
+}
+.example-comment{
+
 }
 .video-and-comments{
   text-align: center;
