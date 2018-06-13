@@ -1,0 +1,45 @@
+<div class="comment-div">
+  <div class="comment-form-div">
+    <form #commentForm="ngForm" (ngSubmit)="submitComment(commentForm, hive, date, time)">
+      <mat-form-field class="comment-form-item" appearance="outline">
+        <mat-label>Username</mat-label>
+        <input matInput placeholder="username" name="username" [maxlength]="maxUserLength" ngModel required #username>
+        <mat-hint>{{username.value.length}}/{{maxUserLength}}<br>Use the same username each time.</mat-hint>
+      </mat-form-field>
+      <mat-form-field class="comment-form-item" appearance="outline">
+        <mat-label>Comment</mat-label>
+        <textarea matInput placeholder="comment" name="comment" [maxlength]="maxCommentLength" ngModel required #comment></textarea>
+        <mat-hint>{{comment.value.length}}/{{maxCommentLength}}</mat-hint>
+      </mat-form-field>
+      <button mat-icon-button type=submit>
+        <mat-icon aria-label="Comment">send</mat-icon>
+      </button>
+    </form>
+  </div>
+  <div class="comment-list-div">
+    <div class="example-comment">
+      <button (click)="showHelp = showHelp ? false : true" id="help-heading">
+        <span>What should I look for</span><mat-icon id="help-icon" aria-label="Help">help_outline</mat-icon>
+      </button>
+      <div *ngIf="showHelp">
+        <h4 id="help-content-heading">We usually look for all of the follwing:</h4>
+        <p id="help-content">Pollen on bees' legs</p>
+        <p id="help-content">Drones (larger than worker bees)</p>
+        <p id="help-content">Queen (longer than worker bees)</p>
+        <p id="help-content">Traffic</p>
+        <p id="help-content">Other Insects</p>
+        <p id="help-content">Unusual Behavior</p>
+        <p id="help-content">Fanning (bees grouped outside beating their wings)</p>
+      </div>
+    </div>
+    <div *ngFor="let comment of comments|slice:0:loadedComments let i=index">
+      <div>
+        <h4 id="comment-heading">Date: {{formatDate(comment.created)}} by {{comment.username}}</h4>
+        <p id="comment-content">{{comment.comment}}</p>
+      </div>
+    </div>
+    <button mat-icon-button *ngIf="moreComments() > 0" (click)="showMoreComments()">
+      <mat-icon>expand_more</mat-icon>
+    </button>
+  </div>
+</div>

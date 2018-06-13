@@ -20,6 +20,7 @@ export class StreamComponent {
   hives: Array<any>;
   error: string;
   correctLength: boolean;
+  videoElement: any;
 
   /* Parameters to display about the CURRENT video.*/
   hive: string;
@@ -43,7 +44,6 @@ export class StreamComponent {
     this.streamHiveSelect = null;
     this.error = null;
     this.correctLength = false;
-
     this._videoService.on('streamHiveList', (hvlst) => {
       this.hives = hvlst.hiveNames;
     });
@@ -51,51 +51,85 @@ export class StreamComponent {
       this.videoLoading = true;
     });
     this._videoService.on('streamReady', (data) => {
-      this.correctLength = false;
+      if (this.videoUrl == data.url) {
+        this.videoLoading = false;
+      }
       this.videoUrl = data.url;
       this.error = null;
-      //process the date to display
       [this.hive, this.date, this.time] = this.getVideoInfo(this.videoUrl);
-      /*If the video is not at least 60 seconds we got a partial video and
-      * need to request that it be reconverted and served.  This corrects for
-      * a video that is still being uploaded.
-      */
-      var videoElements = document.getElementsByClassName('video');
-      if (videoElements.length > 0) {
-        var videoDuration = (<HTMLVideoElement>videoElements[0]).duration;
-        if (videoDuration < 60) {
-          //Emit closeSession to tell the server to delete our session's video
-          this._videoService.emit('closeSession', {video: this.videoUrl});
-          //Call onSubmit to re-request the video.
-          this.videoUrl = null;
-          this.videoLoading = true;
-          this.correctLength = false;
-          this.onSubmit();
-        }
-        else {
-          this.videoLoading = false;
-          this.correctLength = true
-        }
-      }
-      else {
-        this.videoLoading = false;
-        this.correctLength = true;
-      }
     });
     this._videoService.on('novideo', (data) => {
+      console.log(data.message);
       this.error = data.message;
     });
     this._videoService.emit('getStreamHive', {});
+  }
+
+  /*checkDuration(video, hive)
+  * This method verifies that the video is longer than 50 seconds.  If we have
+  * a complete video it should last longer than 50 seconds, if it does not, we
+  * request a new video on a delay.
+  */
+  checkDuration(video, hive) {
+    if (video.duration < 50) {
+      //Emit closeSession to tell the server to delete our session's video
+      this._videoService.emit('closeSession', {video: this.videoUrl});
+      //Call onSubmit to re-request the video on a delay.
+      this.videoLoading = true;
+      this.correctLength = false;
+      setTimeout(StreamComponent.resubmit.bind(null,
+                                    hive,
+                                    this.videoUrl,
+                                    this._videoService), 10000);
+      this.videoUrl = null;
+    }
+    else {
+      this.videoLoading = false;
+      this.correctLength = true
+    }
+  }
+
+  /*resubmit(hive, videoUrl, service)
+  * This function sends the hive choice as a 'getStreamVideo' message from a
+  * context.  It will use service to send a message containing hive and videoUrl
+  * This is meant for use by checkDuration.
+  */
+  public static resubmit(hive, videoUrl, service) {
+    if (hive) {
+      service.emit('getStreamVideo', {
+        hive: hive,
+        previous: videoUrl
+      })
+    }
+  }
+
+  /*showTitle()
+  * This function takes the place of the condition for the video title div.
+  * This has been implemented to simplify our angluar template and comply with
+  * angular standards.
+  */
+  showTitle() {
+    return this.videoUrl && !this.error && this.correctLength &&
+            this.hive && this.date && this.time;
+  }
+
+  /*showVideo()
+  * this fucntion takes the place of the condition for the video div.
+  * This has been implemented to simplify our angular template and comply with
+  * angular standards.
+  */
+  showVideo() {
+    return this.videoUrl && !this.error && this.correctLength;
   }
 
   /* This function sends the hive choice as a 'getStreamVideo' message.
   *
   * The selection for the hives comes from the input box.
   */
-  onSubmit() {
-    if (this.streamHiveSelect != null) {
+  onSubmit(hive) {
+    if (hive != null) {
       var message = {
-        hive: this.streamHiveSelect,
+        hive: hive,
         previous: this.videoUrl
       };
       this._videoService.emit('getStreamVideo', message);

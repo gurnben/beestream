@@ -1,31 +1,46 @@
 <div>
   <h1>Stream</h1>
-  <p *ngIf="error != null">Uh oh, we ran into an issue!  {{error}}</p>
+  <p *ngIf="error">Uh oh, we ran into an issue!  {{error}}</p>
   <form>
     <div class="dropdown-div">
-      <select class="dropdown" name="streamHiveSelect" [(ngModel)]="streamHiveSelect">
+      <select class="dropdown"
+              name="streamHiveSelect"
+              [(ngModel)]="streamHiveSelect">
         <option [ngValue]="null">Choose a Hive</option>
         <option *ngFor="let hive of hives" [ngValue]="hive">{{hive}}</option>
       </select>
     </div>
-    <button class="main-button" (click)="onSubmit()">View</button>
+    <button class="main-button"
+            (click)="onSubmit(streamHiveSelect)">View</button>
   </form>
 </div>
-<div class="video-title-div" *ngIf="videoUrl != null && error == null && correctLength == true && hive != null && date != null && time != null">
+<div class="video-title-div"
+      *ngIf="showTitle()">
   <h2>Video from {{hive}} on {{date}} at {{time}}.</h2>
 </div>
-<div class="video-and-comments">
+<div *ngIf="videoLoading && !error">
+  <p>Video Loading</p>
+</div>
+<div class="video-and-comments"
+      *ngIf="showVideo()">
+  <analysis [video]="videoUrl">
+  </analysis>
   <div class="video-div">
-    <div *ngIf="videoLoading && error == null">
-      <p>Video Loading</p>
-    </div>
-    <div *ngIf="videoUrl != null && error == null && correctLength == true">
-      <video class="video" #VideoStream id="video" (canplay)="onSubmit()" (ended)="onSubmit()" [src] = "videoUrl" controls autoplay loop>
-        Your browser doesn't support HTML5 video.
-      </video>
-    </div>
+    <video
+      class="video"
+      id="streamVideo"
+      (canplay)="onSubmit(hive)"
+      (ended)="onSubmit(hive)"
+      [src] = "videoUrl"
+      controls autoplay loop>
+      Your browser doesn't support HTML5 video.
+    </video>
   </div>
-  <comments *ngIf="videoUrl != null && error == null && correctLength == true"
-    [video]="videoUrl">
+  <comments [video]="videoUrl">
   </comments>
 </div>
+<video *ngIf="videoUrl"
+       #VideoStream
+       [src]="videoUrl"
+       (loadedmetadata)="checkDuration(VideoStream, hive)"
+       hidden></video>

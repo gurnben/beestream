@@ -82,7 +82,7 @@ export class ArchiveComponent implements OnDestroy{
       var videoElements = document.getElementsByClassName('video');
       if (videoElements.length > 0) {
         var videoDuration = (<HTMLVideoElement>videoElements[0]).duration;
-        if (videoDuration < 60) {
+        if (videoDuration < 50) {
           //Emit closeSession to tell the server to delete our session's video
           this._videoService.emit('closeSession', {video: this.videoUrl});
           //Call onSubmit to re-request the video.
@@ -99,6 +99,45 @@ export class ArchiveComponent implements OnDestroy{
       this.error = data.message;
     })
     this._videoService.emit('getHive', {})
+  }
+
+  /*checkDuration(video, hive)
+  * This method verifies that the video is longer than 50 seconds.  If we have
+  * a complete video it should last longer than 50 seconds, if it does not, we
+  * request a new video on a delay.
+  */
+  checkDuration(video, hive, date, time) {
+    if (video.duration < 30) {
+      this.error = `This video only lasts ${Math.ceil(video.duration)} ` +
+                    `seconds, there's probably something wrong with it.  We ` +
+                    `apologize, please view another video and try again later!`;
+      //Emit closeSession to tell the server to delete our session's video
+      this._videoService.emit('closeSession', {video: this.videoUrl});
+      // this.videoUrl = null;
+    }
+    else {
+      this.videoLoading = false;
+      this.correctLength = true
+    }
+  }
+
+  /*showTitle()
+  * This function takes the place of the condition for the video title div.
+  * This has been implemented to simplify our angluar template and comply with
+  * angular standards.
+  */
+  showTitle() {
+    return this.videoUrl && !this.error && this.correctLength &&
+            this.hive && this.date && this.time;
+  }
+
+  /*showVideo()
+  * this fucntion takes the place of the condition for the video div.
+  * This has been implemented to simplify our angular template and comply with
+  * angular standards.
+  */
+  showVideo() {
+    return this.videoUrl && !this.error && this.correctLength;
   }
 
   /*This function handles the formatting of the video's hive, date, and time

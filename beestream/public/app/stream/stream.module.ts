@@ -6,12 +6,14 @@ import { StreamRoutes } from './stream.routes';
 import { StreamComponent } from './stream.component';
 import { VideoService } from '../video/video.service';
 import { CommentModule } from '../comment/comment.module';
+import { AnalysisModule } from '../analysis/analysis.module';
 
 @NgModule({
   imports: [
     FormsModule,
     CommonModule,
     CommentModule,
+    AnalysisModule,
     RouterModule.forChild(StreamRoutes)
   ],
   declarations: [

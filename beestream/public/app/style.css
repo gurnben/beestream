@@ -67,6 +67,18 @@ p{
   line-height: 20px;
   margin: 5px;
 }
+#analysis-heading{
+  text-align: right;
+  margin-bottom: 10px;
+  font-size: 24px;
+  margin: auto;
+}
+#analysis-content{
+  text-align: right;
+  font-size:  20px;
+  line-height: 22px;
+  margin: 5px;
+}
 #example-title{
   margin: 5px;
 }
@@ -167,7 +179,7 @@ p{
 }
 .comment-div{
   display:inline-block;
-  /* width: 35%; */
+  max-width: 420px;
   margin-left: 10px;
 }
 .comment-form-div{
@@ -188,4 +200,34 @@ p{
 }
 .video-and-comments{
   text-align: center;
+}
+.analysis-div{
+  display: inline-block;
+  margin: 10px;
+  vertical-align: top;
+  max-width: 127px;
+}
+.analysis-button{
+  float: right;
+  box-shadow: none;
+  border: none;
+  border-radius: 5px;
+  background-color: white;
+  font-size: 20px;
+  color: #30a5ff;
+}
+.analysis-button:hover{
+  float: right;
+  box-shadow: none;
+  border: none;
+  border-radius: 5px;
+  background-color: white;
+  font-size: 20px;
+  color: black;
+  transition: .2s;
+}
+.analysis-about{
+  text-align: right;
+  font-size: 15px;
+  line-height: 17px;
 }

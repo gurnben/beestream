@@ -125,8 +125,9 @@ module.exports = function(io, socket) {
 
       //If it hasn't been converted, convert and serve.
       else {
-        const convert = spawn('ffmpeg', ['-i', `${requestPath}`, '-c',
-                                         'copy', `./videotmp/${message.hive}@${today}@${time.slice(0, -5)}.mp4`]);
+        const convert = spawn('ffmpeg', ['-framerate', '30', '-i', `${requestPath}`,
+                                         '-c', 'copy',
+                                         `./videotmp/${message.hive}@${today}@${time.slice(0, -5)}.mp4`]);
         convert.on('close', (code) => {
           if (code != 0) {
             socket.emit('novideo', 'Something went wrong when serving the video.  Wait for a second or refresh the page!');

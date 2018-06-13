@@ -1,7 +1,9 @@
 const config = require('../../config/config.js');
 const fs = require('fs');
 const {spawn} = require('child_process');
+const {spawnSync} = require('child_process');
 const {join} = require('path');
+
 
 /*This file handles all socket.io configurations for the article service.
 * This includes creating the listeners and sending the appropriate emit
@@ -106,8 +108,8 @@ module.exports = function(io, socket) {
     if (message.video != null) {
       fs.unlink(`\.${message.video}.mp4`, (err) => {
       	if (err) {
-	  console.log(`Unable to delete file ${message.video}.mp4 in archive closeSession.`);
-	}
+      	  console.log(`Unable to delete file ${message.video}.mp4 in archive closeSession.`);
+      	}
       });
     };
   });
@@ -137,7 +139,8 @@ module.exports = function(io, socket) {
       }
       //Otherwise you have to convert the file and serve.
       else {
-        const convert = spawn('ffmpeg', ['-i', `${requestPath}`, '-c', 'copy',
+
+        const convert = spawn('ffmpeg', ['-framerate', '30', '-i', `${requestPath}`, '-c', 'copy',
                               `./videotmp/${message.hive}@${message.date}@${message.time}.mp4`]);
         convert.on('close', (code) => {
           if (code != 0) {
@@ -168,10 +171,10 @@ module.exports = function(io, socket) {
       //Delete the old file if there was one.
       if (message.previous != null) {
         fs.unlink(`\.${message.previous}.mp4`, (err) => {
-	    if (err) {
-		console.log(`Unable to delete file ${message.previous}.mp4 in archive getVideo.`);
-	    }
-	});
+         if (err) {
+            console.log(`Unable to delete file ${message.previous}.mp4 in archive getVideo.`);
+  	     }
+	     });
       }
     }
   });

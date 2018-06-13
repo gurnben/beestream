@@ -1,0 +1,20 @@
+<div class="analysis-div">
+  <div class="analysis-content" *ngIf="videoAnalysisLoading && !videoAnalysisComplete">
+    <p>Analysis Loading</p>
+  </div>
+  <div class="analysis-content" *ngIf="videoAnalysisComplete">
+    <h4 id="analysis-heading">Arrivals</h4>
+    <p id="analysis-content">{{arrivals}}<p>
+    <h4 id="analysis-heading">Departures</h4>
+    <p id="analysis-content">{{departures}}</p>
+    <button class="analysis-button" (click)="showAbout = showAbout ? false: true">
+      <mat-icon id="help-icon" aria-label="Help">help_outline</mat-icon>
+    </button>
+    <br/>
+    <p *ngIf="showAbout" class="analysis-about">
+      Arrivals and departures are found using our video analysis software
+      called BeeVee, which uses image processing to identify bees and count
+      them as they enter and exit the hive.
+    </p>
+  </div>
+</div>

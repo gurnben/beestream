@@ -26,19 +26,9 @@ module.exports = {
 			},
 			{
 				test: /\.html$/,
-				include: [
-					path.resolve(__dirname, "public/app/archive/archive.template.html"),
-					path.resolve(__dirname, "public/app/home/home.template.html"),
-					path.resolve(__dirname, "public/app/stream/stream.template.html"),
-					path.resolve(__dirname, "public/app/header/header.template.html"),
-					path.resolve(__dirname, "public/app/footer/footer.template.html")
-				],
 				use: [ 'html-loader' ]
 			}
 		]
-	},
-	optimization: {
-		splitChunks: {}
 	},
 	plugins: [
 		new UglifyJsPlugin()
