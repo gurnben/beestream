@@ -3,6 +3,7 @@ const fs = require('fs');
 const {spawn} = require('child_process');
 const {spawnSync} = require('child_process');
 const {join} = require('path');
+const ffmpegPath = config.ffmpegPath;
 
 
 /*This file handles all socket.io configurations for the article service.
@@ -140,7 +141,7 @@ module.exports = function(io, socket) {
       //Otherwise you have to convert the file and serve.
       else {
 
-        const convert = spawn('ffmpeg', ['-framerate', '30', '-i', `${requestPath}`, '-c', 'copy',
+        const convert = spawn(`${ffmpegPath}ffmpeg`, ['-framerate', '30', '-i', `${requestPath}`, '-c', 'copy',
                               `./videotmp/${message.hive}@${message.date}@${message.time}.mp4`]);
         convert.on('close', (code) => {
           if (code != 0) {

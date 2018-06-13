@@ -2,6 +2,7 @@ const config = require('../../config/config.js');
 const fs = require('fs');
 const {spawn} = require('child_process');
 const {join} = require('path');
+const ffmpegPath = config.ffmpegPath;
 
 /* Helper function to get the current date in the correct format: YYYY-MM-DD
 * This shoud be removed and updated to use a new api if JS ever supports normal
@@ -125,7 +126,7 @@ module.exports = function(io, socket) {
 
       //If it hasn't been converted, convert and serve.
       else {
-        const convert = spawn('ffmpeg', ['-framerate', '30', '-i', `${requestPath}`,
+        const convert = spawn(`${ffmpegPath}ffmpeg`, ['-framerate', '30', '-i', `${requestPath}`,
                                          '-c', 'copy',
                                          `./videotmp/${message.hive}@${today}@${time.slice(0, -5)}.mp4`]);
         convert.on('close', (code) => {

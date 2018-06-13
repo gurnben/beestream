@@ -8,6 +8,8 @@ module.exports = {
   videoPath: '/home/gurnben/Projects/video_service',
   //Path to the directory containing beet
   beetPath: '/home/gurnben/PycharmProjects/beet/',
+  //Path to the ffmpeg installation
+  ffmpegPath: '',
   /*Entrance configurations in the format:
   * hive: [
   *   {
