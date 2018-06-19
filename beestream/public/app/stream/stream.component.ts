@@ -77,11 +77,12 @@ export class StreamComponent {
       //Call onSubmit to re-request the video on a delay.
       this.videoLoading = true;
       this.correctLength = false;
+      var url = this.videoUrl;
+      this.videoUrl = null;
       setTimeout(StreamComponent.resubmit.bind(null,
                                     hive,
-                                    this.videoUrl,
+                                    url,
                                     this._videoService), 10000);
-      this.videoUrl = null;
     }
     else {
       this.videoLoading = false;

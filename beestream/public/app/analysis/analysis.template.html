@@ -1,7 +1,4 @@
 <div class="analysis-div">
-  <div class="analysis-content" *ngIf="videoAnalysisLoading && !videoAnalysisComplete">
-    <p>Analysis Loading</p>
-  </div>
   <div class="analysis-content" *ngIf="videoAnalysisComplete">
     <h4 id="analysis-heading">Arrivals</h4>
     <p id="analysis-content">{{arrivals}}<p>

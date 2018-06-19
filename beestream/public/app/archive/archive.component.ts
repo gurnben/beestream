@@ -113,7 +113,7 @@ export class ArchiveComponent implements OnDestroy{
                     `apologize, please view another video and try again later!`;
       //Emit closeSession to tell the server to delete our session's video
       this._videoService.emit('closeSession', {video: this.videoUrl});
-      // this.videoUrl = null;
+      this.videoUrl = null;
     }
     else {
       this.videoLoading = false;

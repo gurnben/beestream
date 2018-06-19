@@ -78,6 +78,10 @@ export class AnalysisComponent implements OnChanges, OnDestroy{
     }
   }
 
+  /*ngOnDestroy()
+  * This function overrides the ngOnDestroy function to add functionality when
+  * the user closes the webpage.
+  */
   ngOnDestroy() {
     this._ioService.removeListener('videoAnalysisSuccess');
     this._ioService.removeListener('videoAnalysisFailure');

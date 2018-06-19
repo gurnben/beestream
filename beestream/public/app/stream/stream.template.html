@@ -39,7 +39,7 @@
   <comments [video]="videoUrl">
   </comments>
 </div>
-<video *ngIf="videoUrl"
+<video *ngIf="videoUrl && !error"
        #VideoStream
        [src]="videoUrl"
        (loadedmetadata)="checkDuration(VideoStream, hive)"

@@ -133,18 +133,20 @@ module.exports = function(io, socket) {
           if (code != 0) {
             socket.emit('novideo', 'Something went wrong when serving the video.  Wait for a second or refresh the page!');
           }
-          const mv = spawn('mv', [`./videotmp/${message.hive}@${today}@${time.slice(0, -5)}.mp4`,
-                                  `./video/${message.hive}@${today}@${time.slice(0, -5)}.mp4`]);
-          mv.on('close', (code) => {
-            if (code != 0) {
-              socket.emit('novideo', 'Something went wrong when serving the video.  Wait for a second or refresh the page!');
-            }
-            else {
-              socket.emit('streamReady', {
-                url: `/video/${message.hive}@${today}@${time.slice(0, -5)}`
-              });
-            }
-          });
+          else {
+            const mv = spawn('mv', [`./videotmp/${message.hive}@${today}@${time.slice(0, -5)}.mp4`,
+                                    `./video/${message.hive}@${today}@${time.slice(0, -5)}.mp4`]);
+            mv.on('close', (code) => {
+              if (code != 0) {
+                socket.emit('novideo', 'Something went wrong when serving the video.  Wait for a second or refresh the page!');
+              }
+              else {
+                socket.emit('streamReady', {
+                  url: `/video/${message.hive}@${today}@${time.slice(0, -5)}`
+                });
+              }
+            });
+          }
         });
       }
 
@@ -152,13 +154,13 @@ module.exports = function(io, socket) {
       if ((message.previous != null) && (message.previous != url)) {
         fs.unlink(`\.${message.previous}.mp4`, (err) => {
       	  if (err) {
-	    console.log(`Unable to delete file .${message.previous}.mp4 in streaming getStreamVideo.`);
-	  }
-	});
+             console.log(`Unable to delete file .${message.previous}.mp4 in streaming getStreamVideo.`);
+         }
+	      });
       }
     }
     else {
-      socket.emit('error', {message: `Safari is not yet supported, sorry!`});
+      socket.emit('error', {message: `Sorry, we encountered an error, try again later.`});
     }
   });
 
@@ -172,9 +174,9 @@ module.exports = function(io, socket) {
     //Delete the old file if there was one.
     if (message.video != null) {
       fs.unlink(`\.${message.video}.mp4`, (err) => {
-      	if (err) {
-	  //console.log(`Unable to delete file .${message.video}.mp4 in streaming closeSession.`);
-	}
+        if (err) {
+           //console.log(`Unable to delete file .${message.video}.mp4 in streaming closeSession.`);
+        }
       });
     }
   });
