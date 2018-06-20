@@ -13,7 +13,7 @@ exports.serve = function(req, res) {
         });
         readStream.pipe(res);
       }
-      else if (err == 'ENOENT') {
+      else if (err.code == 'ENOENT') {
         console.log(`File ${req.video} does not exist.`);
         res.writeHead(204, {});
         res.end();

@@ -97,8 +97,8 @@ export class ArchiveComponent implements OnDestroy{
     });
     this._videoService.on('novideo', (data) => {
       this.error = data.message;
-    })
-    this._videoService.emit('getHive', {})
+    });
+    this._videoService.emit('getHive', {});
   }
 
   /*checkDuration(video, hive)
@@ -203,6 +203,35 @@ export class ArchiveComponent implements OnDestroy{
       };
       this._videoService.emit('getVideo', message);
     }
+  }
+
+  /*formatDate
+  * returns a formatted version of the date in format MM/DD/YYYY
+  *
+  * @param:
+  *   date - a string representation of the date in format yyyy-mm-dd
+  */
+  formatDate(date: string) {
+    var year = date.substr(0, 4);
+    var month = date.substr(5, 2);
+    var day = date.substr(8, 2);
+    return `${month}/${day}/${year}`;
+  }
+
+  /*formatTime
+  * returns a formatted version of the time in format HH:MM:SS AM/PM
+  *
+  * @param:
+  *   date - a string representation of the time in format HH-MM-SS
+  */
+  formatTime(time: string) {
+    var minutes = time.substr(3, 2);
+    var seconds = time.substr(6, 2);
+    var hours = +time.substr(0, 2) > 12 ? +time.substr(0, 2) - 12 : time.substr(0, 2)
+    var fulltime = +time.substr(0, 2) > 11 ?
+      `${hours}:${minutes}:${seconds} PM` :
+      `${hours}:${minutes}:${seconds} AM`;
+    return fulltime;
   }
 
   /*This function handles the user closing the window.  It sends the

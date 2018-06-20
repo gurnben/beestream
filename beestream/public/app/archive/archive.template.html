@@ -17,14 +17,14 @@
               [(ngModel)]="dateSelect"
               (ngModelChange)="respondDate()">
         <option [ngValue]="null">Choose a Date</option>
-        <option *ngFor="let date of dates" [ngValue]="date">{{date}}</option>
+        <option *ngFor="let date of dates" [ngValue]="date">{{formatDate(date)}}</option>
       </select>
       <select class="dropdown"
               [disabled]="!dateSelect"
               name="timeSelect"
               [(ngModel)]="timeSelect">
         <option [ngValue]="null">Choose a Time</option>
-        <option *ngFor="let time of times" [ngValue]="time">{{time}}</option>
+        <option *ngFor="let time of times" [ngValue]="time">{{formatTime(time)}}</option>
       </select>
     </div>
     <button class="main-button"
