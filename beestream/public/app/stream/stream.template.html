@@ -1,3 +1,4 @@
+
 <div>
   <h1>Stream</h1>
   <p *ngIf="error">Uh oh, we ran into an issue!  {{error}}</p>
@@ -35,12 +36,16 @@
       controls autoplay loop>
       Your browser doesn't support HTML5 video.
     </video>
+    <tags [video]="videoUrl"></tags>
   </div>
   <comments [video]="videoUrl">
   </comments>
 </div>
-<video *ngIf="videoUrl && !error"
+<video *ngIf="checkUrl && !error"
        #VideoStream
-       [src]="videoUrl"
-       (loadedmetadata)="checkDuration(VideoStream, hive)"
-       hidden></video>
+       [src]="checkUrl"
+       (error)="reattempt(hive)"
+       (loadedmetadata)="checkDuration(VideoStream)"
+       preload="metadata"
+       hidden>
+</video>

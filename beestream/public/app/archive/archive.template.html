@@ -47,13 +47,14 @@
       <video id="video" [src]="videoUrl" controls autoplay>
         Your browser doesn't support HTML5 video.
       </video>
+      <tags [video]="videoUrl"></tags>
     </div>
   </div>
-  <comments [video]="videoUrl">
-  </comments>
+  <comments [video]="videoUrl"></comments>
 </div>
 <video *ngIf="videoUrl && !error"
        #VideoStream
        [src]="videoUrl"
        (loadedmetadata)="checkDuration(VideoStream, hive, date, time)"
-       hidden></video>
+       hidden>
+</video>

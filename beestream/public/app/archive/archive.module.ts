@@ -7,6 +7,7 @@ import { ArchiveRoutes } from './archive.routes';
 import { ArchiveComponent } from './archive.component';
 import { VideoService } from '../video/video.service'
 import { CommentModule } from '../comment/comment.module';
+import { TagModule } from '../tag/tag.module';
 import { AnalysisModule } from '../analysis/analysis.module';
 
 @NgModule({
@@ -14,6 +15,7 @@ import { AnalysisModule } from '../analysis/analysis.module';
     CommonModule,
     FormsModule,
     CommentModule,
+    TagModule,
     AnalysisModule,
     RouterModule.forChild(ArchiveRoutes)
   ],

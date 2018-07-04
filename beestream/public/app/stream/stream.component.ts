@@ -14,7 +14,8 @@ import { VideoService } from '../video/video.service';
   providers: [ VideoService ]
 })
 export class StreamComponent {
-  videoUrl : any;
+  videoUrl: any = null;
+  checkUrl: any = null;
   streamHiveSelect: string;
   videoLoading: boolean;
   hives: Array<any>;
@@ -51,12 +52,12 @@ export class StreamComponent {
       this.videoLoading = true;
     });
     this._videoService.on('streamReady', (data) => {
+      console.log(`StreamReady signal receieved with url ${data.url}`);
       if (this.videoUrl == data.url) {
         this.videoLoading = false;
       }
-      this.videoUrl = data.url;
+      this.checkUrl = data.url;
       this.error = null;
-      [this.hive, this.date, this.time] = this.getVideoInfo(this.videoUrl);
     });
     this._videoService.on('novideo', (data) => {
       console.log(data.message);
@@ -70,23 +71,21 @@ export class StreamComponent {
   * a complete video it should last longer than 50 seconds, if it does not, we
   * request a new video on a delay.
   */
-  checkDuration(video, hive) {
+  checkDuration(video) {
+    var hive = this.getVideoInfo(this.checkUrl)[0];
     if (video.duration < 50) {
+      console.log("Duration Check Failed");
       //Emit closeSession to tell the server to delete our session's video
-      this._videoService.emit('closeSession', {video: this.videoUrl});
-      //Call onSubmit to re-request the video on a delay.
-      this.videoLoading = true;
-      this.correctLength = false;
-      var url = this.videoUrl;
-      this.videoUrl = null;
-      setTimeout(StreamComponent.resubmit.bind(null,
-                                    hive,
-                                    url,
-                                    this._videoService), 10000);
+      this._videoService.emit('closeSession', {video: this.checkUrl});
+      //call reattempt to reattempt the stream.
+      this.reattempt(hive);
     }
     else {
+      console.log("Duration Check Successful");
       this.videoLoading = false;
-      this.correctLength = true
+      this.correctLength = true;
+      this.videoUrl = this.checkUrl;
+      [this.hive, this.date, this.time] = this.getVideoInfo(this.videoUrl);
     }
   }
 
@@ -97,11 +96,21 @@ export class StreamComponent {
   */
   public static resubmit(hive, videoUrl, service) {
     if (hive) {
+      console.log(`Resubmitting with hive ${hive} and videoUrl ${videoUrl}`);
       service.emit('getStreamVideo', {
         hive: hive,
         previous: videoUrl
       })
     }
+  }
+
+  reattempt(hive) {
+    console.log(`Reattempt was called with hive ${hive} and checkUrl ${this.checkUrl}`);
+    this.videoLoading = true;
+    var url = this.checkUrl;
+    this.checkUrl = null;
+    setTimeout(StreamComponent.resubmit.bind(null, hive, url,
+                                              this._videoService), 10000);
   }
 
   /*showTitle()
@@ -110,7 +119,7 @@ export class StreamComponent {
   * angular standards.
   */
   showTitle() {
-    return this.videoUrl && !this.error && this.correctLength &&
+    return this.videoUrl && !this.error &&
             this.hive && this.date && this.time;
   }
 
@@ -120,7 +129,7 @@ export class StreamComponent {
   * angular standards.
   */
   showVideo() {
-    return this.videoUrl && !this.error && this.correctLength;
+    return this.videoUrl && !this.error;
   }
 
   /* This function sends the hive choice as a 'getStreamVideo' message.
@@ -128,6 +137,7 @@ export class StreamComponent {
   * The selection for the hives comes from the input box.
   */
   onSubmit(hive) {
+    console.log(`onSubmit called with ${hive}`);
     if (hive != null) {
       var message = {
         hive: hive,

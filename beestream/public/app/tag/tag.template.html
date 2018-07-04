@@ -1,0 +1,9 @@
+<div class="tag-block-div">
+  <div class="tag-div" *ngFor="let tag of tags">
+    <a class="{{(tag.count > 0) ? 'tag-on' : 'tag-off'}}"
+        (click)="submitTag(tag, hive, date, time)">
+      <span *ngIf="tag.count > 0" class="tag-number">{{tag.count}}</span>
+      {{tag.name}}
+    </a>
+  </div>
+</div>

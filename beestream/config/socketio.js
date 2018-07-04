@@ -5,6 +5,7 @@ const configureArchive = require('../app/controllers/archive.server.controller.j
 const configureStream = require('../app/controllers/stream.server.controller.js');
 const configureComment = require('../app/controllers/comment.server.controller.js');
 const configureAnalysis = require('../app/controllers/analysis.server.controller.js');
+const configureTags = require('../app/controllers/tag.server.controller.js');
 /* TODO: Add SocketIO component controllers here */
 
 // Define the Socket.io configuration method
@@ -15,5 +16,6 @@ module.exports = function(server, io) {
       configureStream(io, socket);
       configureComment(io, socket);
       configureAnalysis(io, socket);
+      configureTags(io, socket);
   });
 };

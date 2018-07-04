@@ -231,3 +231,47 @@ p{
   font-size: 15px;
   line-height: 17px;
 }
+.tag-on {
+  font-size: 16px;
+  text-decoration: none;
+  background-color: #4CD964;
+  color: #FFFFFF;
+  padding: 5px 15px 5px 15px;
+  border-radius: 30px;
+  box-shadow: 0px 2px #F1F1F1;
+  cursor: pointer;
+  margin-right: 20px;
+  margin-top: 10px;
+  transition: .5s ease;
+}
+.tag-on:hover {
+  background-color: #29A23E;
+}
+.tag-off {
+  font-size: 16px;
+  text-decoration: none;
+  background-color: #8E8E93;
+  color: #FFFFFF;
+  padding: 5px 15px 5px 15px;
+  border-radius: 30px;
+  box-shadow: 0px 2px #F1F1F1;
+  cursor: pointer;
+  margin-right: 20px;
+  margin-top: 10px;
+  transition: .5s ease;
+}
+.tag-off:hover {
+  background-color: #69696E;
+}
+.tag-number {
+  font-weight: 800;
+  margin-right: 5px;
+}
+.tag-div {
+  display: inline-block;
+  margin-top: 15px;
+}
+.tag-block-div {
+  max-width: 640px;
+  text-align: center;
+}

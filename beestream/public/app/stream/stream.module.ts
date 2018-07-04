@@ -6,6 +6,7 @@ import { StreamRoutes } from './stream.routes';
 import { StreamComponent } from './stream.component';
 import { VideoService } from '../video/video.service';
 import { CommentModule } from '../comment/comment.module';
+import { TagModule } from '../tag/tag.module';
 import { AnalysisModule } from '../analysis/analysis.module';
 
 @NgModule({
@@ -13,6 +14,7 @@ import { AnalysisModule } from '../analysis/analysis.module';
     FormsModule,
     CommonModule,
     CommentModule,
+    TagModule,
     AnalysisModule,
     RouterModule.forChild(StreamRoutes)
   ],

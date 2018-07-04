@@ -10,6 +10,8 @@ module.exports = {
   beetPath: '/home/gurnben/PycharmProjects/beet/',
   //Path to the ffmpeg installation
   ffmpegPath: '',
+  tags: ['Pollen', 'Drones', 'Queen', 'High Traffic', 'Low Traffic',
+         'Other Insects', 'Odd Behavior', 'Fanning', 'Swarm'],
   /*Entrance configurations in the format:
   * hive: [
   *   {

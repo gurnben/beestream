@@ -69,18 +69,18 @@ module.exports = function(io, socket) {
                               socket);
                 }
               });
-              analyze.stderr.on('data', (data) => {
-                console.log(`Analysis returned an error: ${data}.`)
-                socket.emit('videoAnalysisFailure', {
-                  message: 'Analysis Failed'
-                });
-              });
-              analyze.on('error', (err) => {
-                console.log(`Error spawning process: ${err}`);
-                socket.emit('videoAnalysisFailure', {
-                  message: 'Failed to start analysis.'
-                });
-              });
+              // analyze.stderr.on('data', (data) => {
+              //   console.log(`Analysis returned an error: ${data}.`)
+              //   socket.emit('videoAnalysisFailure', {
+              //     message: 'Analysis Failed'
+              //   });
+              // });
+              // analyze.on('error', (err) => {
+              //   console.log(`Error spawning process: ${err}`);
+              //   socket.emit('videoAnalysisFailure', {
+              //     message: 'Failed to start analysis.'
+              //   });
+              // });
             }
             else {
               socket.emit('videoAnalysisFailure', {
@@ -108,15 +108,17 @@ module.exports = function(io, socket) {
 function getBoundaryConfig(hive, datetime) {
   var entrances = config.entranceBounds[`${hive}`];
   var entranceConfig = null;
-  for (entrance of entrances) {
-    var startdate = new Date(entrance.start);
-    var enddate = new Date(entrance.end);
-    var date = new Date(datetime)
-    if (startdate < date
-        && (enddate >= date
-            || entrance.end == 'present')) {
-      entranceConfig = entrance.rectangle;
-      break;
+  if (entrances != null) {
+    for (entrance of entrances) {
+      var startdate = new Date(entrance.start);
+      var enddate = new Date(entrance.end);
+      var date = new Date(datetime);
+      if (startdate < date
+          && (enddate >= date
+              || entrance.end == 'present')) {
+        entranceConfig = entrance.rectangle;
+        break;
+      }
     }
   }
   return entranceConfig;

@@ -94,12 +94,6 @@ export class CommentComponent implements OnChanges, OnDestroy{
   submitComment(form: NgForm, hive: string, date: string, time: string) {
     if (form.valid) {
       var videoDate = new Date(`${date.substr(6, 4)}-${date.substr(0, 2)}-${date.substr(3, 2)}T${time}`);
-      console.log({
-        username: form.value.username,
-        comment: form.value.comment,
-        hive: hive,
-        datetime: videoDate
-      })
       this._ioService.emit('newComment', {
         username: form.value.username,
         comment: form.value.comment,
@@ -145,15 +139,13 @@ export class CommentComponent implements OnChanges, OnDestroy{
   }
 
   /*This function makes sure that our socket removes its listeners when the
-  * connection is destroyed/browser is closed.  This als osends the closeSession
-  * message containing the current video's url since we are done with that video
+  * connection is destroyed/browser is closed.
   *
-  * Have to stop listening for 'hiveList', 'dateList', 'timeList',
-  * 'videorequestRecieved', and 'videoReady'.
+  * Have to stop listening for 'commentList', 'commentSuccess', 'commentError'
   */
   ngOnDestroy() {
     this._ioService.removeListener('commentList');
     this._ioService.removeListener('commentSuccess');
-    this._ioService.removeListener('commentFailure');
+    this._ioService.removeListener('commentError');
   }
 }
