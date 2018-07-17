@@ -32,7 +32,8 @@ export class StreamComponent {
   *
   * Gets the videoService and puts it in the _videoService attribute
   */
-  constructor(private _videoService: VideoService, @Inject(DOCUMENT) private document: any) {}
+  constructor(private _videoService: VideoService,
+              @Inject(DOCUMENT) private document: any) {}
 
   /*This overrides the ngOnInit function to add additional functionality.
   *
@@ -52,7 +53,6 @@ export class StreamComponent {
       this.videoLoading = true;
     });
     this._videoService.on('streamReady', (data) => {
-      console.log(`StreamReady signal receieved with url ${data.url}`);
       if (this.videoUrl == data.url) {
         this.videoLoading = false;
       }
@@ -74,14 +74,12 @@ export class StreamComponent {
   checkDuration(video) {
     var hive = this.getVideoInfo(this.checkUrl)[0];
     if (video.duration < 50) {
-      console.log("Duration Check Failed");
       //Emit closeSession to tell the server to delete our session's video
       this._videoService.emit('closeSession', {video: this.checkUrl});
       //call reattempt to reattempt the stream.
       this.reattempt(hive);
     }
     else {
-      console.log("Duration Check Successful");
       this.videoLoading = false;
       this.correctLength = true;
       this.videoUrl = this.checkUrl;
@@ -96,7 +94,6 @@ export class StreamComponent {
   */
   public static resubmit(hive, videoUrl, service) {
     if (hive) {
-      console.log(`Resubmitting with hive ${hive} and videoUrl ${videoUrl}`);
       service.emit('getStreamVideo', {
         hive: hive,
         previous: videoUrl
@@ -105,7 +102,6 @@ export class StreamComponent {
   }
 
   reattempt(hive) {
-    console.log(`Reattempt was called with hive ${hive} and checkUrl ${this.checkUrl}`);
     this.videoLoading = true;
     var url = this.checkUrl;
     this.checkUrl = null;
@@ -137,8 +133,7 @@ export class StreamComponent {
   * The selection for the hives comes from the input box.
   */
   onSubmit(hive) {
-    console.log(`onSubmit called with ${hive}`);
-    if (hive != null) {
+    if (hive != null && !this.videoLoading) {
       var message = {
         hive: hive,
         previous: this.videoUrl

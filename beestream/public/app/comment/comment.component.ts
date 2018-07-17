@@ -93,6 +93,7 @@ export class CommentComponent implements OnChanges, OnDestroy{
   */
   submitComment(form: NgForm, hive: string, date: string, time: string) {
     if (form.valid) {
+      var usernametemp = form.value.username;
       var videoDate = new Date(`${date.substr(6, 4)}-${date.substr(0, 2)}-${date.substr(3, 2)}T${time}`);
       this._ioService.emit('newComment', {
         username: form.value.username,
@@ -101,6 +102,7 @@ export class CommentComponent implements OnChanges, OnDestroy{
         datetime: videoDate
       });
       this.myForm.resetForm();
+      this.myForm.controls['username'].setValue(usernametemp);
     }
   }
 

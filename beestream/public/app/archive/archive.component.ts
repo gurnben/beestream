@@ -3,6 +3,7 @@ import { Inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { NgForm } from '@angular/forms';
 import { VideoService } from '../video/video.service';
+import { Router, ParamMap, ActivatedRoute } from '@angular/router'
 
 /* This component displays the article video chooser and plays a chosen video.
 *
@@ -37,7 +38,10 @@ export class ArchiveComponent implements OnDestroy{
   *
   * Gets the archiveServices and puts it in the _videoService attribute
   */
-  constructor(private _videoService: VideoService, @Inject(DOCUMENT) private document: any) {}
+  constructor(private _videoService: VideoService,
+              @Inject(DOCUMENT) private document: any,
+              private route: ActivatedRoute,
+              private router: Router) {}
 
   /*This overrides the ngOnInit function to add additional functionality.
   *
@@ -50,22 +54,52 @@ export class ArchiveComponent implements OnDestroy{
     this.hives = new Array();
     this.dates = new Array();
     this.times = new Array();
-    this.videoLoading = false;
-    this.correctLength = false;
-    this.videoUrl = null;
     this.hiveSelect = null;
     this.dateSelect = null;
     this.timeSelect = null;
+    this.videoLoading = false;
+    this.correctLength = false;
+    this.videoUrl = null;
     this.error = null;
 
     this._videoService.on('hiveList', (hvlst) => {
       this.hives = hvlst.hiveNames;
+      this.route.paramMap.subscribe(params => {
+        if (this.hives.includes(params.get('hive'))) {
+          this.hiveSelect = params.get('hive');
+          this._videoService.emit('getDate', {
+            text: this.hiveSelect
+          });
+        }
+        // this.respondHive();
+      });
     });
     this._videoService.on('dateList', (dtlst) => {
       this.dates = dtlst.dates;
+      this.route.paramMap.subscribe(params => {
+        if (this.dates.includes(params.get('date'))) {
+          this.dateSelect = params.get('date');
+          this._videoService.emit('getTime', {
+            hive: this.hiveSelect,
+            date: this.dateSelect
+          });
+          // this.respondDate();
+        }
+      });
     });
     this._videoService.on('timeList', (tilst) => {
       this.times = tilst.times;
+      this.route.paramMap.subscribe(params => {
+        if (this.times.includes(params.get('time'))) {
+          this.timeSelect = params.get('time');
+          this._videoService.emit('getVideo', {
+            hive: this.hiveSelect,
+            date: this.dateSelect,
+            time: this.timeSelect,
+            previous: this.videoUrl
+          });
+        }
+      });
     });
     this._videoService.on('videoRequestRecieved', (data) => {
       this.videoLoading = true;
@@ -168,7 +202,7 @@ export class ArchiveComponent implements OnDestroy{
       this.dateSelect = null;
       this.times = new Array();
       this.timeSelect = null;
-      this._videoService.emit('getDate', message);
+      this.router.navigate(['/archive', { hive: this.hiveSelect }]);
     }
   }
 
@@ -184,7 +218,8 @@ export class ArchiveComponent implements OnDestroy{
       };
       this.times = new Array();
       this.timeSelect = null;
-      this._videoService.emit('getTime', message);
+      this.router.navigate(['/archive', { hive: this.hiveSelect,
+                                          date: this.dateSelect }]);
     }
   }
 
@@ -195,13 +230,11 @@ export class ArchiveComponent implements OnDestroy{
   */
   onSubmit() {
     if ((this.hiveSelect != null) && (this.dateSelect != null) && (this.timeSelect != null)) {
-      var message = {
+      this.router.navigate(['/archive', {
         hive: this.hiveSelect,
         date: this.dateSelect,
-        time: this.timeSelect,
-        previous: this.videoUrl
-      };
-      this._videoService.emit('getVideo', message);
+        time: this.timeSelect
+      }]);
     }
   }
 
@@ -227,10 +260,19 @@ export class ArchiveComponent implements OnDestroy{
   formatTime(time: string) {
     var minutes = time.substr(3, 2);
     var seconds = time.substr(6, 2);
-    var hours = +time.substr(0, 2) > 12 ? +time.substr(0, 2) - 12 : time.substr(0, 2)
-    var fulltime = +time.substr(0, 2) > 11 ?
-      `${hours}:${minutes}:${seconds} PM` :
-      `${hours}:${minutes}:${seconds} AM`;
+    var hours = +time.substr(0, 2) > 12 ? String(+time.substr(0, 2) - 12) : time.substr(0, 2)
+    var fulltime = "";
+    if (+time.substr(0, 2) > 12) {
+        fulltime = `${hours}:${minutes}:${seconds} PM`;
+    }
+    else {
+      if (+time.substr(0, 2) > 9) {
+        fulltime = `${hours}:${minutes}:${seconds} AM`;
+      }
+      else {
+        fulltime = `${hours.substr(1, 1)}:${minutes}:${seconds} AM`;
+      }
+    }
     return fulltime;
   }
 

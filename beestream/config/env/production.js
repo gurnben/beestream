@@ -11,7 +11,8 @@ module.exports = {
   //Path to the ffmpeg installation
   ffmpegPath: '',
   tags: ['Pollen', 'Drones', 'Queen', 'High Traffic', 'Low Traffic',
-         'Other Insects', 'Odd Behavior', 'Fanning', 'Swarm'],
+         'Other Insects', 'Odd Behavior', 'Fanning', 'Swarm', 'Washboarding',
+         'Yellow Jacket/Wasp', 'Dead Bees', 'Deformed Bee'],
   /*Entrance configurations in the format:
   * hive: [
   *   {
