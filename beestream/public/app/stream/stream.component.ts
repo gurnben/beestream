@@ -5,7 +5,6 @@ import { NgForm } from '@angular/forms';
 import { VideoService } from '../video/video.service';
 
 /*This component will handle the streaming page and video streaming.
-*
 * This file uses the stream service to interface with the videos.
 */
 @Component({
@@ -28,19 +27,23 @@ export class StreamComponent {
   date: string;
   time: string;
 
-  /*Constructor for ArchiveComponent
+  /*constructor
+  * Sets and initializes necessary fields.
   *
-  * Gets the videoService and puts it in the _videoService attribute
+  * @params:
+  *   _videoService: VideoService - an object wrapper for socket.io interactions
+  *   document: DOCUMENT          - an object encapsulation of the DOM, used for
+  *                                 all DOM interactions.
   */
-  constructor(private _videoService: VideoService,
+  public constructor(private _videoService: VideoService,
               @Inject(DOCUMENT) private document: any) {}
 
-  /*This overrides the ngOnInit function to add additional functionality.
-  *
+  /*ngOnInit
+  * This overrides the ngOnInit function to add additional functionality.
   * This initializes arrays for the hives option list, starts the necessary
   * listeners, and emits the getStreamHive message to get the hives list.
   */
-  ngOnInit() {
+  public ngOnInit() {
     this.hives = new Array();
     this.videoLoading = false;
     this.streamHiveSelect = null;
@@ -66,12 +69,16 @@ export class StreamComponent {
     this._videoService.emit('getStreamHive', {});
   }
 
-  /*checkDuration(video, hive)
+  /*checkDuration
   * This method verifies that the video is longer than 50 seconds.  If we have
   * a complete video it should last longer than 50 seconds, if it does not, we
-  * request a new video on a delay.
+  * request a new video after a delay.
+  *
+  * @params:
+  *   video: HTMLVideoElement - the HTML video player element to check the
+  *           duration of.
   */
-  checkDuration(video) {
+  private checkDuration(video: HTMLVideoElement) {
     var hive = this.getVideoInfo(this.checkUrl)[0];
     if (video.duration < 50) {
       //Emit closeSession to tell the server to delete our session's video
@@ -87,12 +94,17 @@ export class StreamComponent {
     }
   }
 
-  /*resubmit(hive, videoUrl, service)
+  /*resubmit
   * This function sends the hive choice as a 'getStreamVideo' message from a
   * context.  It will use service to send a message containing hive and videoUrl
   * This is meant for use by checkDuration.
+  *
+  * @params:
+  *   hive: string     - the hive name that is currently being streamed
+  *   videoUrl: string - the current videoUrl, which defines the current video
+  *   service          - the calling object's socketio service object
   */
-  public static resubmit(hive, videoUrl, service) {
+  public static resubmit(hive: string, videoUrl: string, service) {
     if (hive) {
       service.emit('getStreamVideo', {
         hive: hive,
@@ -101,7 +113,13 @@ export class StreamComponent {
     }
   }
 
-  reattempt(hive) {
+  /*reattempt
+  * Reloads the video after a 10 second delay.
+  *
+  * @params:
+  *   hive: string - the name of the hive currently being streamed
+  */
+  public reattempt(hive: string) {
     this.videoLoading = true;
     var url = this.checkUrl;
     this.checkUrl = null;
@@ -109,30 +127,33 @@ export class StreamComponent {
                                               this._videoService), 10000);
   }
 
-  /*showTitle()
+  /*showTitle
   * This function takes the place of the condition for the video title div.
   * This has been implemented to simplify our angluar template and comply with
   * angular standards.
   */
-  showTitle() {
+  private showTitle() {
     return this.videoUrl && !this.error &&
             this.hive && this.date && this.time;
   }
 
-  /*showVideo()
+  /*showVideo
   * this fucntion takes the place of the condition for the video div.
   * This has been implemented to simplify our angular template and comply with
   * angular standards.
   */
-  showVideo() {
+  private showVideo() {
     return this.videoUrl && !this.error;
   }
 
-  /* This function sends the hive choice as a 'getStreamVideo' message.
-  *
+  /*onSubmit
+  * This function sends the hive choice as a 'getStreamVideo' message.
   * The selection for the hives comes from the input box.
+  *
+  * @params:
+  *   hive: string - the name of the hive currently being streamed
   */
-  onSubmit(hive) {
+  private onSubmit(hive: string) {
     if (hive != null && !this.videoLoading) {
       var message = {
         hive: hive,
@@ -142,10 +163,14 @@ export class StreamComponent {
     }
   }
 
-  /*This function handles the formatting of the video's hive, date, and time
+  /*getVideoInfo
+  * This function handles the formatting of the video's hive, date, and time
   * into a human readable format to be displayed.
+  *
+  * @params:
+  *   The videoUrl value to be split up into  a readable format.
   */
-  getVideoInfo(videoMetaData: string) {
+  private getVideoInfo(videoMetaData: string) {
     var newVideo = videoMetaData.split('/')[2];
     var hive, date, time;
     [hive, date, time] = newVideo.split('@');
@@ -157,22 +182,28 @@ export class StreamComponent {
     return [hive, date, displayTime];
   }
 
-  /*This function handles the user closing the window.  It sends the
+  /*beforeunloadHandler
+  * This function handles the user closing the window.  It sends the
   * 'closeSession' signal to make sure that the server cleans up the video
   * that the client was streaming.
+  *
+  * @params:
+  *   event - the event to be handled.  In this case it is ignored as the method
+  *            invocation is bouind to an event.
   */
   @HostListener('window:beforeunload', ['$event'])
   beforeunloadHandler(event) {
     this._videoService.emit('closeSession', {video: this.videoUrl});
   }
 
-  /*This function makes sure that our socket removes its listeners when the
+  /*ngOnDestroy
+  * This function makes sure that our socket removes its listeners when the
   * connection is destroyed/browser is closed.  This also sends the closeSession
   * message containing the current video's url since we are done with that video
   *
   * Have to stop listening for 'hiveList', 'dateList', and 'timeList'.
   */
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this._videoService.emit('closeSession', {video: this.videoUrl});
     this._videoService.removeListener('streamHiveList');
     this._videoService.removeListener('streamRequestRecieved');

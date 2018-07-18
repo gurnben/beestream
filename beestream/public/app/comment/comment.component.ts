@@ -7,7 +7,8 @@ import { Component,
 import { NgForm } from '@angular/forms';
 import { VideoService } from '../video/video.service';
 
-/* This component displays a comments box as well as a list of comments for
+/*CommentComponent
+* This component displays a comments box as well as a list of comments for
 * the current video.
 */
 @Component({
@@ -31,17 +32,19 @@ export class CommentComponent implements OnChanges, OnDestroy{
   errors: Array<any>;
   showHelp: boolean = false;
 
-  /*Constructor for CommentComponent
-  *
+  /*constructor
+  * Constructor for CommentComponent
   * Gets the videoservice and puts it in the _ioService attribute
-  */
-  constructor(private _ioService: VideoService) {
-  }
-
-  /*This overrides the ngOnInit function to add additional functionality.
   *
+  * @params:
+  *   _ioService: VideoService - a service instance for socket io interactions
   */
-  ngOnInit() {
+  public constructor(private _ioService: VideoService) { }
+
+  /*ngOnInit
+  * This overrides the ngOnInit function to add additional functionality.
+  */
+  public ngOnInit() {
     //Handles errors associated wtih saving comments.
     this._ioService.on('commentError', (message) => {
       this.errors.push(message.message);
@@ -66,11 +69,16 @@ export class CommentComponent implements OnChanges, OnDestroy{
     });
   }
 
-  /*This method handles variable changes.
+  /*ngOnChanges
+  * This method handles variable changes.
   * Whenever the video source changes, we process that source breaking it up
   * into hive, date, and time.
+  *
+  * @params:
+  *   changes: SimpleChange - an array of key:value pairs holding the input
+  *                           variable changes.
   */
-  ngOnChanges(changes: {[propKey: string]: SimpleChange}) {
+  public ngOnChanges(changes: {[propKey: string]: SimpleChange}) {
     if (changes['video'].currentValue != null) {
       var newVideo = changes['video'].currentValue;
       newVideo = newVideo.split('/')[2];
@@ -87,11 +95,18 @@ export class CommentComponent implements OnChanges, OnDestroy{
     }
   }
 
-  /*This method is a handler for our comment form submission.
+  /*submitComment
+  * This method is a handler for our comment form submission.
   * This will emit the proper socket.io message to store the comment and resets
   * form state.
+  *
+  * @params:
+  *   form: NgForm - the form to submit, should have value username and comment
+  *   hive: string - the current hive
+  *   date: string - the current video's date
+  *   time: string - the current video's time
   */
-  submitComment(form: NgForm, hive: string, date: string, time: string) {
+  private submitComment(form: NgForm, hive: string, date: string, time: string) {
     if (form.valid) {
       var usernametemp = form.value.username;
       var videoDate = new Date(`${date.substr(6, 4)}-${date.substr(0, 2)}-${date.substr(3, 2)}T${time}`);
@@ -106,9 +121,14 @@ export class CommentComponent implements OnChanges, OnDestroy{
     }
   }
 
-  /*This method is a helper method to format the date into a readable format.
+  /*formatDate
+  * This method is a helper method to format the date into a readable format.
+  *
+  * @params:
+  *   d: string - a string representing the datetime in a format that Date()
+  *               will understand.
   */
-  formatDate(d: string) {
+  private formatDate(d: string) {
     var date = new Date(d);
     var minutes = date.getMinutes() > 9 ? date.getMinutes() : '0' + date.getMinutes()
     var time = +date.getHours() > 12 ?
@@ -119,10 +139,11 @@ export class CommentComponent implements OnChanges, OnDestroy{
     return dateString;
   }
 
-  /*This method returns the remaining number of comments to load if it is less
+  /*moreComments
+  * This method returns the remaining number of comments to load if it is less
   * than 5, or 5 if it is larger.
   */
-  moreComments() {
+  private moreComments() {
     if (this.comments != null && this.loadedComments < this.comments.length) {
       return ((this.comments.length - this.loadedComments) < 5) ?
        (this.comments.length - this.loadedComments): 5;
@@ -130,22 +151,24 @@ export class CommentComponent implements OnChanges, OnDestroy{
     return 0;
   }
 
-  /*This method increases the "loadedComments" field by the appropriate amount
+  /*showMoreComments
+  * This method increases the "loadedComments" field by the appropriate amount
   * so that more comments are loaded on screen
   */
-  showMoreComments() {
+  private showMoreComments() {
     if (this.comments != null && this.loadedComments < this.comments.length) {
       this.loadedComments += ((this.comments.length - this.loadedComments) < 5) ?
        (this.comments.length - this.loadedComments): 5;
     }
   }
 
-  /*This function makes sure that our socket removes its listeners when the
+  /*ngOnDestroy
+  * This function makes sure that our socket removes its listeners when the
   * connection is destroyed/browser is closed.
   *
   * Have to stop listening for 'commentList', 'commentSuccess', 'commentError'
   */
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this._ioService.removeListener('commentList');
     this._ioService.removeListener('commentSuccess');
     this._ioService.removeListener('commentError');

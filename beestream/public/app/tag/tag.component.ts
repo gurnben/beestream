@@ -6,7 +6,8 @@ import { Component,
 import { NgForm } from '@angular/forms';
 import { VideoService } from '../video/video.service';
 
-/* This component displays a lsit of tags and options for adding tags.
+/*TagComponent
+* This component displays a lsit of tags and options for adding tags.
 */
 @Component({
   selector: 'tags',
@@ -24,16 +25,19 @@ export class TagComponent implements OnChanges, OnDestroy{
   modified: Array<any> = [];
   errors: Array<any>;
 
-  /*Constructor for TagComponent
+  /*constructor
+  * Initializes necessary variables for our tag component.
   *
-  * Gets the videoservice and puts it in the _ioService attribute
+  * @params:
+  *   _ioService: VideoService - our socket.io service to send and recieve
+  *               communications via websockets.
   */
-  constructor(private _ioService: VideoService) {}
+  public constructor(private _ioService: VideoService) {}
 
-  /*This overrides the ngOnInit function to add additional functionality.
-  *
+  /*ngOnInit
+  * This overrides the ngOnInit function to add additional functionality.
   */
-  ngOnInit() {
+  public ngOnInit() {
     //Handles errors associated wtih saving tags.
     this._ioService.on('tagError', (message) => {
       this.errors.push(message.message);
@@ -70,11 +74,17 @@ export class TagComponent implements OnChanges, OnDestroy{
     });
   }
 
-  /*This method handles variable changes.
+  /*ngOnChanges
+  * This method handles variable changes.
   * Whenever the video source changes, we process that source breaking it up
   * into hive, date, and time.
+  *
+  * @params:
+  *   changes: SimpleChange - a variable holding key:value pairs that define the
+  *             change(s) that triggered this method's execution.  In our case,
+  *             this will hold the
   */
-  ngOnChanges(changes: {[propKey: string]: SimpleChange}) {
+  public ngOnChanges(changes: {[propKey: string]: SimpleChange}) {
     if (changes['video'].currentValue != null) {
       var newVideo = changes['video'].currentValue;
       newVideo = newVideo.split('/')[2];
@@ -92,10 +102,18 @@ export class TagComponent implements OnChanges, OnDestroy{
     }
   }
 
-  /*This method is a handler for our tag submission.
+  /*submitTag
+  * This method is a handler for our tag submission.
   * This will emit the proper socket.io message to store the tag.
+  *
+  * @params:
+  *   tag: any - the tag to be submitted.  Namely, this is an object that
+  *               defines the tag that the user clicked on!
+  *   hive: string - the name of the hive that is currently being viewed
+  *   date: string - the date of the video that is currently being viewed
+  *   time: string - the time of the video that is currently being viewed
   */
-  submitTag(tag: any, hive: string, date: string, time: string) {
+  private submitTag(tag: any, hive: string, date: string, time: string) {
     if (this.tagNames.includes(tag.name) && !this.modified.includes(tag.name)) {
       var videoDate = new Date(`${date.substr(6, 4)}-${date.substr(0, 2)}-${date.substr(3, 2)}T${time}`);
       this._ioService.emit('newTag', {
@@ -116,12 +134,13 @@ export class TagComponent implements OnChanges, OnDestroy{
     }
   }
 
-  /*This function makes sure that our socket removes its listeners when the
+  /*ngOnDestroy
+  * This function makes sure that our socket removes its listeners when the
   * connection is destroyed/browser is closed.
   *
   * Have to stop listening for 'tagList', 'tagSuccess', 'tagError'
   */
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this._ioService.removeListener('tagList');
     this._ioService.removeListener('tagSuccess');
     this._ioService.removeListener('tagError');

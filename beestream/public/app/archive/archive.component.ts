@@ -5,8 +5,8 @@ import { NgForm } from '@angular/forms';
 import { VideoService } from '../video/video.service';
 import { Router, ParamMap, ActivatedRoute } from '@angular/router'
 
-/* This component displays the article video chooser and plays a chosen video.
-*
+/*ArchiveComponent
+* This component displays the article video chooser and plays a chosen video.
 * This file uses the archive service to handle socket interactions.
 */
 @Component({
@@ -34,23 +34,28 @@ export class ArchiveComponent implements OnDestroy{
   error: string;
   correctLength: boolean;
 
-  /*Constructor for ArchiveComponent
-  *
+  /*constructor
+  * Constructor for ArchiveComponent
   * Gets the archiveServices and puts it in the _videoService attribute
+  *
+  * @params:
+  *   _videoService: VideoService - object to handle socket.io interactions
+  *   document: DOCUMENT          - object to interact with the DOM
+  *   route: ActivatedRoute       - object to interact with the URL and URL params
+  *   router: Router              - router object to redirect users.
   */
-  constructor(private _videoService: VideoService,
+  public constructor(private _videoService: VideoService,
               @Inject(DOCUMENT) private document: any,
               private route: ActivatedRoute,
               private router: Router) {}
 
-  /*This overrides the ngOnInit function to add additional functionality.
-  *
+  /*ngOnInit
+  * This overrides the ngOnInit function to add additional functionality.
   * This initializes arrays for each option list, starts our listeners for the
   * list events from socketio, and emits the initial getHive message to get the
   * hive list.
-  *
   */
-  ngOnInit() {
+  public ngOnInit() {
     this.hives = new Array();
     this.dates = new Array();
     this.times = new Array();
@@ -71,7 +76,6 @@ export class ArchiveComponent implements OnDestroy{
             text: this.hiveSelect
           });
         }
-        // this.respondHive();
       });
     });
     this._videoService.on('dateList', (dtlst) => {
@@ -83,7 +87,6 @@ export class ArchiveComponent implements OnDestroy{
             hive: this.hiveSelect,
             date: this.dateSelect
           });
-          // this.respondDate();
         }
       });
     });
@@ -135,12 +138,18 @@ export class ArchiveComponent implements OnDestroy{
     this._videoService.emit('getHive', {});
   }
 
-  /*checkDuration(video, hive)
+  /*checkDuration
   * This method verifies that the video is longer than 50 seconds.  If we have
   * a complete video it should last longer than 50 seconds, if it does not, we
   * request a new video on a delay.
+  *
+  * @params:
+  *   video - the DOM object to check the duration value on
+  *   hive  - the hive that is currently being viewed
+  *   date  - the date of the video that is currently being viewed
+  *   time  - the time of the video that is currently being viewed
   */
-  checkDuration(video, hive, date, time) {
+  private checkDuration(video, hive, date, time) {
     if (video.duration < 30) {
       this.error = `This video only lasts ${Math.ceil(video.duration)} ` +
                     `seconds, there's probably something wrong with it.  We ` +
@@ -155,29 +164,33 @@ export class ArchiveComponent implements OnDestroy{
     }
   }
 
-  /*showTitle()
+  /*showTitle
   * This function takes the place of the condition for the video title div.
   * This has been implemented to simplify our angluar template and comply with
   * angular standards.
   */
-  showTitle() {
+  private showTitle() {
     return this.videoUrl && !this.error && this.correctLength &&
             this.hive && this.date && this.time;
   }
 
-  /*showVideo()
+  /*showVideo
   * this fucntion takes the place of the condition for the video div.
   * This has been implemented to simplify our angular template and comply with
   * angular standards.
   */
-  showVideo() {
+  private showVideo() {
     return this.videoUrl && !this.error && this.correctLength;
   }
 
-  /*This function handles the formatting of the video's hive, date, and time
+  /*getVideoInfo
+  * This function handles the formatting of the video's hive, date, and time
   * into a human readable format to be displayed.
+  *
+  * params:
+  *   videoMetaData: string - the video's url containing its metadata
   */
-  getVideoInfo(videoMetaData: string) {
+  private getVideoInfo(videoMetaData: string) {
     var newVideo = videoMetaData.split('/')[2];
     var hive, date, time;
     [hive, date, time] = newVideo.split('@');
@@ -189,11 +202,12 @@ export class ArchiveComponent implements OnDestroy{
     return [hive, date, displayTime];
   }
 
-  /*This function sends the hive choice as a socket.io getDate message.
-  *
+  /*respondHive
+  * This function submits the current hive selection by redirecting the user to
+  * the archive page with the hive parameter set.
   * The hiveSelect field's current status is sent.
   */
-  respondHive() {
+  private respondHive() {
     if (this.hiveSelect != null) {
       var message = {
         text: this.hiveSelect
@@ -206,11 +220,12 @@ export class ArchiveComponent implements OnDestroy{
     }
   }
 
-  /*This function sends the date choice as a socket.io getTime message.
-  *
+  /*respondDate
+  * This function submits the current date selection by redirecting the user to
+  * the archive page wtih the hive and date parameters set.
   * The dateSelect field's current status is sent.
   */
-  respondDate() {
+  private respondDate() {
     if ((this.hiveSelect != null) && (this.dateSelect != null)) {
       var message = {
         hive: this.hiveSelect,
@@ -223,12 +238,15 @@ export class ArchiveComponent implements OnDestroy{
     }
   }
 
-  /*This function sends the video choice as a socket.io getVideo message.
+  /*onSubmit
+  * This function submits the hive, date, and time selections to get a new video
+  * by redirecting the user to the same archive page with hive, date, and time
+  * parameters set.
   *
   * The input boxes field's current status is sent as well as the current
   * video url so since we are done with that video.
   */
-  onSubmit() {
+  private onSubmit() {
     if ((this.hiveSelect != null) && (this.dateSelect != null) && (this.timeSelect != null)) {
       this.router.navigate(['/archive', {
         hive: this.hiveSelect,
@@ -241,10 +259,10 @@ export class ArchiveComponent implements OnDestroy{
   /*formatDate
   * returns a formatted version of the date in format MM/DD/YYYY
   *
-  * @param:
+  * @params:
   *   date - a string representation of the date in format yyyy-mm-dd
   */
-  formatDate(date: string) {
+  private formatDate(date: string) {
     var year = date.substr(0, 4);
     var month = date.substr(5, 2);
     var day = date.substr(8, 2);
@@ -254,10 +272,10 @@ export class ArchiveComponent implements OnDestroy{
   /*formatTime
   * returns a formatted version of the time in format HH:MM:SS AM/PM
   *
-  * @param:
+  * @params:
   *   date - a string representation of the time in format HH-MM-SS
   */
-  formatTime(time: string) {
+  private formatTime(time: string) {
     var minutes = time.substr(3, 2);
     var seconds = time.substr(6, 2);
     var hours = +time.substr(0, 2) > 12 ? String(+time.substr(0, 2) - 12) : time.substr(0, 2)
@@ -276,23 +294,29 @@ export class ArchiveComponent implements OnDestroy{
     return fulltime;
   }
 
-  /*This function handles the user closing the window.  It sends the
+  /*beforeunloadHandler
+  * This function handles the user closing the window.  It sends the
   * 'closeSession' signal to make sure that the server cleans up the video
   * that the client was streaming.
+  *
+  * @params:
+  *   event - The event that is being handled.  In this case, thie event doesn't
+  *           matter!
   */
   @HostListener('window:beforeunload', ['$event'])
   beforeunloadHandler(event) {
     this._videoService.emit('closeSession', {video: this.videoUrl});
   }
 
-  /*This function makes sure that our socket removes its listeners when the
+  /*ngOnDestroy
+  * This function makes sure that our socket removes its listeners when the
   * connection is destroyed/browser is closed.  This als osends the closeSession
   * message containing the current video's url since we are done with that video
   *
   * Have to stop listening for 'hiveList', 'dateList', 'timeList',
   * 'videorequestRecieved', and 'videoReady'.
   */
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this._videoService.emit('closeSession', {video: this.videoUrl});
     this._videoService.removeListener('hiveList');
     this._videoService.removeListener('dateList');

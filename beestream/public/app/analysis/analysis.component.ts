@@ -25,17 +25,20 @@ export class AnalysisComponent implements OnChanges, OnDestroy{
   videoAnalysisComplete: boolean = false;
   videoAnalysisLoading: boolean = false;
 
-  /*Constructor for AnalysisComponent
-  *
+  /*constructor
   * Puts our VideoService instance in the _ioService attribute.
-  */
-  constructor(private _ioService: VideoService) {}
-
-  /*This overrides the ngOnInit function to add additional functionality.
   *
+  * @params:
+  *   _ioService: VideoService - an instance of VideoService to handle socket.io
+  *                              communications.
+  */
+  public constructor(private _ioService: VideoService) {}
+
+  /*ngOnInit
+  * This overrides the ngOnInit function to add additional functionality.
   * This adds the necessary socket.io 'on' events.
   */
-  ngOnInit() {
+  private ngOnInit() {
     this._ioService.on('videoAnalysisSuccess', (message) => {
       var analysisDate = new Date(message.datetime);
       var ourDate = new Date(this.datetime);
@@ -53,13 +56,17 @@ export class AnalysisComponent implements OnChanges, OnDestroy{
     });
   }
 
-  /*This method handles variable changes.
+  /*ngOnChanges
+  * This method handles variable changes.
   * Whenever the video soruce changes, we process that source by breaking it up
   * into hive, date, and time.
+  *
+  * @params:
+  *   changes: SimpleChange - an array of key:value pairs holding the input
+  *                           variable changes.
   */
-  ngOnChanges(changes: {[propKey: string]: SimpleChange}) {
+  public ngOnChanges(changes: {[propKey: string]: SimpleChange}) {
     if (changes['video'].currentValue != null) {
-
       //get new video info and process it into "readable" format.
       var newVideo = changes['video'].currentValue;
       newVideo = newVideo.split('/')[2];
@@ -78,11 +85,11 @@ export class AnalysisComponent implements OnChanges, OnDestroy{
     }
   }
 
-  /*ngOnDestroy()
+  /*ngOnDestroy
   * This function overrides the ngOnDestroy function to add functionality when
   * the user closes the webpage.
   */
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this._ioService.removeListener('videoAnalysisSuccess');
     this._ioService.removeListener('videoAnalysisFailure');
   }
