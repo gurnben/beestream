@@ -12,18 +12,28 @@ const config = require('../../config/config.js');
 * newTag: Signals that a user has clicked on a tag to be inserted into
 *             the database.  This should insert the tag or increment a database
 *             counter and return a new tag list for the video.
-* getComments: Signals a request for a list of comments for a given datetime/
-*              hive pair.  This should return a list of all comments for that
+*
+* getTags: Signals a request for a list of Tags for a given datetime/
+*              hive pair.  This should return a list of all Tags for that
 *              datetime/hive.
 *
+* decrementTag: a message signaling that a specific tag should have its count
+*               decremented
+*
 ******************************Outgoing Messages********************************
-* commentList: Signals that a comment list is being sent.  Should be accompanied
-*              by a list of comments.
+* tagList: Signals that a Tag list is being sent.  Should be accompanied
+*              by a list of Tags.
 *
 */
 module.exports = function(io, socket) {
 
-  /* This will handle the creation or incrementing of tags. */
+  /*newTag: Signals that a user has clicked on a tag to be inserted into
+  *             the database.  This should insert the tag or increment a database
+  *             counter and return a new tag list for the video.
+  *
+  * tagList: Signals that a Tag list is being sent.  Should be accompanied
+  *              by a list of Tags.
+  */
   socket.on('newTag', (message) => {
     var hive = message.hive;
     var date = message.datetime;
@@ -77,6 +87,12 @@ module.exports = function(io, socket) {
     }
   });
 
+  /*decrementTag: a message signaling that a specific tag should have its count
+  *               decremented
+  *
+  * tagList: Signals that a Tag list is being sent.  Should be accompanied
+  *              by a list of Tags.
+  */
   socket.on('decrementTag', (message) => {
     var hive = message.hive;
     var date = message.datetime;
@@ -127,7 +143,13 @@ module.exports = function(io, socket) {
     }
   });
 
-  /* This will handle the retrieval of tags. */
+  /* getTags: Signals a request for a list of Tags for a given datetime/
+  *              hive pair.  This should return a list of all Tags for that
+  *              datetime/hive.
+  *
+  * tagList: Signals that a Tag list is being sent.  Should be accompanied
+  *              by a list of Tags.
+  */
   socket.on('getTags', (message) => {
     var date = message.datetime
     var hive = message.hive;

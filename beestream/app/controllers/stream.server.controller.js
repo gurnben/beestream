@@ -4,7 +4,8 @@ const {spawn} = require('child_process');
 const {join} = require('path');
 const ffmpegPath = config.ffmpegPath;
 
-/* Helper function to get the current date in the correct format: YYYY-MM-DD
+/*getDate
+* Helper function to get the current date in the correct format: YYYY-MM-DD
 * This shoud be removed and updated to use a new api if JS ever supports normal
 * date.format() output.  Until that point, it is necessary.
 *
@@ -45,7 +46,7 @@ const getDate = function() {
 *               message is sent with any current video to ensure that the
 *               video is garbage collected.
 ******************************Outgoing Messages********************************
-* hiveStreamList: The response should contain a JSON payload with the entry
+* streamHiveList: The response should contain a JSON payload with the entry
 *                 hiveName containing a list of the avalaible hives.
 *
 * streamRequestRecieved: The request for a video has been recieved and is being
@@ -53,11 +54,23 @@ const getDate = function() {
 *
 * streamReady: The video is ready to stream.  Should contain a JSON payload of
 *             the URL to use to get the video.
+*
+* novideo: A message indicating that no videos exist for today.
+*
+* streamRequestReceived: A message indicating that a the request for a
+*                        streaming request is being processed.
+*
+* streamReady: a message indicating that a stream is ready.  Accompanied by a
+*              video URL.  
 */
 module.exports = function(io, socket) {
 
   /*getStreamHive: The initial request for a list of hives.  This should respond
   *                with a list of all hives that are avaliable to stream.
+  *
+  * streamHiveList: The response should contain a JSON payload with the entry
+  *                 hiveName containing a list of the avalaible hives.
+  *
   * This function should sanitize input to make sure that this is a hive we want
   * people to be able to stream.
   */
@@ -77,8 +90,17 @@ module.exports = function(io, socket) {
     socket.emit('streamHiveList', {hiveNames: files});
   });
 
-  /* getStreamVideo: The request for a video to be served.  This should respond
+  /*getStreamVideo: The request for a video to be served.  This should respond
   *                 with the video url.
+  *
+  * novideo: A message indicating that no videos exist for today.
+  *
+  * streamRequestReceived: A message indicating that a the request for a
+  *                        streaming request is being processed.
+  *
+  * streamReady: a message indicating that a stream is ready.  Accompanied by a
+  *              video URL.
+  *
   * This will convert the video if necessary.
   */
   socket.on('getStreamVideo', (message) => {

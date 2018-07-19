@@ -22,7 +22,11 @@ const ffmpegPath = config.ffmpegPath;
 *
 * getTime: The request for a list of avaliable times based on the selected
 *          hive and date.  Should respond with a list of all dates avaliable
-*          to view for that hvie.
+*          to view for that hive.
+*
+* getVideo: The request for a specific video to be served.  This request will
+*           be accompanied by a hive, date, and time to identify a specific
+*           video to convert and serve!
 *
 * closeSession: The request sent when a user closes the browser window. This
 *               message is sent with any current video to ensure that the
@@ -33,6 +37,9 @@ const ffmpegPath = config.ffmpegPath;
 *
 * dateList: The Response should contain a JSON payload with the entry date
 *           contianing a list of the avaliable dates to view for that hive.
+*
+* timeList: The Response should contain a JSON payload with the entry time
+*           contianing a list of the avaliable times to view for that hive.
 *
 * videoRequestRecieved: The request for a video has been recieved and is being
 *                       processed.
@@ -115,7 +122,11 @@ module.exports = function(io, socket) {
     };
   });
 
-  /*videoRequestRecieved: The request for a video has been recieved and is being
+  /*getVideo: The request for a specific video to be served.  This request will
+  *           be accompanied by a hive, date, and time to identify a specific
+  *           video to convert and serve!
+  *
+  * videoRequestRecieved: The request for a video has been recieved and is being
   *                       processed.
   *
   * videoReady: The video is ready to stream.  Should contain a JSON payload of

@@ -21,11 +21,15 @@ const BeetLocation = config.beetPath;
 ******************************Outgoing Messages********************************
 * videoAnalysisSuccess: Signals that video analysis is complete.  Should be
 *                       accompanied by an arrivals count and a departures count.
+* videoAnalysisFailure: Signals that video analysis failed.  This may indicate
+*                       that we didn't have an entrance boundary for a video, or
+*                       that we encountered another issue.  It will be
+*                       accompanied by an error message.
 *
 */
 module.exports = function(io, socket) {
 
-  /*The getAnalysis is a request for analysis of a video.  This should return
+  /*getAnalysis: a request for analysis of a video.  This should return
   * a JSON object containing an arrivals count and a departures count.
   */
   socket.on('getAnalysis', (message) => {
@@ -69,18 +73,6 @@ module.exports = function(io, socket) {
                               socket);
                 }
               });
-              // analyze.stderr.on('data', (data) => {
-              //   console.log(`Analysis returned an error: ${data}.`)
-              //   socket.emit('videoAnalysisFailure', {
-              //     message: 'Analysis Failed'
-              //   });
-              // });
-              // analyze.on('error', (err) => {
-              //   console.log(`Error spawning process: ${err}`);
-              //   socket.emit('videoAnalysisFailure', {
-              //     message: 'Failed to start analysis.'
-              //   });
-              // });
             }
             else {
               socket.emit('videoAnalysisFailure', {
@@ -104,6 +96,10 @@ module.exports = function(io, socket) {
 *
 * A boundary configuration is valid if the entranceBounds config entry for hive
 * contains an entry with start < date and end >= date.
+*
+* @params:
+*   hive - the hive that we are analyzing.
+*   datetime - the video's datatime.
 */
 function getBoundaryConfig(hive, datetime) {
   var entrances = config.entranceBounds[`${hive}`];
@@ -127,6 +123,10 @@ function getBoundaryConfig(hive, datetime) {
 /*getFilepath
 * This function constructs the filepath for the video analysis from a given hive
 * and datetime.  The filepath is config.videoPath/hive/day/video/time.h264.
+*
+* @params:
+*   hive - the hive the video comes from
+*   datetime - the datetime of the video.
 */
 function getFilepath(hive, datetime) {
   var date = new Date(datetime);
@@ -143,6 +143,15 @@ function getFilepath(hive, datetime) {
 /*sendResults
 * This function wraps the sending of a response to the client as well as writing
 * the results to the database if store is true.
+*
+* @params:
+*   store: boolean - a boolean to tell us whether or not to store the value in
+*                     the database.
+*   hive: string   - the hive that the video is from.
+*   datetime: string - the datetiem of the video
+*   arrivals: number - the number of arrivals from analysis
+*   departures: number  - then number of departures from analysis
+*   socket: socket.io socket - the socket to communicate through.
 */
 function sendResults(store, hive, datetime, arrivals, departures, socket) {
   socket.emit('videoAnalysisSuccess', {

@@ -19,10 +19,24 @@ const Comment = mongoose.model('Comment');
 * commentList: Signals that a comment list is being sent.  Should be accompanied
 *              by a list of comments.
 *
+* commentError: indicates that an error occurred in the comment process.  Will
+*               be accompanied by an error message in the field message.
+*
+* commentSuccess: indicates that a comment was successfully saved.
+*
 */
 module.exports = function(io, socket) {
 
-  /* This will handle the creation of new comments. */
+  /*newComment: Signals that a user has created a new comment to be inserted into
+  *             the database.  This should insert the comment and return a new
+  *             comments list for the video.
+  *
+  * commentError: indicates that an error occurred in the comment process.  Will
+  *               be accompanied by an error message in the field message.
+  *
+  * commentSuccess: indicates that a comment was successfully saved.
+  *
+  */
   socket.on('newComment', (message) => {
     var commentData = JSON.parse(JSON.stringify(message));
     var newComment = new Comment({
@@ -47,6 +61,16 @@ module.exports = function(io, socket) {
     });
   });
 
+  /*getComments: Signals a request for a list of comments for a given datetime/
+  *              hive pair.  This should return a list of all comments for that
+  *              datetime/hive.
+  *
+  * commentList: Signals that a comment list is being sent.  Should be accompanied
+  *              by a list of comments.
+  *
+  * commentError: indicates that an error occurred in the comment process.  Will
+  *               be accompanied by an error message in the field message.
+  */
   socket.on('getComments', (message) => {
     var parsedMessage = JSON.parse(JSON.stringify(message));
     var hive = parsedMessage.hive;
