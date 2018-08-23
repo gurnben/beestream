@@ -48,6 +48,64 @@
         Your browser doesn't support HTML5 video.
       </video>
       <tags [video]="videoUrl"></tags>
+      <div class="share-button-div">
+        <button mat-icon-button
+                class="share-button"
+                shareButton="facebook"
+                #fbBtn
+                [style.color]="share.prop.facebook.color"
+                [url]="link">
+          <fa-icon [icon]="share.prop.facebook.icon" size="lg"></fa-icon>
+        </button>
+        <button mat-icon-button
+                class="share-button"
+                shareButton="twitter"
+                #twtBtn
+                [style.color]="share.prop.twitter.color"
+                [url]="link">
+          <fa-icon [icon]="share.prop.twitter.icon" size="lg"></fa-icon>
+        </button>
+        <button mat-icon-button
+                class="share-button"
+                shareButton="linkedin"
+                #inBtn
+                [style.color]="share.prop.linkedin.color"
+                [url]="link">
+          <fa-icon [icon]="share.prop.linkedin.icon" size="lg"></fa-icon>
+        </button>
+        <button mat-icon-button
+                class="share-button"
+                shareButton="pinterest"
+                #cpBtn
+                [style.color]="share.prop.pinterest.color"
+                [url]="link">
+          <fa-icon [icon]="share.prop.pinterest.icon" size="lg"></fa-icon>
+        </button>
+        <button mat-icon-button
+                class="share-button"
+                shareButton="tumblr"
+                #cpBtn
+                [style.color]="share.prop.tumblr.color"
+                [url]="link">
+          <fa-icon [icon]="share.prop.tumblr.icon" size="lg"></fa-icon>
+        </button>
+        <button mat-icon-button
+                class="share-button"
+                shareButton="reddit"
+                #cpBtn
+                [style.color]="share.prop.reddit.color"
+                [url]="link">
+          <fa-icon [icon]="share.prop.reddit.icon" size="lg"></fa-icon>
+        </button>
+        <button mat-icon-button
+                class="share-button"
+                shareButton="copy"
+                #cpBtn
+                [style.color]="share.prop.linkedin.color"
+                [url]="link">
+          <fa-icon [icon]="share.prop.copy.icon" size="lg"></fa-icon>
+        </button>
+      </div>
     </div>
   </div>
   <comments [video]="videoUrl"></comments>

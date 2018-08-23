@@ -9,6 +9,7 @@ import { HttpModule } from '@angular/http';
 import { HomeModule } from './home/home.module';
 import { ArchiveModule } from './archive/archive.module';
 import { StreamModule } from './stream/stream.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 /* Component Imports from our project */
 import { HeaderComponent } from './header/header.component';
@@ -29,6 +30,7 @@ require("./style.css");
     HomeModule,
     ArchiveModule,
     StreamModule,
+    DashboardModule,
     RouterModule.forRoot(AppRoutes)
   ],
   declarations: [

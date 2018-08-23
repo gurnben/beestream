@@ -275,3 +275,15 @@ p{
   max-width: 640px;
   text-align: center;
 }
+.share-button:hover {
+  background-color: #e5e5e5;
+  border-color: black;
+  border-width: 2px;
+  transition: .2s;
+}
+.share-button-div {
+  max-width: 640px;
+  text-align: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}

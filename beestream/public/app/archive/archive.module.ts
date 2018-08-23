@@ -2,6 +2,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { ShareModule } from '@ngx-share/core';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { MatButtonModule } from '@angular/material/button';
 
 import { ArchiveRoutes } from './archive.routes';
 import { ArchiveComponent } from './archive.component';
@@ -17,6 +21,10 @@ import { AnalysisModule } from '../analysis/analysis.module';
     CommentModule,
     TagModule,
     AnalysisModule,
+    HttpClientModule,
+    FontAwesomeModule,
+    MatButtonModule,
+    ShareModule.forRoot(),
     RouterModule.forChild(ArchiveRoutes)
   ],
   declarations: [

@@ -4,6 +4,8 @@ import { DOCUMENT } from '@angular/common';
 import { NgForm } from '@angular/forms';
 import { VideoService } from '../video/video.service';
 import { Router, ParamMap, ActivatedRoute } from '@angular/router'
+import { PlatformLocation } from '@angular/common';
+import { ShareButtons } from '@ngx-share/core';
 
 /*ArchiveComponent
 * This component displays the article video chooser and plays a chosen video.
@@ -31,6 +33,7 @@ export class ArchiveComponent implements OnDestroy{
 
   videoLoading: boolean;
   videoUrl: any;
+  link: any;
   error: string;
   correctLength: boolean;
 
@@ -47,7 +50,9 @@ export class ArchiveComponent implements OnDestroy{
   public constructor(private _videoService: VideoService,
               @Inject(DOCUMENT) private document: any,
               private route: ActivatedRoute,
-              private router: Router) {}
+              private router: Router,
+              private platformLocation: PlatformLocation,
+              @Inject(ShareButtons) private share: ShareButtons) {}
 
   /*ngOnInit
   * This overrides the ngOnInit function to add additional functionality.
@@ -65,6 +70,7 @@ export class ArchiveComponent implements OnDestroy{
     this.videoLoading = false;
     this.correctLength = false;
     this.videoUrl = null;
+    this.link = null;
     this.error = null;
 
     this._videoService.on('hiveList', (hvlst) => {
@@ -95,12 +101,14 @@ export class ArchiveComponent implements OnDestroy{
       this.route.paramMap.subscribe(params => {
         if (this.times.includes(params.get('time'))) {
           this.timeSelect = params.get('time');
+          console.log(this.videoUrl);
           this._videoService.emit('getVideo', {
             hive: this.hiveSelect,
             date: this.dateSelect,
             time: this.timeSelect,
             previous: this.videoUrl
           });
+          this.router.navigate(['/archive']);
         }
       });
     });
@@ -209,14 +217,13 @@ export class ArchiveComponent implements OnDestroy{
   */
   private respondHive() {
     if (this.hiveSelect != null) {
-      var message = {
-        text: this.hiveSelect
-      };
       this.dates = new Array();
       this.dateSelect = null;
       this.times = new Array();
       this.timeSelect = null;
-      this.router.navigate(['/archive', { hive: this.hiveSelect }]);
+      this._videoService.emit('getDate', {
+        text: this.hiveSelect
+      });
     }
   }
 
@@ -227,14 +234,12 @@ export class ArchiveComponent implements OnDestroy{
   */
   private respondDate() {
     if ((this.hiveSelect != null) && (this.dateSelect != null)) {
-      var message = {
-        hive: this.hiveSelect,
-        date: this.dateSelect
-      };
       this.times = new Array();
       this.timeSelect = null;
-      this.router.navigate(['/archive', { hive: this.hiveSelect,
-                                          date: this.dateSelect }]);
+      this._videoService.emit('getTime', {
+        hive: this.hiveSelect,
+        date: this.dateSelect
+      });
     }
   }
 
@@ -248,11 +253,13 @@ export class ArchiveComponent implements OnDestroy{
   */
   private onSubmit() {
     if ((this.hiveSelect != null) && (this.dateSelect != null) && (this.timeSelect != null)) {
-      this.router.navigate(['/archive', {
+      this.link = `${(this.platformLocation as any).location.href};hive=${this.hiveSelect};date=${this.dateSelect};time=${this.timeSelect}`;
+      this._videoService.emit('getVideo', {
         hive: this.hiveSelect,
         date: this.dateSelect,
-        time: this.timeSelect
-      }]);
+        time: this.timeSelect,
+        previous: this.videoUrl
+      });
     }
   }
 
@@ -310,7 +317,7 @@ export class ArchiveComponent implements OnDestroy{
 
   /*ngOnDestroy
   * This function makes sure that our socket removes its listeners when the
-  * connection is destroyed/browser is closed.  This als osends the closeSession
+  * connection is destroyed/browser is closed.  This also sends the closeSession
   * message containing the current video's url since we are done with that video
   *
   * Have to stop listening for 'hiveList', 'dateList', 'timeList',

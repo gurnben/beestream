@@ -1,5 +1,4 @@
-import 'rxjs/Rx';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 const io = require('socket.io-client');
@@ -49,7 +48,7 @@ export class VideoService {
   * This method will remove the listener for a specified eventName.
   *
   * @params:
-  *   eventName - the event name to remove the listener for. 
+  *   eventName - the event name to remove the listener for.
   */
   public removeListener(eventName) {
     if (this.socket) {
