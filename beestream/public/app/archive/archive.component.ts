@@ -75,17 +75,19 @@ export class ArchiveComponent implements OnDestroy{
 
     this._videoService.on('hiveList', (hvlst) => {
       this.hives = hvlst.hiveNames;
+      this.hives = this.hives.sort();
       this.route.paramMap.subscribe(params => {
         if (this.hives.includes(params.get('hive'))) {
           this.hiveSelect = params.get('hive');
           this._videoService.emit('getDate', {
-            text: this.hiveSelect
+            hive: this.hiveSelect
           });
         }
       });
     });
     this._videoService.on('dateList', (dtlst) => {
       this.dates = dtlst.dates;
+      this.dates.sort().reverse();
       this.route.paramMap.subscribe(params => {
         if (this.dates.includes(params.get('date'))) {
           this.dateSelect = params.get('date');
@@ -98,6 +100,7 @@ export class ArchiveComponent implements OnDestroy{
     });
     this._videoService.on('timeList', (tilst) => {
       this.times = tilst.times;
+      this.times.sort().reverse();
       this.route.paramMap.subscribe(params => {
         if (this.times.includes(params.get('time'))) {
           this.timeSelect = params.get('time');
@@ -222,7 +225,7 @@ export class ArchiveComponent implements OnDestroy{
       this.times = new Array();
       this.timeSelect = null;
       this._videoService.emit('getDate', {
-        text: this.hiveSelect
+        hive: this.hiveSelect
       });
     }
   }

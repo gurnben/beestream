@@ -2,29 +2,34 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const CommentSchema = new Schema({
-  username: {
+  'Username': {
     type: String,
     required: 'Username is required.',
     trim: true
   },
-  comment: {
+  'Comment': {
     type: String,
     required: 'Comment is required.',
     trim: true
   },
-  hive: {
+  'Hive': {
     type: String,
     required: 'Hive name is required!',
     trim: true
   },
-  date: {
+  'UTCDate': {
     type: Date,
     required: 'A date is required to identify the related files.',
   },
-  created: {
+  'FilePath': {
+    type: String,
+    required: 'Filepath is required',
+    trim: true
+  },
+  'Created': {
     type: Date,
     required: true,
     default: Date.now
   }
 });
-mongoose.model('Comment', CommentSchema);
+mongoose.model('Comment', CommentSchema, 'Comments');

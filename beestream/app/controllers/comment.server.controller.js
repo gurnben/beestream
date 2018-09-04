@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Comment = mongoose.model('Comment');
+const config = require('../../config/config');
 
 /*This file handles all socket.io configurations for the comment component.
 * This includes creating the listeners and sending the appropriate emit
@@ -39,11 +40,21 @@ module.exports = function(io, socket) {
   */
   socket.on('newComment', (message) => {
     var commentData = JSON.parse(JSON.stringify(message));
+    var date = new Date(commentData.datetime);
+    var month = (date.getMonth() + 1 < 10) ? `0${date.getMonth() + 1}` : `${date.getMonth() + 1}`;
+    var day = (date.getDate() < 10) ? `0${date.getDate()}` : `${date.getDate()}`;
+    var hour = (date.getHours() < 10) ? `0${date.getHours()}` : `${date.getHours()}`;
+    var minute = (date.getMinutes() < 10) ? `0${date.getMinutes()}` : `${date.getMinutes()}`;
+    var second = (date.getSeconds() < 10) ? `0${date.getSeconds()}` : `${date.getSeconds()}`;
+    var filepath = `${config.videoPath}/${commentData.hive}/` +
+                   `${date.getFullYear()}-${month}-${day}` +
+                   `/video/${hour}-${minute}-${second}.h264`;
     var newComment = new Comment({
-      username: commentData.username,
-      comment: commentData.comment,
-      hive: commentData.hive,
-      date: new Date(commentData.datetime),
+      'Username': commentData.username,
+      'Comment': commentData.comment,
+      'Hive': commentData.hive,
+      'UTCDate': date,
+      'FilePath': filepath
     });
     newComment.save((err) => {
       if (err) {
@@ -75,7 +86,7 @@ module.exports = function(io, socket) {
     var parsedMessage = JSON.parse(JSON.stringify(message));
     var hive = parsedMessage.hive;
     var date = new Date(parsedMessage.datetime);
-    Comment.find({date: date, hive: hive}, {_id: 0}).sort({created: 'desc', username: 'desc'}).exec((err, comments) => {
+    Comment.find({UTCDate: date, Hive: hive}, {_id: 0}).sort({Created: 'desc', Username: 'desc'}).exec((err, comments) => {
       if (err) {
         console.log(`Error retrieving comments list with message ${err}.`);
         socket.emit('commentError', {message: 'Reservation listing failed.'});

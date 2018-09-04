@@ -9,8 +9,9 @@ const mongoose = require('mongoose');
 module.exports = function() {
   const db = mongoose.connect(config.db); //uses the db path from the config
   require('../app/models/comment.server.model.js');
-  require('../app/models/analysis.server.model.js');
   require('../app/models/tag.server.model.js');
+  require('../app/models/videofile.server.model.js');
+  require('../app/models/avaliabletags.server.model.js');
   //Any necessary models should be called here.
   return db;
 }

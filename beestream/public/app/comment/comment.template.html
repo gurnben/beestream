@@ -34,8 +34,8 @@
     </div>
     <div *ngFor="let comment of comments|slice:0:loadedComments let i=index">
       <div>
-        <h4 id="comment-heading">Date: {{formatDate(comment.created)}} by {{comment.username}}</h4>
-        <p id="comment-content">{{comment.comment}}</p>
+        <h4 id="comment-heading">Date: {{formatDate(comment.Created)}} by {{comment.Username}}</h4>
+        <p id="comment-content">{{comment.Comment}}</p>
       </div>
     </div>
     <button mat-icon-button *ngIf="moreComments() > 0" (click)="showMoreComments()">

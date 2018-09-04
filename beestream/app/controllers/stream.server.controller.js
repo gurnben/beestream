@@ -2,6 +2,8 @@ const config = require('../../config/config.js');
 const fs = require('fs');
 const {spawn} = require('child_process');
 const {join} = require('path');
+const mongoose = require('mongoose');
+const VideoFile = mongoose.model('VideoFile');
 const ffmpegPath = config.ffmpegPath;
 
 /*getDate
@@ -61,7 +63,7 @@ const getDate = function() {
 *                        streaming request is being processed.
 *
 * streamReady: a message indicating that a stream is ready.  Accompanied by a
-*              video URL.  
+*              video URL.
 */
 module.exports = function(io, socket) {
 
@@ -76,18 +78,23 @@ module.exports = function(io, socket) {
   */
   socket.on('getStreamHive', (message) => {
     var today = getDate();
+    //get today's date we're at time 00:00:00
+    var date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate());
+    //get the date after the date we're looking for (for a less-than value)
+    var nextDate = new Date(date);
+    nextDate.setDate(nextDate.getDate() + 1);
     var files = [];
-    /* Check if a hive is valid and get the list */
-    if (fs.existsSync(config.videoPath)) {
-      fs.readdirSync(config.videoPath).filter(file => fs.statSync(join(config.videoPath, file)).isDirectory()).forEach(file => {
-        if (config.avaliableHives.includes(file) &&
-            fs.existsSync(`${config.videoPath}/${file}/${today}/video`) &&
-            fs.readdirSync(`${config.videoPath}/${file}/${today}/video`).filter(file2 => fs.statSync(`${config.videoPath}/${file}/${today}/video/${file2}`).isFile()).length > 0) {
-          files.push(file);
-        }
-      });
-    }
-    socket.emit('streamHiveList', {hiveNames: files});
+    VideoFile.find({$and:[{UTCDate:{$lt:nextDate}},{UTCDate:{$gte:date}}]}, {_id: 0, HiveName: 1}, (err, hives) => {
+      if (err) {
+        console.log(`Error retrieving streaming hives: ${err}`);
+      }
+      else {
+        let hiveList = [...new Set(hives.map(hive => hive.HiveName))];
+        socket.emit('streamHiveList', {hiveNames: hiveList});
+      }
+    });
   });
 
   /*getStreamVideo: The request for a video to be served.  This should respond
@@ -105,81 +112,84 @@ module.exports = function(io, socket) {
   */
   socket.on('getStreamVideo', (message) => {
     if (message.hive != null) {
-      //Get today's date for use in the path.
-      var today = getDate();
-      //Variable to hold our video name.
-      var time = null;
 
-      //Build the path of the requested video
-      var requestPath = `${config.videoPath}/${message.hive}/${today}/video/`;
-      if ((message.hive != null) && fs.existsSync(requestPath)) {
-        var videos = fs.readdirSync(requestPath)
-                       .filter(file => fs.statSync(join(requestPath, file))
-                       .isFile());
-        if (videos.length > 0) {
-          time = videos[videos.length - 1];
-          requestPath += time;
+      //get today's date we're at time 00:00:00
+      var date = new Date();
+      date.setHours(0, 0, 0, 0);
+      date.setDate(date.getDate());
+      //get the date after the date we're looking for (for a less-than value)
+      var nextDate = new Date(date);
+      nextDate.setDate(nextDate.getDate() + 1);
+      VideoFile.find({$and:[{UTCDate:{$lt:nextDate}},{UTCDate:{$gte:date}}]}, {_id: 0, FilePath: 1}, (err, hives) => {
+        if (err) {
+          console.log(`Error retrieving streaming hives: ${err}`);
         }
-        else {
+        else if (hives.length == 0) {
           console.log(`error: a hive: ${message.hive} was requested for ` +
                       'streaming that doesn\'t have videos for today.');
           socket.emit('novideo', {message: `No videos for today from ${message.hive}`});
           return;
         }
-      }
-      else {
-    	  socket.emit('novideo', {message: `No videos for today from ${message.hive}.  Videos usually start at 8AM so check back then!`});
-    	  return;
-      }
+        else {
+          let videos = hives.map(hive => hive.FilePath);
+          videos.sort().reverse();
+          let mostRecent = videos[0];
+          mostRecent = mostRecent.split('/');
+          mostRecent = mostRecent[mostRecent.length - 1];
+          mostRecent = mostRecent.replace('.h264', '');
 
-      //If we've made it here, we have a video to convert and serve!
-      socket.emit('streamRequestRecieved', {
-        text: `Preparing to serve stream for ${message.hive}`
-      });
+          //let the client know that a video is loading
+          socket.emit('streamRequestRecieved', {
+            text: `Preparing to serve stream for ${message.hive}`
+          });
 
-      var url = `/video/${message.hive}@${today}@${time.slice(0, -5)}`;
+          var today = getDate();
+          var url = `/video/${message.hive}@${today}@${mostRecent}`;
+          var requestPath = `${config.videoPath}/${message.hive}/${today}/video/${mostRecent}.h264`;
 
-      //If it's already converted, we don't need to convert it.
-      if(fs.existsSync(`./video/${message.hive}@${today}@${time.slice(0, -5)}.mp4`)) {
-        socket.emit('streamReady', {
-          url: `/video/${message.hive}@${today}@${time.slice(0, -5)}`
-        });
-      }
-
-      //If it hasn't been converted, convert and serve.
-      else {
-        const convert = spawn(`${ffmpegPath}ffmpeg`, ['-framerate', '30', '-i', `${requestPath}`,
-                                         '-c', 'copy',
-                                         `./videotmp/${message.hive}@${today}@${time.slice(0, -5)}.mp4`]);
-        convert.on('close', (code) => {
-          if (code != 0) {
-            socket.emit('novideo', 'Something went wrong when serving the video.  Wait for a second or refresh the page!');
+          //If it's already converted, we don't need to convert it.
+          if(fs.existsSync(`./video/${message.hive}@${today}@${mostRecent}`)) {
+            socket.emit('streamReady', {
+              url: url
+            });
           }
+
+          //If it hasn't been converted, convert and serve.
           else {
-            const mv = spawn('mv', [`./videotmp/${message.hive}@${today}@${time.slice(0, -5)}.mp4`,
-                                    `./video/${message.hive}@${today}@${time.slice(0, -5)}.mp4`]);
-            mv.on('close', (code) => {
+            const convert = spawn(`${ffmpegPath}ffmpeg`, ['-framerate', '30', '-i', `${requestPath}`,
+                                             '-c', 'copy',
+                                             `./videotmp/${message.hive}@${today}@${mostRecent}.mp4`]);
+            convert.on('close', (code) => {
               if (code != 0) {
                 socket.emit('novideo', 'Something went wrong when serving the video.  Wait for a second or refresh the page!');
               }
               else {
-                socket.emit('streamReady', {
-                  url: `/video/${message.hive}@${today}@${time.slice(0, -5)}`
+                const mv = spawn('mv', [`./videotmp/${message.hive}@${today}@${mostRecent}.mp4`,
+                                        `./video/${message.hive}@${today}@${mostRecent}.mp4`]);
+                mv.on('close', (code) => {
+                  if (code != 0) {
+                    socket.emit('novideo', 'Something went wrong when serving the video.  Wait for a second or refresh the page!');
+                  }
+                  else {
+                    socket.emit('streamReady', {
+                      url: url
+                    });
+                  }
                 });
               }
             });
           }
-        });
-      }
 
-      //Delete the old file if there was one.
-      if ((message.previous != null) && (message.previous != url)) {
-        fs.unlink(`\.${message.previous}.mp4`, (err) => {
-      	  if (err) {
-             console.log(`Unable to delete file .${message.previous}.mp4 in streaming getStreamVideo.`);
-         }
-	      });
-      }
+          //Delete the old file if there was one.
+          if ((message.previous != null) && (message.previous != url)) {
+            fs.unlink(`\.${message.previous}.mp4`, (err) => {
+              if (err) {
+                 console.log(`Unable to delete file .${message.previous}.mp4 in streaming getStreamVideo.`);
+             }
+            });
+          }
+        }
+      });
     }
     else {
       socket.emit('error', {message: `Sorry, we encountered an error, try again later.`});

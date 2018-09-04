@@ -8,7 +8,6 @@ const morgan = require('morgan');
 const compress = require('compression');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
-const session = require('express-session');
 const flash = require('connect-flash');
 const path = require('path');
 const configureSocket = require('./socketio.js');

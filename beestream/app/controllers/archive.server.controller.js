@@ -3,6 +3,8 @@ const fs = require('fs');
 const {spawn} = require('child_process');
 const {spawnSync} = require('child_process');
 const {join} = require('path');
+const mongoose = require('mongoose');
+const VideoFile = mongoose.model('VideoFile');
 const ffmpegPath = config.ffmpegPath;
 
 
@@ -54,16 +56,15 @@ module.exports = function(io, socket) {
   * the user to view.
   */
   socket.on('getHive', (message) => {
-    var files = [];
-    if (fs.existsSync(config.videoPath)) {
-      //Note: We're making sure we only respond with directories.
-      fs.readdirSync(config.videoPath).filter(file => fs.statSync(join(config.videoPath, file)).isDirectory()).forEach(file => {
-        if (config.avaliableHives.includes(file)) {
-          files.push(file);
-        }
-      });
-    }
-    socket.emit('hiveList', {hiveNames: files});
+    VideoFile.find().distinct('HiveName', (err, hives) => {
+      if (err) {
+        console.log(`Error Retrieving Hive List: ${err}`);
+      }
+      else {
+        hives.sort();
+        socket.emit('hiveList', {hiveNames: hives});
+      }
+    });
   });
 
   /*getDate: The request for a list of avaliable dates based on the selected
@@ -73,17 +74,25 @@ module.exports = function(io, socket) {
   * an empty list.
   */
   socket.on('getDate', (message) => {
-    var files = []
-    var requestPath = config.videoPath + '/' + message.text;
-    if ((message.text != null) && (fs.existsSync(requestPath))) {
-      //Note: We're making sure we only respond with directories.
-      fs.readdirSync(requestPath).filter(file => fs.statSync(join(requestPath, file)).isDirectory()).forEach(file => {
-        if (config.avaliableHives.includes(message.text)) {
-          files.unshift(file);
+    VideoFile.find({HiveName: message.hive}, {UTCDate: 1}, (err, dates) => {
+      if (err) {
+        console.log(`Error retrieving date list: ${err}`);
+      }
+      else {
+        var dateList = [];
+        for (date of dates) {
+          var d = new Date(date.UTCDate);
+          var dt = (d.getDate() < 10) ? `0${d.getDate()}` : `${d.getDate()}`;
+          var month = (d.getMonth() + 1 < 10) ? `0${d.getMonth() + 1}` : `${d.getMonth() + 1}`;
+          var dt = `${d.getFullYear()}-${month}-${dt}`;
+          if (!dateList.includes(dt)) {
+            dateList.push(dt);
+          }
         }
-      });
-    }
-    socket.emit('dateList', {dates: files});
+        dateList.sort().reverse();
+        socket.emit('dateList', {dates: dateList});
+      }
+    });
   });
 
   /*getTime: The request for a list of avaliable times based on the selected
@@ -93,17 +102,32 @@ module.exports = function(io, socket) {
   * respond with an empty list.
   */
   socket.on('getTime', (message) => {
-    var files = []
-    var requestPath = config.videoPath + '/' + message.hive + '/' + message.date + '/video';
-    if ((message.hive != null) && (message.date != null) &&
-        (fs.existsSync(requestPath))) {
-      fs.readdirSync(requestPath).forEach(file => {
-        if (config.avaliableHives.includes(message.hive)) {
-          files.unshift(file.slice(0, -5));
+    //get the date we're looking for at time 00:00:00
+    var date = new Date(message.date);
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() + 1);
+    //get the date after the date we're looking for (for a less-than value)
+    var nextDate = new Date(date);
+    nextDate.setDate(nextDate.getDate() + 1);
+    //query and respond
+    VideoFile.find({$and:[{UTCDate:{$lt:nextDate}},{UTCDate:{$gte:date}}], HiveName: message.hive}, {_id: 0, FilePath: 1}, (err, videos) => {
+      if (err) {
+        console.log(`Error getting times: ${err}.`);
+      }
+      else {
+        var files = []
+        for (video of videos) {
+          var filename = video.FilePath.split('/');
+          filename = filename[filename.length - 1];
+          filename = filename.replace('.h264', '');
+          if (!files.includes(filename)) {
+            files.push(filename);
+          }
         }
-      });
-    }
-    socket.emit('timeList', {times: files});
+        files.sort().reverse();
+        socket.emit('timeList', {times: files});
+      }
+    });
   });
 
   /*closeSession: The request sent when a user closes the browser window. This

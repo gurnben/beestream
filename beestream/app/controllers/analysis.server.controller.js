@@ -2,10 +2,8 @@ const fs = require('fs');
 const { exec } = require('child_process');
 const { join } = require('path');
 const mongoose = require('mongoose');
-
 const config = require('../../config/config.js');
-const Analysis = mongoose.model('Analysis');
-
+const VideoFile = mongoose.model('VideoFile');
 const BeetLocation = config.beetPath;
 
 /*This export handles all socket.io configurations for the analysis component.
@@ -34,57 +32,30 @@ module.exports = function(io, socket) {
   */
   socket.on('getAnalysis', (message) => {
     if (config.avaliableHives.includes(message.hive)) {
-      Analysis.findOne({hive: message.hive, date: new Date(message.datetime)},
-                    {_id: 0, arrivals: 1, departures: 1}).exec((err, result) => {
+      VideoFile.findOne({HiveName: message.hive, UTCDate: new Date(message.datetime)},
+                    {_id: 0}).exec((err, result) => {
         if (err) {
           console.log(err);
         }
         else {
-          if (result) {
+          if (result && result.ArrivalsTriangle != null && result.DeparturesTriangle != null) {
             sendResults(false,
                         message.hive,
                         message.datetime,
-                        result.arrivals,
-                        result.departures,
+                        result.ArrivalsTriangle,
+                        result.DeparturesTriangle,
                         socket);
           }
           else {
-            var arrivals = 0, departures = 0;
-            //Process the datetime into out folders and filenames
-            var filepath = getFilepath(message.hive, message.datetime);
-            //Find the entrance boundary configuration from the config file.
-            var entranceConfig = getBoundaryConfig(message.hive, message.datetime);
-            //analyze the video if we have a valid entrancConfig on file.
-            if (entranceConfig) {
-              const analyze = exec(`python3 ${BeetLocation}/beet.py -R ${entranceConfig} -v -s ${filepath}`);
-              analyze.stdout.on('data', (data) => {
-                [arrivals, departures] = data.substr(0, data.length - 1).split(' ');
-              });
-              analyze.on('close', (code) => {
-                if (code != 0) {
-                  console.log(`Something went wrong with analysis.  Return code ${code}.`);
-                }
-                else {
-                  sendResults(true,
-                              message.hive,
-                              message.datetime,
-                              arrivals,
-                              departures,
-                              socket);
-                }
-              });
-            }
-            else {
-              socket.emit('videoAnalysisFailure', {
-                message: 'No entrance configuraiton.'
-              });
-            }
+            socket.emit('videoAnalysisFailure', {
+              message: 'No Analysis Avaliable'
+            });
           }
         }
       });
     }
     else {
-      socket.emit('videoAnalysisFailure', {message: 'Invalid Hive'});
+      socket.emit('videoAnalysisFailure', {message: 'Invalid Hive or Date'});
     }
   });
 }
