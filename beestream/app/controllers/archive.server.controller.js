@@ -74,23 +74,36 @@ module.exports = function(io, socket) {
   * an empty list.
   */
   socket.on('getDate', (message) => {
-    VideoFile.find({HiveName: message.hive}, {UTCDate: 1}, (err, dates) => {
+    console.log(message.hive);
+    VideoFile.aggregate([
+      { "$project": {
+          "year": { "$year": "$UTCDate" },
+          "month": { "$month": "$UTCDate" },
+          "day" : {"$dayOfMonth": "$UTCDate"},
+          "HiveName": 1
+      }},
+      { "$match": {
+          "HiveName": message.hive
+        }
+      },
+      { "$group": {
+        "_id": null,
+        "distinctDate": { "$addToSet": { "year": "$year", "month": "$month", "day": "$day"}}
+      }}
+    ]).exec((err, results) => {
       if (err) {
         console.log(`Error retrieving date list: ${err}`);
       }
       else {
-        var dateList = [];
-        for (date of dates) {
-          var d = new Date(date.UTCDate);
-          var dt = (d.getDate() < 10) ? `0${d.getDate()}` : `${d.getDate()}`;
-          var month = (d.getMonth() + 1 < 10) ? `0${d.getMonth() + 1}` : `${d.getMonth() + 1}`;
-          var dt = `${d.getFullYear()}-${month}-${dt}`;
-          if (!dateList.includes(dt)) {
-            dateList.push(dt);
-          }
+        let distinctDates = results[0].distinctDate;
+        let dates = [];
+        for (var date of distinctDates) {
+          var dt = (date.day < 10) ? `0${date.day}` : `${date.day}`;
+          var month = (date.month < 10) ? `0${date.month}` : `${date.month}`;
+          dates.push(`${date.year}-${month}-${dt}`);
         }
-        dateList.sort().reverse();
-        socket.emit('dateList', {dates: dateList});
+        dates.sort().reverse();
+        socket.emit('dateList', {dates: dates});
       }
     });
   });

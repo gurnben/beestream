@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 * @export: db object.  This is the mongoose database connection.
 */
 module.exports = function() {
-  const db = mongoose.connect(config.db); //uses the db path from the config
+  const db = mongoose.connect(config.db, {useNewUrlParser: true }); //uses the db path from the config
   require('../app/models/comment.server.model.js');
   require('../app/models/tag.server.model.js');
   require('../app/models/videofile.server.model.js');
