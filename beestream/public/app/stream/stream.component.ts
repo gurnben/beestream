@@ -50,7 +50,7 @@ export class StreamComponent {
     this.error = null;
     this.correctLength = false;
     this._videoService.on('streamHiveList', (hvlst) => {
-      this.hives = hvlst.hiveNames;
+      this.hives = hvlst.hiveNames.sort();
     });
     this._videoService.on('streamRequestRecieved', (data) => {
       this.videoLoading = true;

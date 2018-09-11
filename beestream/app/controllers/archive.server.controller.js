@@ -74,7 +74,6 @@ module.exports = function(io, socket) {
   * an empty list.
   */
   socket.on('getDate', (message) => {
-    console.log(message.hive);
     VideoFile.aggregate([
       { "$project": {
           "year": { "$year": "$UTCDate" },

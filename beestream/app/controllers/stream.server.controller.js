@@ -92,6 +92,7 @@ module.exports = function(io, socket) {
       }
       else {
         let hiveList = [...new Set(hives.map(hive => hive.HiveName))];
+        hiveList.sort();
         socket.emit('streamHiveList', {hiveNames: hiveList});
       }
     });
@@ -120,7 +121,10 @@ module.exports = function(io, socket) {
       //get the date after the date we're looking for (for a less-than value)
       var nextDate = new Date(date);
       nextDate.setDate(nextDate.getDate() + 1);
-      VideoFile.find({$and:[{UTCDate:{$lt:nextDate}},{UTCDate:{$gte:date}}]}, {_id: 0, FilePath: 1}, (err, hives) => {
+      VideoFile.find({
+        $and:[{UTCDate:{$lt:nextDate}},{UTCDate:{$gte:date}}],
+        HiveName: message.hive
+      }, {_id: 0, FilePath: 1}, (err, hives) => {
         if (err) {
           console.log(`Error retrieving streaming hives: ${err}`);
         }
@@ -161,6 +165,7 @@ module.exports = function(io, socket) {
                                              `./videotmp/${message.hive}@${today}@${mostRecent}.mp4`]);
             convert.on('close', (code) => {
               if (code != 0) {
+                console.log(`Video conversion error with code ${code}`);
                 socket.emit('novideo', 'Something went wrong when serving the video.  Wait for a second or refresh the page!');
               }
               else {
