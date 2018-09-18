@@ -36,5 +36,8 @@
 ehthumbs.db
 Thumbs.db
 
-public/build
+**public/build
 node_modules
+package-lock.json
+videotmp/
+video/
