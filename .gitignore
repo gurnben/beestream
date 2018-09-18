@@ -36,8 +36,13 @@
 ehthumbs.db
 Thumbs.db
 
+# Project Ignores #
+###################
 **public/build
+**config/env/production.js
+**config/env/development.js
 node_modules
 package-lock.json
 videotmp/
 video/
+
