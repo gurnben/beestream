@@ -32,5 +32,6 @@ module.exports = {
 	},
 	plugins: [
 		new UglifyJsPlugin()
-	]
+	],
+	mode: `${process.env.NODE_ENV}`
 };

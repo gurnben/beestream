@@ -7,8 +7,6 @@ const express = require('express');
 const morgan = require('morgan');
 const compress = require('compression');
 const bodyParser = require('body-parser');
-const methodOverride = require('method-override');
-const flash = require('connect-flash');
 const path = require('path');
 const configureSocket = require('./socketio.js');
 
@@ -39,15 +37,9 @@ module.exports = function(db) {
   }));
   app.use(bodyParser.json());
 
-  /*Add methodOverride middlewear to allow us to override some methods.*/
-  app.use(methodOverride());
-
   /* Configure our app with our views. */
   app.set('views', './app/views');
   app.set('view engine', 'ejs');
-
-  /* Configure flash for sending messages between pages. */
-  app.use(flash());
 
   /* Set up important routes. */
   app.use('/', express.static(path.resolve('./public')));
