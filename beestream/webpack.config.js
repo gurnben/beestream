@@ -11,7 +11,7 @@ module.exports = {
     extensions: ['.ts', '.js', '.json', '.html']
   },
 	output: {
-		path: '/home/gurnben/Projects/beestream/beestream/public/build',
+		path: path.join(path.join(__dirname, 'public'), 'build'),
 		filename: '[name].js',
 	},
 	module: {

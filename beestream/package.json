@@ -5,7 +5,7 @@
     "app": "node server",
     "start": "concurrently \"npm run watch:build\" \"npm run watch:server\"",
     "watch:build": "webpack --watch",
-    "watch:server": "nodemon \"./server.js\" --watch \"./app ./public/build ./config\"",
+    "watch:server": "nodemon \"./server.js\" --watch ",
     "build": "webpack",
     "pbuild": "webpack -p"
   },
