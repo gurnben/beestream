@@ -20,9 +20,10 @@ require('./c3.styles.css');
 export class DashboardComponent implements OnDestroy, AfterViewInit {
 
   @ViewChild("primaryChart") chart: BaseChartDirective;
-  private charts:Array<any> = [];
-  private hives:Array<string> = null;
-  private activeHives:Array<string> = [];
+  private charts: Array<any> = [];
+  private hives: Array<string> = null;
+  private activeHives: Array<string> = [];
+  private requestedHives: Array<string> = [];
   private MAX_VALUES_PER_HIVE:number = 1000;
 
   /*constructor
@@ -107,8 +108,8 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
     for (let name in form.value) {
       let status = form.value[name];
       //if we want the hive data (status is true) and it isn't active or inactive, then request the data
-      if (status && !this.activeHives.includes(name)) {
-        console.log(`Requesting data for ${name}`);
+      if (status && !this.requestedHives.includes(name)) {
+        this.requestedHives.push(name);
         this._ioService.emit('getData', {
           hives: [name]
         })
@@ -122,10 +123,6 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   */
   private updateChartData(newColumns: Array<any>, dataKey: string,
                           datesKey: string) {
-    console.log({
-      columns: newColumns,
-      dataKeyPair: {dataKey: datesKey}
-    });
     for (var chart of this.charts) {
       setTimeout(() => {
         let xs = {};
@@ -172,15 +169,22 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
       y: []
     };
     if (Math.floor(itemsPerDay) <= 2) {
-      // filtered = this.findRangeAverage(8, 0, 16, 0, dateList, x, y);
+      let dateIntervals = this.generateDatetimeIntervals(dateList, 8, 0, 16, 0);
+      let data = this.findRangeAverage(dateIntervals.list, x, y);
+      filtered.x = filtered.x.concat(dateIntervals.dates);
+      filtered.y = filtered.y.concat(data);
     }
     else if (Math.floor(itemsPerDay) <= 4) {
-      // let d1 = this.findRangeAverage(8, 0, 12, 0, dateList, x, y);
-      // filtered.x = filtered.x.concat(d1.x);
-      // filtered.y = filtered.y.concat(d1.y);
-      // let d2 = this.findRangeAverage(12, 1, 14, 0, dateList, x, y);
-      // filtered.x = filtered.x.concat(d2.x);
-      // filtered.y = filtered.y.concat(d2.y);
+      //Average the first half of the day
+      let dateIntervals = this.generateDatetimeIntervals(dateList, 8, 0, 12, 0);
+      let data = this.findRangeAverage(dateIntervals.list, x, y);
+      filtered.x = filtered.x.concat(dateIntervals.dates);
+      filtered.y = filtered.y.concat(data);
+      //Average the second half of the day
+      dateIntervals = this.generateDatetimeIntervals(dateList, 12, 1, 14, 0);
+      data = this.findRangeAverage(dateIntervals.list, x, y);
+      filtered.x = filtered.x.concat(dateIntervals.dates);
+      filtered.y = filtered.y.concat(data);
     }
     else if (itemsPerDay <= 8) {
       for (let i = 8; i < 16; i++) {
@@ -199,7 +203,6 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         y: y
       };
     }
-    console.log(filtered);
     return filtered;
   }
 
@@ -216,12 +219,13 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   private findRangeAverage(intervals: Array<any>, dateTimes: Array<Date>, data: Array<any>) {
     let averages = new Array(intervals.length).fill(0);
     let videoCountPerInterval = new Array(intervals.length).fill(0);
-    // console.log(intervals);
     for (let i = 0; i < dateTimes.length; i++) {
       for (let j = 0; j < intervals.length; j++) {
-        // console.log(`Object at index ${j} in intervals is ${intervals[j]}`);
-        if ((dateTimes[i] >= (intervals[j].start)) &&
-            dateTimes[i] <= intervals[j].stop) {
+        let datetime = new Date(dateTimes[i]);
+        let start = new Date(intervals[j].start);
+        let end = new Date(intervals[j].stop);
+        if (datetime >= start &&
+            datetime <= end) {
           averages[j] += data[i];
           videoCountPerInterval[j]++;
         }
@@ -264,8 +268,8 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
     let intervalDates = [];
     for (var i = 0; i < dateList.length; i++) {
       //set our start and stop intervals
-      let start = this.setTimeForDate(new Date(dateList[i / 2]), startHour, startMinute);
-      let stop = this.setTimeForDate(new Date(dateList[i / 2]), stopHour, stopMinute);
+      let start = this.setTimeForDate(new Date(dateList[i]), startHour, startMinute);
+      let stop = this.setTimeForDate(new Date(dateList[i]), stopHour, stopMinute);
       intervalsList[i] = {
         start: start,
         stop: stop
