@@ -287,3 +287,10 @@ p{
   margin-top: 15px;
   margin-bottom: 15px;
 }
+.visual-block {
+  display: block;
+}
+.dashboard-hive-select {
+  display: block;
+  align-self: center;
+}

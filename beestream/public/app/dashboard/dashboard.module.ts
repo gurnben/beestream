@@ -1,8 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import { ChartsModule } from 'ng2-charts';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {  MatInputModule,
+          MatFormFieldModule,
+          MatButtonModule,
+          MatIconModule,
+          MatCheckboxModule,
+       } from '@angular/material';
 
 import { DashboardRoutes } from './dashboard.routes';
 import { DashboardComponent } from './dashboard.component';
@@ -13,6 +19,13 @@ import { VideoService } from '../video/video.service';
     CommonModule,
     FormsModule,
     ChartsModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCheckboxModule,
     RouterModule.forChild(DashboardRoutes)
   ],
   declarations: [
