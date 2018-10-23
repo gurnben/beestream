@@ -44,20 +44,20 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         this.hives = message.hiveNames
     });
     this._ioService.on('updateData', (message) => {
-      if (!this.activeHives.includes(message.hiveName)) {
-        let dates = message.dates
-        let data = message.arrivals
-        this.activeHives.push(message.hiveName);
-        var filteredData = this.filterData(dates, data);
-
-        let datesKey = message.hiveName + 'Dates';
-        let dataKey = message.hiveName;
-        let x = [datesKey].concat(filteredData.x);
-        let y = [dataKey].concat(filteredData.y);
-        let newColumn = [x, y]
-
-        this.updateChartData(newColumn, dataKey, datesKey);
-      }
+      // if (!this.activeHives.includes(message.hiveName)) {
+      //   let dates = message.dates
+      //   let data = message.arrivals
+      //   this.activeHives.push(message.hiveName);
+      //   var filteredData = this.filterData(dates, data);
+      //
+      //   let datesKey = message.hiveName + 'Dates';
+      //   let dataKey = message.hiveName;
+      //   let x = [datesKey].concat(filteredData.x);
+      //   let y = [dataKey].concat(filteredData.y);
+      //   let newColumn = [x, y]
+      //
+      //   this.updateChartData(newColumn, dataKey, datesKey);
+      // }
     });
   }
 
@@ -111,7 +111,10 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
       if (status && !this.requestedHives.includes(name)) {
         this.requestedHives.push(name);
         this._ioService.emit('getData', {
-          hives: [name]
+          hives: [name],
+          count: this.MAX_VALUES_PER_HIVE,
+          startDate: null,
+          stopDate: null
         })
       }
     }

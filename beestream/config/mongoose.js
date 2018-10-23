@@ -12,6 +12,8 @@ module.exports = function() {
   require('../app/models/tag.server.model.js');
   require('../app/models/videofile.server.model.js');
   require('../app/models/avaliabletags.server.model.js');
+  require('../app/models/averagetrafficbyhour.server.model.js');
+  require('../app/models/averagetrafficbyday.server.model.js');
   //Any necessary models should be called here.
   return db;
 }
