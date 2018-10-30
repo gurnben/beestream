@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-mongoose.model('AverageTrafficByDay', new Schema({
+mongoose.model('AverageTrafficBiHourly', new Schema({
   HiveName: {
     type: String
   },
@@ -38,4 +38,4 @@ mongoose.model('AverageTrafficByDay', new Schema({
   UTCEndDate: {
     type: Date
   }
-}), 'AverageTrafficByDay');
+}), 'AverageTrafficBiHourly');

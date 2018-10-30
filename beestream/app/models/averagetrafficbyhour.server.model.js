@@ -5,22 +5,37 @@ mongoose.model('AverageTrafficByHour', new Schema({
   HiveName: {
     type: String
   },
-  UTCYear: {
-    type: Number
-  },
-  UTCMonth: {
-    type: Number
-  },
-  UTCDay: {
-    type: Number
-  },
-  UTCHour: {
-    type: Number
-  },
   AverageArrivals: {
     type: Number
   },
   AverageDepartures: {
     type: Number
+  },
+  AverageFileSize: {
+    type: Number
+  },
+  MinimumArrivals: {
+    type: Number
+  },
+  MinimumDepartures: {
+    type: Number
+  },
+  MinimumFileSize: {
+    type: Number
+  },
+  MaximumArrivals: {
+    type: Number
+  },
+  MaximumDepartures: {
+    type: Number
+  },
+  MaximumFileSize: {
+    type: Number
+  },
+  UTCStartDate: {
+    type: Date
+  },
+  UTCEndDate: {
+    type: Date
   }
 }), 'AverageTrafficByHour');
