@@ -32,11 +32,13 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
     startDate: null,
     endDate: null
   };
+  private dataLoading = false;
   private dataReceived = false;
   private MAX_VALUES_PER_HIVE:number = 1000;
   private startDateFilter: any = null;
   private endDateFilter: any = null;
   private dateFilterDates: any = null;
+  private color = 'primary';
 
   /*constructor
   * Constructor for DashbordComponent
@@ -63,6 +65,7 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
       let newColumn = [x, y];
       this.updateChartData(newColumn,
         message.HiveName, message.HiveName + 'Dates');
+      this.dataLoading = false;
       this.dataReceived = true;
       this.charts[0].resize();
     });
@@ -208,6 +211,7 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
       startDate: form.value.startDate,
       stopDate: form.value.endDate
     });
+    this.dataLoading = true;
   }
 
   /*updateChartData()

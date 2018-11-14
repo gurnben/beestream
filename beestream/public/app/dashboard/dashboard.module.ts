@@ -9,7 +9,8 @@ import {  MatInputModule,
           MatIconModule,
           MatCheckboxModule,
           MatDatepickerModule,
-          MatNativeDateModule
+          MatNativeDateModule,
+          MatProgressSpinnerModule
        } from '@angular/material';
 
 import { DashboardRoutes } from './dashboard.routes';
@@ -30,6 +31,7 @@ import { VideoService } from '../video/video.service';
     MatCheckboxModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatProgressSpinnerModule,
     RouterModule.forChild(DashboardRoutes)
   ],
   declarations: [

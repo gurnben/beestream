@@ -1,4 +1,4 @@
-@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
 /*You'll find any CSS Styling here*/
 body{
   font-family: Arial;
@@ -298,7 +298,6 @@ p{
 }
 .dashboard-checkbox {
   margin: 10px;
-  color: "blue";
 }
 .dashboard-datepicker {
   margin-right: 10px;
@@ -314,4 +313,9 @@ p{
 }
 .dashboard-chart-invisible {
   display: none;
+}
+.dashboard-loading {
+  margin: auto;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }

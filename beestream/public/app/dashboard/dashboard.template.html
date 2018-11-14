@@ -9,6 +9,7 @@
       <mat-checkbox class="dashboard-checkbox"
           *ngFor="let hive of hives"
           name="{{hive}}"
+          color="primary"
           ngModel (ngModelChange)="hiveSelected(HiveForm)">{{hive}}</mat-checkbox>
       <br>
       <mat-form-field class="dashboard-datepicker">
@@ -32,6 +33,10 @@
       <br>
       <button class="main-button" type="submit">Get Analysis</button>
     </form>
+  </div>
+  <div class="dashbord-form-parent"
+    *ngIf="(!(hives && startDateFilter && endDateFilter)) || dataLoading">
+      <mat-spinner class=dashboard-loading diameter="50"></mat-spinner>
   </div>
   <div class="dashboard-chart-{{dataReceived ? '' : 'invisible'}}">
     <div id="chart">Loading</div>

@@ -8,14 +8,11 @@ const mongoose = require('mongoose');
 */
 module.exports = function() {
   const db = mongoose.connect(config.db, {useNewUrlParser: true }); //uses the db path from the config
-  require('../app/models/comment.server.model.js');
-  require('../app/models/tag.server.model.js');
-  require('../app/models/videofile.server.model.js');
-  require('../app/models/avaliabletags.server.model.js');
-  require('../app/models/averagetrafficbyhour.server.model.js');
-  require('../app/models/averagetrafficbyday.server.model.js');
-  require('../app/models/averagetrafficbihourly.server.model.js');
-  require('../app/models/hiveswithanalysis.server.model.js');
+  //require all db configuration files.
+  path = require('path').resolve("app/models/");
+  require('fs').readdirSync(path).forEach((file) => {
+    require(`../app/models/${file}`);
+  });
   //Any necessary models should be called here.
   return db;
 }

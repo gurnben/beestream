@@ -1,5 +1,5 @@
 /* What is our environment? Default to development. */
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 
 // Configure the Database
 const db = require('./config/mongoose')();
