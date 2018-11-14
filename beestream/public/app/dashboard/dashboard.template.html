@@ -1,15 +1,39 @@
 <div>
-  <h1>Test</h1>
+  <h2 class="dashboard-title">Analysis Dashboard</h2>
 </div>
 <div>
-  <div class="dashboard-hive-select" *ngIf="hives">
-    <form #HiveForm="ngForm">
-      <mat-checkbox *ngFor="let hive of hives"
+  <div class="dashboard-form-parent" *ngIf="hives && startDateFilter && endDateFilter">
+    <form class="dashboard-form"
+          #HiveForm="ngForm" (ngSubmit)="getAnalysis(HiveForm)">
+      <h3 class="dashboard-form-title">Select Hives and Dates</h3>
+      <mat-checkbox class="dashboard-checkbox"
+          *ngFor="let hive of hives"
           name="{{hive}}"
-          (ngModelChange)="getAnalysis(HiveForm)"
-          ngModel>{{hive}}</mat-checkbox>
-      <button mat-button type="submit">Get Analysis</button>
+          ngModel (ngModelChange)="hiveSelected(HiveForm)">{{hive}}</mat-checkbox>
+      <br>
+      <mat-form-field class="dashboard-datepicker">
+        <input matInput #startPickerInput [matDatepickerFilter]="startDateFilter"
+          [matDatepicker]="startPicker"
+          placeholder="Choose a Start Date"
+          name="startDate"
+          (dateChange)="startDateSelected(startPickerInput.value)" ngModel>
+        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field class="dashboard-datepicker">
+        <input matInput #endPickerInput [matDatepickerFilter]="endDateFilter"
+          [matDatepicker]="stopPicker"
+          placeholder="Choose an End Date"
+          name="endDate"
+          (dateChange)="endDateSelected(endPickerInput.value)" ngModel>
+        <mat-datepicker-toggle matSuffix [for]="stopPicker"></mat-datepicker-toggle>
+        <mat-datepicker #stopPicker></mat-datepicker>
+      </mat-form-field>
+      <br>
+      <button class="main-button" type="submit">Get Analysis</button>
     </form>
   </div>
-  <div id="chart">Loading</div>
+  <div class="dashboard-chart-{{dataReceived ? '' : 'invisible'}}">
+    <div id="chart">Loading</div>
+  </div>
 </div>

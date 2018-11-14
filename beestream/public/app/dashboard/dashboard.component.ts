@@ -1,6 +1,7 @@
 import { Component, ViewEncapsulation, OnDestroy, AfterViewInit } from '@angular/core';
 import { VideoService } from '../video/video.service';
 import { NgForm } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ViewChild } from '@angular/core';
 import { ChartsModule } from 'ng2-charts';
 import { BaseChartDirective } from 'ng2-charts';
@@ -20,11 +21,22 @@ require('./c3.styles.css');
 export class DashboardComponent implements OnDestroy, AfterViewInit {
 
   @ViewChild("primaryChart") chart: BaseChartDirective;
+  private checkboxGroup = null;
+  private hiddenControl = null;
+  private form = null;
   private charts: Array<any> = [];
   private hives: Array<string> = null;
+  private hiveRanges: Array<any> = null;
   private activeHives: Array<string> = [];
-  private requestedHives: Array<string> = [];
+  private activeRange: any = {
+    startDate: null,
+    endDate: null
+  };
+  private dataReceived = false;
   private MAX_VALUES_PER_HIVE:number = 1000;
+  private startDateFilter: any = null;
+  private endDateFilter: any = null;
+  private dateFilterDates: any = null;
 
   /*constructor
   * Constructor for DashbordComponent
@@ -39,25 +51,37 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   * This overrides the ngOnInit function to add additional functionality.
   */
   public ngOnInit() {
-    this._ioService.emit('dashboardHiveList', {});
+    this._ioService.emit('dashboardConnect', {});
     this._ioService.on('dashboardHiveList', (message) => {
-        this.hives = message.hiveNames
+      this.hives = message.hiveNames
+      console.log(message.dates);
+      this.hiveRanges = message.dates;
     });
     this._ioService.on('updateData', (message) => {
-      // if (!this.activeHives.includes(message.hiveName)) {
-      //   let dates = message.dates
-      //   let data = message.arrivals
-      //   this.activeHives.push(message.hiveName);
-      //   var filteredData = this.filterData(dates, data);
-      //
-      //   let datesKey = message.hiveName + 'Dates';
-      //   let dataKey = message.hiveName;
-      //   let x = [datesKey].concat(filteredData.x);
-      //   let y = [dataKey].concat(filteredData.y);
-      //   let newColumn = [x, y]
-      //
-      //   this.updateChartData(newColumn, dataKey, datesKey);
-      // }
+      let y = [message.HiveName].concat(message.AverageArrivals);
+      let x = [message.HiveName + 'Dates'].concat(message.StartDates);
+      let newColumn = [x, y];
+      this.updateChartData(newColumn,
+        message.HiveName, message.HiveName + 'Dates');
+      this.dataReceived = true;
+      this.charts[0].resize();
+    });
+    this._ioService.on('availableDateList', (message) => {
+      let dates = [];
+      for (let i = 0; i < message.dateList.length; i++) {
+        dates[i] = new Date(message.dateList[i]);
+        dates[i].setHours(0);
+        dates[i].setMinutes(0);
+        dates[i].setSeconds(0);
+        dates[i] = dates[i].toISOString();
+      }
+      this.dateFilterDates = dates;
+      this.startDateFilter = (d: Date): boolean => {
+        return false;
+      }
+      this.endDateFilter = (d: Date): boolean => {
+        return false;
+      }
     });
   }
 
@@ -97,6 +121,73 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
     //TODO: remove listeners
   }
 
+  private hiveSelected(form: NgForm) {
+    this.activeRange.startDate = null;
+    this.activeRange.endDate = null;
+    for (let hive of this.hives) {
+      if (form.value[hive]) {
+        this.activeHives.push(hive);
+        let hiveStart = new Date(this.hiveRanges[hive].StartDate);
+        let activeStart = new Date(this.activeRange.startDate);
+        let hiveEnd = new Date(this.hiveRanges[hive].EndDate);
+        let activeEnd = new Date(this.activeRange.endDate);
+        if (hiveStart < activeStart || this.activeRange.startDate == null) {
+          this.activeRange.startDate = hiveStart;
+          this.activeRange.startDate.setHours(0);
+          this.activeRange.startDate.setMinutes(0);
+          this.activeRange.startDate.setSeconds(0);
+        }
+        if (hiveEnd > activeEnd || this.activeRange.endDate == null) {
+          this.activeRange.endDate = hiveEnd;
+          this.activeRange.endDate.setHours(0);
+          this.activeRange.endDate.setMinutes(0);
+          this.activeRange.endDate.setSeconds(0);
+        }
+      }
+    }
+    console.log(this.activeRange);
+    this.startDateFilter = (d: Date): boolean => {
+      return d >= this.activeRange.startDate && d <= this.activeRange.endDate &&
+        this.dateFilterDates.includes(d.toISOString());
+    }
+    this.endDateFilter = (d: Date): boolean => {
+      return d >= this.activeRange.startDate && d <= this.activeRange.endDate &&
+        this.dateFilterDates.includes(d.toISOString());
+    }
+  }
+
+  /*startDateSelected
+  * This method will handle the user selecting a start date.  This will change
+  * the datepickerfilter for the endDate to only allow selection of dates after
+  * the selected start date.
+  *
+  * @params:
+  *   date:Date - the start date selected
+  */
+  private startDateSelected(date: Date) {
+    this.endDateFilter = (d: Date): boolean => {
+      let threshold_date = new Date(date);
+      return d >= this.activeRange.startDate && d <= this.activeRange.endDate &&
+        this.dateFilterDates.includes(d.toISOString()) && d > threshold_date;
+    }
+  }
+
+  /*endDateSelected
+  * This method will handle the user selecting an end date.  This will change
+  * the datepickerfilter for the startdate to only allow selection of dates
+  * before the selected end date.
+  *
+  * @params:
+  *   date:Date - the start date selected
+  */
+  private endDateSelected(date: Date) {
+    this.startDateFilter = (d: Date): boolean => {
+      let threshold_date = new Date(date);
+      return d >= this.activeRange.startDate && d <= this.activeRange.endDate &&
+        this.dateFilterDates.includes(d.toISOString()) && d < threshold_date;
+    }
+  }
+
   /*getAnalysis
   * This method will handle requests for analysis for a list of hives from our
   * form with hive checkboxes!
@@ -104,20 +195,19 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   * @params:
   *   form: NgForm the angular form object
   */
-  public getAnalysis(form: NgForm) {
-    for (let name in form.value) {
-      let status = form.value[name];
-      //if we want the hive data (status is true) and it isn't active or inactive, then request the data
-      if (status && !this.requestedHives.includes(name)) {
-        this.requestedHives.push(name);
-        this._ioService.emit('getData', {
-          hives: [name],
-          count: this.MAX_VALUES_PER_HIVE,
-          startDate: null,
-          stopDate: null
-        })
+  private getAnalysis(form: NgForm) {
+    let hiveRequestList = [];
+    for (let name of Object.keys(form.value)) {
+      if (this.hives.includes(name) && form.value[name]) {
+        hiveRequestList.push(name);
       }
     }
+    this._ioService.emit('getData', {
+      hives: hiveRequestList,
+      count: this.MAX_VALUES_PER_HIVE,
+      startDate: form.value.startDate,
+      stopDate: form.value.endDate
+    });
   }
 
   /*updateChartData()
@@ -127,6 +217,7 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   private updateChartData(newColumns: Array<any>, dataKey: string,
                           datesKey: string) {
     for (var chart of this.charts) {
+      console.log(`Datakey: ${dataKey}, datesKey: ${datesKey}`)
       setTimeout(() => {
         let xs = {};
         xs[dataKey] = datesKey;
@@ -135,175 +226,6 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
           xs: xs
         })
       }, 1000);
-    }
-  }
-
-  /*filterData
-  * this method will filter the data to show 1, 2, 3, or 5 values per day based
-  * on the number of days and a display threshold.  This will allow the data
-  * display to adapt to different zoom levels without lagging out the
-  * visualization.
-  *
-  * @params:
-  *   x: Array<any> - our x-values aka the list of datetimes
-  *   y: Array<any> - our y-values aka our analysis values
-  */
-  private filterData(x: Array<any>, y: Array<any>) {
-    let dataSetSize = x.length;
-    let dateList = [];
-    let filesPerDay = 0;
-    for (let date of x.slice(0, x.length - 1)) {
-      let d = new Date(date);
-      d.setHours(0);
-      d.setMinutes(0);
-      d.setSeconds(0);
-      if (!dateList.includes(d.toISOString())) {
-        dateList.push(d.toISOString());
-      }
-      else {
-        filesPerDay++;
-      }
-    }
-    filesPerDay = filesPerDay / dateList.length;
-    let itemsPerDay = (this.MAX_VALUES_PER_HIVE / (dateList.length - 1)) + 1;
-    console.log(Math.floor(itemsPerDay));
-    var filtered = {
-      x: [],
-      y: []
-    };
-    if (Math.floor(itemsPerDay) <= 2) {
-      let dateIntervals = this.generateDatetimeIntervals(dateList, 8, 0, 16, 0);
-      let data = this.findRangeAverage(dateIntervals.list, x, y);
-      filtered.x = filtered.x.concat(dateIntervals.dates);
-      filtered.y = filtered.y.concat(data);
-    }
-    else if (Math.floor(itemsPerDay) <= 4) {
-      //Average the first half of the day
-      let dateIntervals = this.generateDatetimeIntervals(dateList, 8, 0, 12, 0);
-      let data = this.findRangeAverage(dateIntervals.list, x, y);
-      filtered.x = filtered.x.concat(dateIntervals.dates);
-      filtered.y = filtered.y.concat(data);
-      //Average the second half of the day
-      dateIntervals = this.generateDatetimeIntervals(dateList, 12, 1, 14, 0);
-      data = this.findRangeAverage(dateIntervals.list, x, y);
-      filtered.x = filtered.x.concat(dateIntervals.dates);
-      filtered.y = filtered.y.concat(data);
-    }
-    else if (itemsPerDay <= 8) {
-      for (let i = 8; i < 16; i++) {
-        let dateIntervals = this.generateDatetimeIntervals(dateList, i, 0, i + 1, i % 2);
-        let data = this.findRangeAverage(dateIntervals.list, x, y);
-        filtered.x = filtered.x.concat(dateIntervals.dates);
-        filtered.y = filtered.y.concat(data);
-      }
-    }
-    else if (itemsPerDay <= filesPerDay) {
-      filtered = this.halveData(dateList, x, y);
-    }
-    else {
-      filtered = {
-        x: x,
-        y: y
-      };
-    }
-    return filtered;
-  }
-
-  /*findRangeAverage
-  * given an array of datetimes and data, this function will find the average
-  * value in data for each unique date between the time of startHour:startMinute
-  * and stopHour and stopMinute.
-  *
-  * @params:
-  *   intervals: Array<any> - an array containing all intervals to check
-  *   dateTimes: Array<any> - an array containing all datetimes to be evaluated
-  *   data: Array<any> - the data to be averaged based on dateTimes.
-  */
-  private findRangeAverage(intervals: Array<any>, dateTimes: Array<Date>, data: Array<any>) {
-    let averages = new Array(intervals.length).fill(0);
-    let videoCountPerInterval = new Array(intervals.length).fill(0);
-    for (let i = 0; i < dateTimes.length; i++) {
-      for (let j = 0; j < intervals.length; j++) {
-        let datetime = new Date(dateTimes[i]);
-        let start = new Date(intervals[j].start);
-        let end = new Date(intervals[j].stop);
-        if (datetime >= start &&
-            datetime <= end) {
-          averages[j] += data[i];
-          videoCountPerInterval[j]++;
-        }
-      }
-    }
-    for (let i = 0; i < averages.length; i++) {
-      if (videoCountPerInterval[i] > 0) {
-        averages[i] = Math.round(averages[i] / videoCountPerInterval[i]);
-      }
-    }
-    return averages;
-  }
-
-  /*setTimeForDate
-  * This method will take an input date and an hour and minute value and return
-  * a datetime object with that hour and minute set.
-  *
-  * @params:
-  *   date: Date - the date to set hour and minute on
-  *   hour: number -  the hour to set on date
-  *   minute: number - the minute to set on date.
-  */
-  private setTimeForDate(date: Date, hour: number, minute: number) {
-    date.setHours(hour);
-    date.setMinutes(minute);
-    date.setSeconds(0);
-    return date;
-  }
-
-  /*generateDatetimeIntervals
-  * This method will take as input a list of unique datetimes and
-  * start and stop times and will return a list of intervals.  The intervals
-  * will be an object containing as datetime object formatting to the start and
-  * stop times.
-  */
-  private generateDatetimeIntervals(dateList: Array<Date>,
-                                    startHour: number, startMinute: number,
-                                    stopHour: number, stopMinute: number) {
-    let intervalsList = [];
-    let intervalDates = [];
-    for (var i = 0; i < dateList.length; i++) {
-      //set our start and stop intervals
-      let start = this.setTimeForDate(new Date(dateList[i]), startHour, startMinute);
-      let stop = this.setTimeForDate(new Date(dateList[i]), stopHour, stopMinute);
-      intervalsList[i] = {
-        start: start,
-        stop: stop
-      };
-      //average our start and stop datetimes as our new "interval datetimes"
-      intervalDates[i] = new Date((start.getTime() + stop.getTime()) / 2);
-    }
-    return {
-      dates: intervalDates,
-      list: intervalsList
-    }
-  }
-
-  /*halveData
-  * This method will take an input data and will average every other value,
-  * in essense halving the data size.
-  *
-  * @params:
-  *   dates: Array<any> - an array containig all the distinct dates in the given
-  *                       dateTimes array.
-  *   dateTimes: Array<any> - an array containing all dateTimes to be evaluated
-  *   data: Array<any> - the data to be averaged based on dateTimes.
-  */
-  private halveData(dates: Array<any>, dateTimes: Array<any>,
-                    data: Array<any>) {
-    for (var date of dates) {
-      // console.log(date);
-    }
-    return {
-      x: dateTimes,
-      y: data
     }
   }
 }

@@ -290,7 +290,28 @@ p{
 .visual-block {
   display: block;
 }
-.dashboard-hive-select {
-  display: block;
-  align-self: center;
+.dashboard-form-parent {
+  text-align: center
+}
+.dashboard-form {
+  display: inline-block;
+}
+.dashboard-checkbox {
+  margin: 10px;
+  color: "blue";
+}
+.dashboard-datepicker {
+  margin-right: 10px;
+  margin-left: 10px;
+}
+.dashboard-form-title {
+  margin-bottom: 15px;
+  margin-top: 5px;
+}
+.dashboard-title {
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
+.dashboard-chart-invisible {
+  display: none;
 }

@@ -15,6 +15,7 @@ module.exports = function() {
   require('../app/models/averagetrafficbyhour.server.model.js');
   require('../app/models/averagetrafficbyday.server.model.js');
   require('../app/models/averagetrafficbihourly.server.model.js');
+  require('../app/models/hiveswithanalysis.server.model.js');
   //Any necessary models should be called here.
   return db;
 }

@@ -8,6 +8,8 @@ import {  MatInputModule,
           MatButtonModule,
           MatIconModule,
           MatCheckboxModule,
+          MatDatepickerModule,
+          MatNativeDateModule
        } from '@angular/material';
 
 import { DashboardRoutes } from './dashboard.routes';
@@ -26,6 +28,8 @@ import { VideoService } from '../video/video.service';
     MatButtonModule,
     MatIconModule,
     MatCheckboxModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     RouterModule.forChild(DashboardRoutes)
   ],
   declarations: [
