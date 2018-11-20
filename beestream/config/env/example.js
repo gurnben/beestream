@@ -4,5 +4,7 @@ module.exports = {
   //Path to the directory containing hive folders
   videoPath: '',
   //Path to the ffmpeg installation
-  ffmpegPath: ''
+  ffmpegPath: '',
+  //The port to run the server on.
+  port: 80
 };
