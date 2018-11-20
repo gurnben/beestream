@@ -56,7 +56,6 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
     this._ioService.emit('dashboardConnect', {});
     this._ioService.on('dashboardHiveList', (message) => {
       this.hives = message.hiveNames
-      console.log(message.dates);
       this.hiveRanges = message.dates;
     });
     this._ioService.on('updateData', (message) => {
@@ -148,7 +147,6 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         }
       }
     }
-    console.log(this.activeRange);
     this.startDateFilter = (d: Date): boolean => {
       return d >= this.activeRange.startDate && d <= this.activeRange.endDate &&
         this.dateFilterDates.includes(d.toISOString());
@@ -221,7 +219,6 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   private updateChartData(newColumns: Array<any>, dataKey: string,
                           datesKey: string) {
     for (var chart of this.charts) {
-      console.log(`Datakey: ${dataKey}, datesKey: ${datesKey}`)
       setTimeout(() => {
         let xs = {};
         xs[dataKey] = datesKey;

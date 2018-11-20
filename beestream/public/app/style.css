@@ -314,6 +314,9 @@ p{
 .dashboard-chart-invisible {
   display: none;
 }
+.dashboard-chart {
+  margin: 20px;
+}
 .dashboard-loading {
   margin: auto;
   margin-top: 15px;
