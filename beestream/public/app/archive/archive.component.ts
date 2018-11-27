@@ -105,12 +105,13 @@ export class ArchiveComponent implements OnDestroy{
         if (this.times.includes(params.get('time'))) {
           this.timeSelect = params.get('time');
           console.log(this.videoUrl);
-          this._videoService.emit('getVideo', {
-            hive: this.hiveSelect,
-            date: this.dateSelect,
-            time: this.timeSelect,
-            previous: this.videoUrl
-          });
+          // this._videoService.emit('getVideo', {
+          //   hive: this.hiveSelect,
+          //   date: this.dateSelect,
+          //   time: this.timeSelect,
+          //   previous: this.videoUrl
+          // });
+          this.onSubmit()
           this.router.navigate(['/archive']);
         }
       });

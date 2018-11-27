@@ -1,15 +1,9 @@
 const mongoose = require('mongoose');
 const fs = require('fs');
-const VideoFile = mongoose.model('VideoFile');
-const AverageTrafficByHour = mongoose.model('AverageTrafficByHour');
-const AverageTrafficBiHourly = mongoose.model('AverageTrafficBiHourly');
 const AverageTrafficByDay = mongoose.model('AverageTrafficByDay');
 const HivesWithAnalysis = mongoose.model('HivesWithAnalysis');
 const config = require('../../config/config');
-const DAILY_THRESHOLD = 2;
-const BI_HOURLY_THRESHOLD = 6;
-const HOURLY_THRESHOLD = 60;
-const AVERAGE_VIDEOS_PER_DAY = HOURLY_THRESHOLD + 1;
+const AVERAGE_VIDEOS_PER_DAY = 120
 const viewQuerySelection = {
   _id: 0,
   HiveName: 1,
