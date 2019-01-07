@@ -2,8 +2,9 @@ const mongoose = require('mongoose');
 const VideoFile = mongoose.model('VideoFile');
 const utils = require('./datapath-utils.js');
 
-module.exports = {
+var alldata = {
   name: 'alldata',
+  aggregateMethod: '',
   threshold: 120,
   query: async function(viewQuerySelection, hives, startDate, stopDate, callback) {
     for (var hive of hives) {
@@ -56,9 +57,11 @@ module.exports = {
             StopDates: dates,
             HiveName: hivename
           };
-          callback(response);
+          callback(response, '');
         }
       });
     }
   }
 }
+
+module.exports = alldata

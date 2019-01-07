@@ -9,7 +9,7 @@
 *   stop - a string or number representing the stop date of the query.
 */
 const queryFromView = function(model, hives, start, stop, viewQuerySelection,
-  callback) {
+  callback, aggregateMethod) {
   for (let hive of hives) {
     if (start && stop) {
       let startDate = new Date(start);
@@ -19,14 +19,14 @@ const queryFromView = function(model, hives, start, stop, viewQuerySelection,
         UTCStartDate: { "$gte": startDate, "$lte": endDate },
         UTCEndDate: { "$gte": startDate, "$lte": endDate }
       }, viewQuerySelection, (err, data) => {
-        viewCallback(err, data, callback);
+        viewCallback(err, data, callback, aggregateMethod);
       });
     }
     else {
       model.find({
         HiveName: hive
       }, viewQuerySelection, (err, data) => {
-        viewCallback(err, data, callback);
+        viewCallback(err, data, callback, aggregateMethod);
       });
     }
   }
@@ -42,7 +42,7 @@ const queryFromView = function(model, hives, start, stop, viewQuerySelection,
 *   err - any errors thrown by the query.
 *   data - the data returned from the view query
 */
-const viewCallback = function(err, data, callback) {
+const viewCallback = function(err, data, callback, aggregateMethod) {
   if (err) {
     console.log(`Error retrieving data: ${err}`);
   }
@@ -88,7 +88,7 @@ const viewCallback = function(err, data, callback) {
       StopDates: stopDates,
       HiveName: hivename
     };
-    callback(response);
+    callback(response, aggregateMethod);
   }
 }
 

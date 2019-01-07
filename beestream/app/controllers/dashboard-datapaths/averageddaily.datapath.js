@@ -4,9 +4,10 @@ const utils = require('./datapath-utils.js');
 
 module.exports = {
   name: 'byday',
+  aggregateMethod: ' Averaged Daily',
   threshold: 2,
   query: async function(viewQuerySelection, hives, startDate, stopDate, callback) {
     utils.queryFromView(AverageTrafficByDay,
-        hives, startDate, stopDate, viewQuerySelection, callback);
+        hives, startDate, stopDate, viewQuerySelection, callback, ' Averaged Daily');
   }
 }

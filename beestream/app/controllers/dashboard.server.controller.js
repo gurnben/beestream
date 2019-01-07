@@ -4,6 +4,7 @@ const AverageTrafficByDay = mongoose.model('AverageTrafficByDay');
 const HivesWithAnalysis = mongoose.model('HivesWithAnalysis');
 const config = require('../../config/config');
 const AVERAGE_VIDEOS_PER_DAY = 120
+let datapaths = {};
 const viewQuerySelection = {
   _id: 0,
   HiveName: 1,
@@ -19,7 +20,6 @@ const viewQuerySelection = {
   UTCStartDate: 1,
   UTCEndDate: 1
 }
-let datapaths = {};
 path = require('path').resolve("app/controllers/dashboard-datapaths/");
 require('fs').readdirSync(path).forEach((file) => {
   let datapath = require(`${path}/${file}`);
@@ -37,15 +37,34 @@ module.exports = function(io, socket) {
   * This function will send an updateData response with the given data.
   *
   * @params:
-  *   data - the data to send to the client.
+  *   data            - the data to send to the client.
+  *   aggregateMethod - the method used to aggregate data.
   */
-  const sendResponse = function(data) {
+  const sendResponse = function(data, aggregateMethod) {
     //Do any other data processing/filtertering/custom responses here.
-    socket.emit('updateData', data);
+    console.log(aggregateMethod);
+    var transmittableData = data;
+    transmittableData['aggregateMethod'] = aggregateMethod;
+    socket.emit('updateData', transmittableData);
   }
 
   //Socket handler to return analysis data for a hive.
   socket.on('getData', (message) => {
+
+    //build query conditions from client's message request.
+    let viewQuerySelection = {};
+    message.dataSets.forEach((dataset) => {
+      if (config.dataSets.includes(dataset)) {
+        viewQuerySelection[dataset] = 1;
+      }
+      else {
+        console.log(`${dataset} is not an avaliable dataSet`);
+      }
+    });
+    viewQuerySelection._id = 0;
+    viewQuerySelection.HiveName = 1;
+    viewQuerySelection.UTCStartDate = 1;
+    viewQuerySelection.UTCEndDate = 1;
 
     //Set our data counting conditions based on start and stop date.
     let countConditions = {
@@ -126,6 +145,9 @@ module.exports = function(io, socket) {
           dateList: result
         });
       }
-    })
+    });
+    socket.emit('avaliableDataSets', {
+      dataSets: config.dataSets
+    });
   });
 }

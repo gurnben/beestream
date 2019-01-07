@@ -1,10 +1,9 @@
-import { Component, ViewEncapsulation, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, ViewEncapsulation, OnDestroy, AfterViewInit, ViewChild } from '@angular/core';
 import { VideoService } from '../video/video.service';
 import { NgForm } from '@angular/forms';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ViewChild } from '@angular/core';
-import { ChartsModule } from 'ng2-charts';
-import { BaseChartDirective } from 'ng2-charts';
+import { DeparturesChartComponent } from './dashboard-charts/departures-chart/departureschart.component';
+import { ArrivalsChartComponent } from './dashboard-charts/arrivals-chart/arrivalschart.component';
 import * as c3 from 'c3';
 require('./c3.styles.css');
 
@@ -19,8 +18,10 @@ require('./c3.styles.css');
   styles: [ './c3.styles.css' ]
 })
 export class DashboardComponent implements OnDestroy, AfterViewInit {
-
-  @ViewChild("primaryChart") chart: BaseChartDirective;
+  @ViewChild(DeparturesChartComponent)
+    private departuresChart: DeparturesChartComponent;
+  @ViewChild(ArrivalsChartComponent)
+    private arrivalsChart: ArrivalsChartComponent;
   private checkboxGroup = null;
   private hiddenControl = null;
   private form = null;
@@ -32,6 +33,8 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
     startDate: null,
     endDate: null
   };
+  private avaliableDataSets: Array<any> = [];
+  private aggregateMethod: String;
   private dataLoading = false;
   private dataReceived = false;
   private MAX_VALUES_PER_HIVE:number = 1000;
@@ -59,14 +62,17 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
       this.hiveRanges = message.dates;
     });
     this._ioService.on('updateData', (message) => {
-      let y = [message.HiveName].concat(message.AverageArrivals);
+      let AverageArrivals = [message.HiveName].concat(message.AverageArrivals);
+      var response = {};
+      for (let dataset of this.avaliableDataSets) {
+        response[dataset] = [message.HiveName].concat(message[dataset]);
+      }
       let x = [message.HiveName + 'Dates'].concat(message.StartDates);
-      let newColumn = [x, y];
-      this.updateChartData(newColumn,
+      this.updateChartData(x, response,
         message.HiveName, message.HiveName + 'Dates');
       this.dataLoading = false;
       this.dataReceived = true;
-      this.charts[0].resize();
+      this.aggregateMethod = message.aggregateMethod;
     });
     this._ioService.on('availableDateList', (message) => {
       let dates = [];
@@ -85,6 +91,9 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         return false;
       }
     });
+    this._ioService.on('avaliableDataSets', (message) => {
+      this.avaliableDataSets = message.dataSets;
+    });
   }
 
   /*ngAfterViewInit()
@@ -92,27 +101,8 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   * namely, we'll have to set up our c3 charts here.
   */
   public ngAfterViewInit() {
-    let chart = c3.generate({
-      bindto: '#chart',
-      data: {
-        xs: {},
-        xFormat: '%Y-%m-%dT%H:%M:%S.000Z',
-        columns: [],
-        type: 'scatter'
-      },
-      axis: {
-        x: {
-          type: 'timeseries',
-          tick: {
-            rotate: 60,
-            fit: true,
-            multiline: true,
-            format: '%Y-%m-%d %H:%M:%S'
-          }
-        }
-      }
-    });
-    this.charts.push(chart);
+    this.charts.push(this.departuresChart);
+    this.charts.push(this.arrivalsChart);
   }
 
   /*ngOnDestroy
@@ -203,11 +193,13 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         hiveRequestList.push(name);
       }
     }
+    let requestDataSet = this.avaliableDataSets;
     this._ioService.emit('getData', {
       hives: hiveRequestList,
       count: this.MAX_VALUES_PER_HIVE,
       startDate: form.value.startDate,
-      stopDate: form.value.endDate
+      stopDate: form.value.endDate,
+      dataSets: requestDataSet
     });
     this.dataLoading = true;
   }
@@ -216,17 +208,10 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   * This method will update all chart data with our new data.  May need to be
   * specialized to deal with special types of charts later!
   */
-  private updateChartData(newColumns: Array<any>, dataKey: string,
-                          datesKey: string) {
+  private updateChartData(x: any, y: any,
+                          dataKey: string, datesKey: string) {
     for (var chart of this.charts) {
-      setTimeout(() => {
-        let xs = {};
-        xs[dataKey] = datesKey;
-        chart.load({
-          columns: newColumns,
-          xs: xs
-        })
-      }, 1000);
+      chart.updateData(x, y, dataKey, datesKey, this.aggregateMethod);
     }
   }
 }

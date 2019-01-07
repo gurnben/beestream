@@ -12,10 +12,11 @@ import {  MatInputModule,
           MatNativeDateModule,
           MatProgressSpinnerModule
        } from '@angular/material';
-
 import { DashboardRoutes } from './dashboard.routes';
 import { DashboardComponent } from './dashboard.component';
 import { VideoService } from '../video/video.service';
+import { DeparturesChartComponent } from './dashboard-charts/departures-chart/departureschart.component';
+import { ArrivalsChartComponent } from './dashboard-charts/arrivals-chart/arrivalschart.component';
 
 @NgModule({
   imports: [
@@ -35,7 +36,9 @@ import { VideoService } from '../video/video.service';
     RouterModule.forChild(DashboardRoutes)
   ],
   declarations: [
-    DashboardComponent
+    DashboardComponent,
+    DeparturesChartComponent,
+    ArrivalsChartComponent
   ],
   providers: [
     VideoService

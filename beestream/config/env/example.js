@@ -6,5 +6,9 @@ module.exports = {
   //Path to the ffmpeg installation
   ffmpegPath: '',
   //The port to run the server on.
-  port: 80
+  port: 80,
+  //All the datasets provded by the datapaths for the dashboard page.  
+  dataSets: [
+    "dataset"
+  ]
 };
