@@ -42,7 +42,6 @@ module.exports = function(io, socket) {
   */
   const sendResponse = function(data, aggregateMethod) {
     //Do any other data processing/filtertering/custom responses here.
-    console.log(aggregateMethod);
     var transmittableData = data;
     transmittableData['aggregateMethod'] = aggregateMethod;
     socket.emit('updateData', transmittableData);
