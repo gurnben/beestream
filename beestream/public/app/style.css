@@ -311,11 +311,16 @@ p{
   margin-bottom: 5px;
   margin-top: 5px;
 }
-.dashboard-chart-invisible {
+.dashboard-chart-div-invisible {
   display: none;
 }
-.dashboard-chart {
+.dashboard-chart-div {
   margin: 20px;
+}
+.dashboard-chart {
+  height: auto;
+  width: auto;
+  min-height: 480px;
 }
 .dashboard-loading {
   margin: auto;

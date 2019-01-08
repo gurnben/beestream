@@ -31,13 +31,7 @@ module.exports = {
 		]
 	},
 	plugins: [
-		new UglifyJsPlugin(),
-		new webpack.ContextReplacementPlugin(
-			// The (\\|\/) piece accounts for path separators in *nix and Windows
-			/angular(\\|\/)core/,
-			path.join(__dirname, 'public'), // location of your src
-			{ }
-		)
+		new UglifyJsPlugin()
 	],
 	mode: `${((process.env.NODE_ENV === 'development') || (process.env.NODE_ENV === 'production')) ? process.env.NODE_ENV : 'development'}`
 };
