@@ -145,7 +145,7 @@ module.exports = function(io, socket) {
         });
       }
     });
-    socket.emit('avaliableDataSets', {
+    socket.emit('availableDataSets', {
       dataSets: config.dataSets
     });
   });

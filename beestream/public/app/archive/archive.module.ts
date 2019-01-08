@@ -24,7 +24,7 @@ import { AnalysisModule } from '../analysis/analysis.module';
     HttpClientModule,
     FontAwesomeModule,
     MatButtonModule,
-    ShareModule.forRoot(),
+    ShareModule,
     RouterModule.forChild(ArchiveRoutes)
   ],
   declarations: [

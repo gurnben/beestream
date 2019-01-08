@@ -1,5 +1,6 @@
-import { Component, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { ViewChild } from '@angular/core';
+import { ChartComponent } from '../chart.interface.component';
 import * as c3 from 'c3';
 require('../../c3.styles.css');
 
@@ -11,24 +12,11 @@ require('../../c3.styles.css');
   template: require('./departureschart.template.html'),
   styles: [ '../../c3.styles.css' ]
 })
-export class DeparturesChartComponent implements OnDestroy, AfterViewInit {
+export class DeparturesChartComponent implements ChartComponent, AfterViewInit {
 
   private chart:any;
   private showChart: boolean;
-
-  /*constructor
-  * Constructor for DashbordComponent
-  * initializes necessary entry variables and service instances
-  *
-  * @params:
-  *   _ioService: VideoService - object to handle socket.io interactions
-  */
-  public constructor() {}
-
-  /*ngOnInit
-  * This overrides the ngOnInit function to add additional functionality.
-  */
-  public ngOnInit() {}
+  private requiredDataSet: string = 'AverageDepartures';
 
   /*ngAfterViewInit()
   * This method overrides the ngAfterViewInit method to add functionality,
@@ -61,14 +49,6 @@ export class DeparturesChartComponent implements OnDestroy, AfterViewInit {
     });
   }
 
-  /*ngOnDestroy
-  * This method overrides the ngOnDestroy method to add functionality, namely
-  * it ensures that our socket.io listeners are removed.
-  */
-  public ngOnDestroy() {
-    //TODO: remove listeners
-  }
-
   /*updateChartData()
   * This method will update all chart data with our new data.  May need to be
   * specialized to deal with special types of charts later!
@@ -79,13 +59,22 @@ export class DeparturesChartComponent implements OnDestroy, AfterViewInit {
       let xs = {};
       xs[dataKey] = datesKey;
       this.chart.load({
-        columns: [x, y.AverageDepartures],
+        columns: [x, y[this.requiredDataSet]],
         xs: xs,
       })
     }, 1000);
-    setTimeout(() => {
-      this.chart.axis.labels({y: 'Departures' + aggregateMethod});
-    }, 1000);
+    if (aggregateMethod) {
+      setTimeout(() => {
+        this.chart.axis.labels({y: 'Departures' + aggregateMethod});
+      }, 1000);
+    }
     this.showChart = true;
+  }
+
+  /*
+  *
+  */
+  public requiredDataSets() {
+    return this.requiredDataSet;
   }
 }

@@ -4,6 +4,7 @@ import { NgForm } from '@angular/forms';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DeparturesChartComponent } from './dashboard-charts/departures-chart/departureschart.component';
 import { ArrivalsChartComponent } from './dashboard-charts/arrivals-chart/arrivalschart.component';
+import { ChartComponent } from './dashboard-charts/chart.interface.component';
 import * as c3 from 'c3';
 require('./c3.styles.css');
 
@@ -19,9 +20,9 @@ require('./c3.styles.css');
 })
 export class DashboardComponent implements OnDestroy, AfterViewInit {
   @ViewChild(DeparturesChartComponent)
-    private departuresChart: DeparturesChartComponent;
+    private departuresChart: ChartComponent;
   @ViewChild(ArrivalsChartComponent)
-    private arrivalsChart: ArrivalsChartComponent;
+    private arrivalsChart: ChartComponent;
   private checkboxGroup = null;
   private hiddenControl = null;
   private form = null;
@@ -68,11 +69,11 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         response[dataset] = [message.HiveName].concat(message[dataset]);
       }
       let x = [message.HiveName + 'Dates'].concat(message.StartDates);
+      this.aggregateMethod = message.aggregateMethod;
       this.updateChartData(x, response,
         message.HiveName, message.HiveName + 'Dates');
       this.dataLoading = false;
       this.dataReceived = true;
-      this.aggregateMethod = message.aggregateMethod;
     });
     this._ioService.on('availableDateList', (message) => {
       let dates = [];
@@ -91,7 +92,7 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         return false;
       }
     });
-    this._ioService.on('avaliableDataSets', (message) => {
+    this._ioService.on('availableDataSets', (message) => {
       this.avaliableDataSets = message.dataSets;
     });
   }
@@ -110,7 +111,10 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   * it ensures that our socket.io listeners are removed.
   */
   public ngOnDestroy() {
-    //TODO: remove listeners
+    this._ioService.removeListener('dashboardHiveList');
+    this._ioService.removeListener('updateData');
+    this._ioService.removeListener('availableDateList');
+    this._ioService.removeListener('availableDataSets');
   }
 
   private hiveSelected(form: NgForm) {
@@ -211,7 +215,9 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   private updateChartData(x: any, y: any,
                           dataKey: string, datesKey: string) {
     for (var chart of this.charts) {
-      chart.updateData(x, y, dataKey, datesKey, this.aggregateMethod);
+      if (y[chart.requiredDataSets()]) {
+        chart.updateData(x, y, dataKey, datesKey, this.aggregateMethod);
+      }
     }
   }
 }
