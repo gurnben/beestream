@@ -42,6 +42,8 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   private startDateFilter: any = null;
   private endDateFilter: any = null;
   private dateFilterDates: any = null;
+  private beginStartAt: any = new Date();
+  private endStartAt: any = new Date();
   private color = 'primary';
 
   /*constructor
@@ -141,6 +143,8 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         }
       }
     }
+    this.endStartAt = this.activeRange.endDate;
+    this.beginStartAt = this.activeRange.endDate;
     this.startDateFilter = (d: Date): boolean => {
       return d >= this.activeRange.startDate && d <= this.activeRange.endDate &&
         this.dateFilterDates.includes(d.toISOString());

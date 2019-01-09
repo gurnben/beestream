@@ -19,7 +19,7 @@
           name="startDate"
           (dateChange)="startDateSelected(startPickerInput.value)" ngModel>
         <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-        <mat-datepicker #startPicker></mat-datepicker>
+        <mat-datepicker [startAt]="beginStartAt" #startPicker></mat-datepicker>
       </mat-form-field>
       <mat-form-field class="dashboard-datepicker">
         <input matInput #endPickerInput [matDatepickerFilter]="endDateFilter"
@@ -28,7 +28,7 @@
           name="endDate"
           (dateChange)="endDateSelected(endPickerInput.value)" ngModel>
         <mat-datepicker-toggle matSuffix [for]="stopPicker"></mat-datepicker-toggle>
-        <mat-datepicker #stopPicker></mat-datepicker>
+        <mat-datepicker [startAt]='endStartAt' #stopPicker></mat-datepicker>
       </mat-form-field>
       <br>
       <button class="main-button" type="submit">Get Analysis</button>
