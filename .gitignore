@@ -39,10 +39,13 @@ Thumbs.db
 # Project Ignores #
 ###################
 **public/build
-**config/env/production.js
-**config/env/development.js
+**env/production.js
+**env/development.js
 node_modules
 package-lock.json
 videotmp/
 video/
-
+beetlog.txt
+**log.txt
+**mongolog
+**public/build/

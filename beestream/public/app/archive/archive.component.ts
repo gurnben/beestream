@@ -5,7 +5,7 @@ import { NgForm } from '@angular/forms';
 import { VideoService } from '../video/video.service';
 import { Router, ParamMap, ActivatedRoute } from '@angular/router'
 import { PlatformLocation } from '@angular/common';
-import { ShareButtons } from '@ngx-share/core';
+import { ShareService } from '@ngx-share/core';
 
 /*ArchiveComponent
 * This component displays the article video chooser and plays a chosen video.
@@ -52,7 +52,7 @@ export class ArchiveComponent implements OnDestroy{
               private route: ActivatedRoute,
               private router: Router,
               private platformLocation: PlatformLocation,
-              @Inject(ShareButtons) private share: ShareButtons) {}
+              public share: ShareService) {}
 
   /*ngOnInit
   * This overrides the ngOnInit function to add additional functionality.
@@ -105,12 +105,13 @@ export class ArchiveComponent implements OnDestroy{
         if (this.times.includes(params.get('time'))) {
           this.timeSelect = params.get('time');
           console.log(this.videoUrl);
-          this._videoService.emit('getVideo', {
-            hive: this.hiveSelect,
-            date: this.dateSelect,
-            time: this.timeSelect,
-            previous: this.videoUrl
-          });
+          // this._videoService.emit('getVideo', {
+          //   hive: this.hiveSelect,
+          //   date: this.dateSelect,
+          //   time: this.timeSelect,
+          //   previous: this.videoUrl
+          // });
+          this.onSubmit()
           this.router.navigate(['/archive']);
         }
       });

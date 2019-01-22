@@ -16,5 +16,8 @@ mongoose.model('VideoFile', new Schema({
   },
   DeparturesTriangle: {
     type: Number
+  },
+  FileSize: {
+    type: Number
   }
 }), 'VideoFiles');

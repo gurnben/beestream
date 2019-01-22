@@ -1,4 +1,4 @@
-@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
 /*You'll find any CSS Styling here*/
 body{
   font-family: Arial;
@@ -284,6 +284,46 @@ p{
 .share-button-div {
   max-width: 640px;
   text-align: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+.visual-block {
+  display: block;
+}
+.dashboard-form-parent {
+  text-align: center
+}
+.dashboard-form {
+  display: inline-block;
+}
+.dashboard-checkbox {
+  margin: 10px;
+}
+.dashboard-datepicker {
+  margin-right: 10px;
+  margin-left: 10px;
+}
+.dashboard-form-title {
+  margin-bottom: 15px;
+  margin-top: 5px;
+}
+.dashboard-title {
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
+.dashboard-chart-div-invisible {
+  display: none;
+}
+.dashboard-chart-div {
+  margin: 20px;
+}
+.dashboard-chart {
+  height: auto;
+  width: auto;
+  min-height: 480px;
+}
+.dashboard-loading {
+  margin: auto;
   margin-top: 15px;
   margin-bottom: 15px;
 }

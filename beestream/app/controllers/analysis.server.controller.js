@@ -31,32 +31,27 @@ module.exports = function(io, socket) {
   * a JSON object containing an arrivals count and a departures count.
   */
   socket.on('getAnalysis', (message) => {
-    if (config.avaliableHives.includes(message.hive)) {
-      VideoFile.findOne({HiveName: message.hive, UTCDate: new Date(message.datetime)},
-                    {_id: 0}).exec((err, result) => {
-        if (err) {
-          console.log(err);
+    VideoFile.findOne({HiveName: message.hive, UTCDate: new Date(message.datetime)},
+                  {_id: 0}).exec((err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      else {
+        if (result && result.ArrivalsTriangle != null && result.DeparturesTriangle != null) {
+          sendResults(false,
+                      message.hive,
+                      message.datetime,
+                      result.ArrivalsTriangle,
+                      result.DeparturesTriangle,
+                      socket);
         }
         else {
-          if (result && result.ArrivalsTriangle != null && result.DeparturesTriangle != null) {
-            sendResults(false,
-                        message.hive,
-                        message.datetime,
-                        result.ArrivalsTriangle,
-                        result.DeparturesTriangle,
-                        socket);
-          }
-          else {
-            socket.emit('videoAnalysisFailure', {
-              message: 'No Analysis Avaliable'
-            });
-          }
+          socket.emit('videoAnalysisFailure', {
+            message: 'No Analysis Avaliable'
+          });
         }
-      });
-    }
-    else {
-      socket.emit('videoAnalysisFailure', {message: 'Invalid Hive or Date'});
-    }
+      }
+    });
   });
 }
 
