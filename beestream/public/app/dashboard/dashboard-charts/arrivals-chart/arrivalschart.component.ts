@@ -14,9 +14,9 @@ require('../../c3.styles.css');
 })
 export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
 
-  private chart:any;
+  private chart: any;
   private showChart: boolean;
-  private requiredDataSet: string = 'AverageArrivals';
+  requiredDataSet: any = {video: ['AverageArrivals', 'UTCStartDate', 'UTCEndDate']};
 
   /*ngAfterViewInit()
   * This method overrides the ngAfterViewInit method to add functionality,
@@ -53,28 +53,59 @@ export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
   * This method will update all chart data with our new data.  May need to be
   * specialized to deal with special types of charts later!
   */
-  public updateData(x: any, y: any, dataKey: string,
-                          datesKey: string, aggregateMethod: string) {
-    setTimeout(() => {
-      let xs = {};
-      xs[dataKey] = datesKey;
-      this.chart.load({
-        columns: [x, y[this.requiredDataSet]],
-        xs: xs
-      })
-    }, 1000);
-    if (aggregateMethod) {
-      setTimeout(() => {
-        this.chart.axis.labels({y: 'Arrivals' + aggregateMethod});
-      }, 2000);
+  public updateData(res: any, dataKey: string,
+                    datesKey: string, aggregateMethod: string,
+                    unchartedHives: Array<string>) {
+    //hide the chart while we update it.
+    this.showChart = false;
+
+    //Process data by appending a hivename or hivename with date appended.
+    let data = { video: {
+      UTCStartDate: [],
+      AverageArrivals: []
+    }, audio: {} };
+    for (let field in res.video) {
+      if (field.includes('Date')) {
+        (data['video'])[field] = [datesKey].concat(res.video[field]);
+      }
+      else if (field != 'HiveName') {
+        (data['video'])[field] = [dataKey].concat(res.video[field]);
+      }
     }
+
+    //Clear the chart
+    let hivesToRemove = [];
+    for (let hive of unchartedHives) {
+      hivesToRemove.push(hive);
+      hivesToRemove.push(hive + 'Dates');
+    }
+
+    console.log(hivesToRemove.toString());
+
+    //TODO: Figure out how to actually remove a dataset from the chart and get it to redraw
+
+    //push the new data to the chart
+    let xs = {};
+    xs[dataKey] = datesKey;
+    this.chart.load({
+      unload: hivesToRemove,
+      columns: [data.video.UTCStartDate, data.video.AverageArrivals],
+      xs: xs
+    });
+
+    //update the chart's key with the method of aggregation
+    if (aggregateMethod) {
+      this.chart.axis.labels({y: 'Arrivals' + aggregateMethod});
+    }
+
+    //show the chart!
     this.showChart = true;
   }
 
-  /*
-  *
+  /*requiredDataSets
+  * returns a list of required data sets.
   */
-  public requiredDataSets() {
+  public requiredDataSets(): { audio: [], video: [] } {
     return this.requiredDataSet;
   }
 }

@@ -17,6 +17,7 @@ import { DashboardComponent } from './dashboard.component';
 import { VideoService } from '../video/video.service';
 import { DeparturesChartComponent } from './dashboard-charts/departures-chart/departureschart.component';
 import { ArrivalsChartComponent } from './dashboard-charts/arrivals-chart/arrivalschart.component';
+import { RMSLinearChartComponent } from './dashboard-charts/rmslinear-chart/rmslinearchart.component.ts';
 
 @NgModule({
   imports: [
@@ -38,7 +39,8 @@ import { ArrivalsChartComponent } from './dashboard-charts/arrivals-chart/arriva
   declarations: [
     DashboardComponent,
     DeparturesChartComponent,
-    ArrivalsChartComponent
+    ArrivalsChartComponent,
+    RMSLinearChartComponent
   ],
   providers: [
     VideoService

@@ -8,15 +8,15 @@ require('../../c3.styles.css');
 * This component will be our dashboard for beemon analytics.
 */
 @Component({
-  selector: 'departures-chart',
-  template: require('./departureschart.template.html'),
+  selector: 'rmslinear-chart',
+  template: require('./rmslinearchart.template.html'),
   styles: [ '../../c3.styles.css' ]
 })
-export class DeparturesChartComponent implements ChartComponent, AfterViewInit {
+export class RMSLinearChartComponent implements ChartComponent, AfterViewInit {
 
   private chart:any;
   private showChart: boolean;
-  requiredDataSet: any = {video: ['AverageDepartures', 'UTCStartDate', 'UTCEndDate']};
+  requiredDataSet: any = {audio: ['AverageRMSLinear', 'UTCStartDate', 'UTCEndDate']};
 
   /*ngAfterViewInit()
   * This method overrides the ngAfterViewInit method to add functionality,
@@ -24,7 +24,7 @@ export class DeparturesChartComponent implements ChartComponent, AfterViewInit {
   */
   public ngAfterViewInit() {
     this.chart = c3.generate({
-      bindto: '#departures-chart',
+      bindto: '#rmslinear-chart',
       data: {
         xs: {},
         xFormat: '%Y-%m-%dT%H:%M:%S.000Z',
@@ -43,7 +43,7 @@ export class DeparturesChartComponent implements ChartComponent, AfterViewInit {
           }
         },
         y: {
-          label: 'Departures'
+          label: 'RMS Linear'
         }
       }
     });
@@ -59,20 +59,6 @@ export class DeparturesChartComponent implements ChartComponent, AfterViewInit {
     //hide the chart while we update it.
     this.showChart = false;
 
-    //Process data by appending a hivename or hivename with date appended.
-    let data = { video: {
-      UTCStartDate: [],
-      AverageDepartures: []
-    }, audio: {} };
-    for (let field in res.video) {
-      if (field.includes('Date')) {
-        (data['video'])[field] = [datesKey].concat(res.video[field]);
-      }
-      else if (field != 'HiveName') {
-        (data['video'])[field] = [dataKey].concat(res.video[field]);
-      }
-    }
-
     //Clear the chart
     let hivesToRemove = [];
     for (let hive of unchartedHives) {
@@ -81,17 +67,31 @@ export class DeparturesChartComponent implements ChartComponent, AfterViewInit {
     }
 
     //push the new data to the chart
+    let data = { video: {}, audio: {
+      UTCStartDate: [],
+      AverageRMSLinear: []
+    } };
+    for (let field in res.audio) {
+      if (field.includes('Date')) {
+        (data['audio'])[field] = [datesKey].concat(res.audio[field]);
+      }
+      else if (field != 'HiveName') {
+        (data['audio'])[field] = [dataKey].concat(res.audio[field]);
+      }
+    }
+
+    //push the new data to the chart
     let xs = {};
     xs[dataKey] = datesKey;
     this.chart.load({
       unload: hivesToRemove,
-      columns: [data.video.UTCStartDate, data.video.AverageDepartures],
-      xs: xs
+      columns: [data.audio.UTCStartDate, data.audio.AverageRMSLinear],
+      xs: xs,
     })
 
     //update the chart's key with the method of aggregation
     if (aggregateMethod) {
-      this.chart.axis.labels({y: 'Departures' + aggregateMethod});
+      this.chart.axis.labels({y: 'RMS' + aggregateMethod});
     }
 
     //show the chart!
