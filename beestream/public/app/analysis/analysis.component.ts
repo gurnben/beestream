@@ -11,7 +11,7 @@ import { VideoService } from '../video/video.service';
 */
 @Component({
   selector: 'analysis',
-  templateUrl: '/app/analysis/analysis.template.html',
+  template: require('./analysis.template.html'),
   providers: [VideoService]
 })
 export class AnalysisComponent implements OnChanges, OnDestroy{

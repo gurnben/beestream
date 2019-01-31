@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ChartsModule } from 'ng2-charts';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {  MatInputModule,
           MatFormFieldModule,
@@ -23,7 +22,6 @@ import { RMSLinearChartComponent } from './dashboard-charts/rmslinear-chart/rmsl
   imports: [
     CommonModule,
     FormsModule,
-    ChartsModule,
     FormsModule,
     ReactiveFormsModule,
     MatInputModule,

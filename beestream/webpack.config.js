@@ -1,5 +1,4 @@
 const webpack = require('webpack');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const path = require('path');
 
 module.exports = {
@@ -26,12 +25,14 @@ module.exports = {
 			},
 			{
 				test: /\.html$/,
-				use: [ 'html-loader' ]
+				use: [ {
+					loader: 'html-loader',
+					options: {
+						caseSensitive: true
+					}
+				} ]
 			}
 		]
 	},
-	plugins: [
-		new UglifyJsPlugin()
-	],
 	mode: `${((process.env.NODE_ENV === 'development') || (process.env.NODE_ENV === 'production')) ? process.env.NODE_ENV : 'development'}`
 };

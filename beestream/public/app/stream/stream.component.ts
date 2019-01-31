@@ -9,7 +9,7 @@ import { VideoService } from '../video/video.service';
 */
 @Component({
   selector: 'stream',
-  templateUrl: '/app/stream/stream.template.html',
+  template: require('./stream.template.html'),
   providers: [ VideoService ]
 })
 export class StreamComponent {
