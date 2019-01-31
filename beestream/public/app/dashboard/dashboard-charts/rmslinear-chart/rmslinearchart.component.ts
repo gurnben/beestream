@@ -8,17 +8,17 @@ require('../../c3.styles.css');
 * This component will be our dashboard for beemon analytics.
 */
 @Component({
-  selector: 'arrivals-chart',
-  template: require('./arrivalschart.template.html'),
+  selector: 'rmslinear-chart',
+  template: require('./rmslinearchart.template.html'),
   styles: [ '../../c3.styles.css' ]
 })
-export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
+export class RMSLinearChartComponent implements ChartComponent, AfterViewInit {
 
-  private chart: any;
+  private chart:any;
   private showChart: boolean;
   private columns: Array<any> = [];
   private xs: any = {};
-  requiredDataSet: any = {video: ['AverageArrivals', 'UTCStartDate', 'UTCEndDate']};
+  requiredDataSet: any = {audio: ['AverageRMSLinear', 'UTCStartDate', 'UTCEndDate']};
 
   /*ngAfterViewInit()
   * This method overrides the ngAfterViewInit method to add functionality,
@@ -26,7 +26,7 @@ export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
   */
   public ngAfterViewInit() {
     this.chart = c3.generate({
-      bindto: '#arrivals-chart',
+      bindto: '#rmslinear-chart',
       data: {
         xs: {},
         xFormat: '%Y-%m-%dT%H:%M:%S.000Z',
@@ -45,7 +45,7 @@ export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
           }
         },
         y: {
-          label: 'Arrivals'
+          label: 'RMS Linear'
         }
       }
     });
@@ -67,20 +67,17 @@ export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
       unusedDataSets.push(hive + "Dates");
     }
 
-    //hide the chart while we update it.
-    // this.showChart = false;
-
     //Process data by appending a hivename or hivename with date appended.
-    let data = { video: {
+    let data = { video: {}, audio: {
       UTCStartDate: [],
-      AverageArrivals: []
-    }, audio: {} };
-    for (let field in res.video) {
+      AverageRMSLinear: []
+    } };
+    for (let field in res.audio) {
       if (field.includes('Date')) {
-        (data['video'])[field] = [datesKey].concat(res.video[field]);
+        (data['audio'])[field] = [datesKey].concat(res.audio[field]);
       }
       else if (field != 'HiveName') {
-        (data['video'])[field] = [dataKey].concat(res.video[field]);
+        (data['audio'])[field] = [dataKey].concat(res.audio[field]);
       }
     }
 
@@ -95,8 +92,8 @@ export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
     }
 
     //push new datasets
-    this.columns.push(data.video.UTCStartDate);
-    this.columns.push(data.video.AverageArrivals);
+    this.columns.push(data.audio.UTCStartDate);
+    this.columns.push(data.audio.AverageRMSLinear);
 
     //Load our new XS key-value pair
     let newXS = {};
@@ -108,7 +105,7 @@ export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
     newXS[dataKey] = datesKey;
     this.xs = newXS;
 
-    //Hide the chart while we update it.
+
     this.showChart = false;
 
     //Re-generate and reload the chart.
@@ -118,7 +115,7 @@ export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
     //this.chart.load successfully loads new datasets and unloads requested
     //datasets, but the re-render process doesn't un-render removed datasets.
     this.chart = c3.generate({
-      bindto: '#arrivals-chart',
+      bindto: '#rmslinear-chart',
       data: {
         xs: {},
         xFormat: '%Y-%m-%dT%H:%M:%S.000Z',
@@ -137,7 +134,7 @@ export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
           }
         },
         y: {
-          label: 'Arrivals'
+          label: 'RMS'
         }
       }
     });
@@ -150,7 +147,7 @@ export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
 
     //update the chart's key with the method of aggregation
     if (aggregateMethod) {
-      this.chart.axis.labels({y: 'Arrivals' + aggregateMethod});
+      this.chart.axis.labels({y: 'RMS' + aggregateMethod});
     }
 
     //show the chart!

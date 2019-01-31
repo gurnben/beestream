@@ -5,21 +5,6 @@ const HivesWithAnalysis = mongoose.model('HivesWithAnalysis');
 const config = require('../../config/config');
 const AVERAGE_VIDEOS_PER_DAY = 120
 let datapaths = {};
-const viewQuerySelection = {
-  _id: 0,
-  HiveName: 1,
-  AverageArrivals: 1,
-  AverageDepartures: 1,
-  AverageFileSize: 1,
-  MinimumArrivals: 1,
-  MinimumDepartures: 1,
-  MinimumFileSize: 1,
-  MaximumArrivals: 1,
-  MaximumDepartures: 1,
-  MaximumFileSize: 1,
-  UTCStartDate: 1,
-  UTCEndDate: 1
-}
 path = require('path').resolve("app/controllers/dashboard-datapaths/");
 require('fs').readdirSync(path).forEach((file) => {
   let datapath = require(`${path}/${file}`);
@@ -51,19 +36,29 @@ module.exports = function(io, socket) {
   socket.on('getData', (message) => {
 
     //build query conditions from client's message request.
-    let viewQuerySelection = {};
-    message.dataSets.forEach((dataset) => {
-      if (config.dataSets.includes(dataset)) {
-        viewQuerySelection[dataset] = 1;
+    let viewQuerySelection = { audio: {}, video: {} };
+    message.dataSets.video.forEach((dataset) => {
+      if (config.dataSets.video.includes(dataset)) {
+        viewQuerySelection.video[dataset] = 1;
       }
       else {
         console.log(`${dataset} is not an avaliable dataSet`);
       }
     });
-    viewQuerySelection._id = 0;
-    viewQuerySelection.HiveName = 1;
-    viewQuerySelection.UTCStartDate = 1;
-    viewQuerySelection.UTCEndDate = 1;
+    message.dataSets.audio.forEach((dataset) => {
+      if (config.dataSets.audio.includes(dataset)) {
+        viewQuerySelection.audio[dataset] = 1;
+      }
+      else {
+        console.log(`${dataset} is not an avaliable dataSet`);
+      }
+    });
+
+    //TODO: Required query fields here.
+    viewQuerySelection.video._id = 0;
+    viewQuerySelection.audio._id = 0;
+    viewQuerySelection.video.HiveName = 1;
+    viewQuerySelection.audio.HiveName = 1;
 
     //Set our data counting conditions based on start and stop date.
     let countConditions = {

@@ -1,5 +1,8 @@
 const webpack = require('webpack');
+<<<<<<< HEAD
 const TerserPlugin = require('terser-webpack-plugin');
+=======
+>>>>>>> d032f7f6bea05550771ac8885eae3e6c1754a71c
 const path = require('path');
 
 module.exports = {
@@ -35,6 +38,7 @@ module.exports = {
 			}
 		]
 	},
+<<<<<<< HEAD
 	optimization: {
 		minimizer: [
 			new TerserPlugin({
@@ -42,5 +46,7 @@ module.exports = {
 			})
 		]
 	},
+=======
+>>>>>>> d032f7f6bea05550771ac8885eae3e6c1754a71c
 	mode: `${((process.env.NODE_ENV === 'development') || (process.env.NODE_ENV === 'production')) ? process.env.NODE_ENV : 'development'}`
 };
