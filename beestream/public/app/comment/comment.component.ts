@@ -13,7 +13,7 @@ import { VideoService } from '../video/video.service';
 */
 @Component({
   selector: 'comments',
-  templateUrl: '/app/comment/comment.template.html',
+  template: require('./comment.template.html'),
   providers: [VideoService]
 })
 export class CommentComponent implements OnChanges, OnDestroy{

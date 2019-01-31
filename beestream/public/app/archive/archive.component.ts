@@ -13,7 +13,7 @@ import { ShareService } from '@ngx-share/core';
 */
 @Component({
   selector: 'archive',
-  templateUrl: '/app/archive/archive.template.html',
+  template: require('./archive.template.html'),
   providers: [VideoService]
 })
 export class ArchiveComponent implements OnDestroy{

@@ -1,5 +1,7 @@
 export interface ChartComponent {
-  updateData(x: any, y: any, dataKey: string,
-              datesKey: string, aggregateMethod: string): void;
-  requiredDataSets(): string;
+  requiredDataSet: any;
+  updateData(res: any, dataKey: string,
+              datesKey: string, aggregateMethod: string,
+              unchartedHives: Array<string>): void;
+  requiredDataSets(): { audio: [], video: [] };
 }

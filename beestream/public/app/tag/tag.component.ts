@@ -11,7 +11,7 @@ import { VideoService } from '../video/video.service';
 */
 @Component({
   selector: 'tags',
-  templateUrl: '/app/tag/tag.template.html',
+  template: require('./tag.template.html'),
   providers: [VideoService]
 })
 export class TagComponent implements OnChanges, OnDestroy{

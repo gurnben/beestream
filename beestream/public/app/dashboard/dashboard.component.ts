@@ -4,6 +4,7 @@ import { NgForm } from '@angular/forms';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DeparturesChartComponent } from './dashboard-charts/departures-chart/departureschart.component';
 import { ArrivalsChartComponent } from './dashboard-charts/arrivals-chart/arrivalschart.component';
+import { RMSLinearChartComponent } from './dashboard-charts/rmslinear-chart/rmslinearchart.component';
 import { ChartComponent } from './dashboard-charts/chart.interface.component';
 import * as c3 from 'c3';
 require('./c3.styles.css');
@@ -23,6 +24,8 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
     private departuresChart: ChartComponent;
   @ViewChild(ArrivalsChartComponent)
     private arrivalsChart: ChartComponent;
+  @ViewChild(RMSLinearChartComponent)
+    private rmsLinearChart: ChartComponent;
   private checkboxGroup = null;
   private hiddenControl = null;
   private form = null;
@@ -30,11 +33,12 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   private hives: Array<string> = null;
   private hiveRanges: Array<any> = null;
   private activeHives: Array<string> = [];
+  private unchartedHives: Array<string> = [];
   private activeRange: any = {
     startDate: null,
     endDate: null
   };
-  private avaliableDataSets: Array<any> = [];
+  private avaliableDataSets: any = {};
   private aggregateMethod: String;
   private dataLoading = false;
   private dataReceived = false;
@@ -65,15 +69,12 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
       this.hiveRanges = message.dates;
     });
     this._ioService.on('updateData', (message) => {
-      let AverageArrivals = [message.HiveName].concat(message.AverageArrivals);
       var response = {};
-      for (let dataset of this.avaliableDataSets) {
-        response[dataset] = [message.HiveName].concat(message[dataset]);
-      }
-      let x = [message.HiveName + 'Dates'].concat(message.StartDates);
+      response['video'] = message.video;
+      response['audio'] = message.audio;
       this.aggregateMethod = message.aggregateMethod;
-      this.updateChartData(x, response,
-        message.HiveName, message.HiveName + 'Dates');
+      this.updateChartData(response,
+        message.video.HiveName, message.video.HiveName + 'Dates');
       this.dataLoading = false;
       this.dataReceived = true;
     });
@@ -104,8 +105,11 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   * namely, we'll have to set up our c3 charts here.
   */
   public ngAfterViewInit() {
+    //TODO: Add any new @ViewChild charts to the charts array here
+    //Example: this.charts.push(this.chart);
     this.charts.push(this.departuresChart);
     this.charts.push(this.arrivalsChart);
+    this.charts.push(this.rmsLinearChart)
   }
 
   /*ngOnDestroy
@@ -164,6 +168,7 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   *   date:Date - the start date selected
   */
   private startDateSelected(date: Date) {
+    this.beginStartAt = date;
     this.endDateFilter = (d: Date): boolean => {
       let threshold_date = new Date(date);
       return d >= this.activeRange.startDate && d <= this.activeRange.endDate &&
@@ -180,6 +185,7 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   *   date:Date - the start date selected
   */
   private endDateSelected(date: Date) {
+    this.endStartAt = date;
     this.startDateFilter = (d: Date): boolean => {
       let threshold_date = new Date(date);
       return d >= this.activeRange.startDate && d <= this.activeRange.endDate &&
@@ -195,13 +201,39 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   *   form: NgForm the angular form object
   */
   private getAnalysis(form: NgForm) {
+
+    //Get a list of selected hives to get data for
     let hiveRequestList = [];
     for (let name of Object.keys(form.value)) {
       if (this.hives.includes(name) && form.value[name]) {
         hiveRequestList.push(name);
       }
     }
-    let requestDataSet = this.avaliableDataSets;
+
+    //Update the list of currently requested hives
+    this.unchartedHives = [];
+    for (let hive of this.hives) {
+      if (!hiveRequestList.includes(hive)) {
+        this.unchartedHives.push(hive);
+      }
+    }
+
+    //Get a list of datasets that our charts require
+    let requestDataSet = { audio: [], video: [] };
+    for (let chart of this.charts) {
+      let dataSetList = chart.requiredDataSets();
+      if (dataSetList.audio) {
+        for (let audiodataset of dataSetList.audio) {
+          requestDataSet.audio.push(audiodataset);
+        }
+      }
+      if (dataSetList.video) {
+        for (let videodataset of dataSetList.video) {
+          requestDataSet.video.push(videodataset);
+        }
+      }
+    }
+
     this._ioService.emit('getData', {
       hives: hiveRequestList,
       count: this.MAX_VALUES_PER_HIVE,
@@ -212,15 +244,26 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
     this.dataLoading = true;
   }
 
+  private dataSetAvailableForChart(y: any, chart: ChartComponent): boolean {
+      let requiredDataSets = chart.requiredDataSets();
+      for (let key of Object.keys(requiredDataSets)) {
+        for (let dataSet of requiredDataSets[key]) {
+          if (!((y[key])[dataSet])) {
+            return false;
+          }
+        }
+      }
+      return true;
+  }
+
   /*updateChartData()
   * This method will update all chart data with our new data.  May need to be
   * specialized to deal with special types of charts later!
   */
-  private updateChartData(x: any, y: any,
-                          dataKey: string, datesKey: string) {
+  private updateChartData(res: any, dataKey: string, datesKey: string) {
     for (var chart of this.charts) {
-      if (y[chart.requiredDataSets()]) {
-        chart.updateData(x, y, dataKey, datesKey, this.aggregateMethod);
+      if (this.dataSetAvailableForChart(res, chart)) {
+        chart.updateData(res, dataKey, datesKey, this.aggregateMethod, this.unchartedHives);
       }
     }
   }
