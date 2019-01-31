@@ -16,6 +16,8 @@ export class RMSLinearChartComponent implements ChartComponent, AfterViewInit {
 
   private chart:any;
   private showChart: boolean;
+  private columns: Array<any> = [];
+  private xs: any = {};
   requiredDataSet: any = {audio: ['AverageRMSLinear', 'UTCStartDate', 'UTCEndDate']};
 
   /*ngAfterViewInit()
@@ -56,17 +58,16 @@ export class RMSLinearChartComponent implements ChartComponent, AfterViewInit {
   public updateData(res: any, dataKey: string,
                     datesKey: string, aggregateMethod: string,
                     unchartedHives: Array<string>) {
-    //hide the chart while we update it.
-    this.showChart = false;
-
-    //Clear the chart
-    let hivesToRemove = [];
+    //Get a list of hives that aren't currently charted and their names with
+    //'dates' appended to cover the dates datasets.  This is used to remove
+    //previously charted datasets later.
+    let unusedDataSets = [];
     for (let hive of unchartedHives) {
-      hivesToRemove.push(hive);
-      hivesToRemove.push(hive + 'Dates');
+      unusedDataSets.push(hive);
+      unusedDataSets.push(hive + "Dates");
     }
 
-    //push the new data to the chart
+    //Process data by appending a hivename or hivename with date appended.
     let data = { video: {}, audio: {
       UTCStartDate: [],
       AverageRMSLinear: []
@@ -80,14 +81,69 @@ export class RMSLinearChartComponent implements ChartComponent, AfterViewInit {
       }
     }
 
-    //push the new data to the chart
-    let xs = {};
-    xs[dataKey] = datesKey;
+    //Remove any datasets that shouldn't be charted anymore, or that will be
+    //replaced by this update.
+    for (let index = 0; index < this.columns.length; index++) {
+      if ((this.columns[index][0] === dataKey)
+          || (this.columns[index][0] === datesKey)
+          || (unusedDataSets.includes(this.columns[index][0]))) {
+        this.columns.splice(index, 2);
+      }
+    }
+
+    //push new datasets
+    this.columns.push(data.audio.UTCStartDate);
+    this.columns.push(data.audio.AverageRMSLinear);
+
+    //Load our new XS key-value pair
+    let newXS = {};
+    for (let pair in this.xs) {
+      if (!((unusedDataSets.includes(pair)) || (pair === dataKey))) {
+        newXS[pair] = pair + "Dates";
+      }
+    }
+    newXS[dataKey] = datesKey;
+    this.xs = newXS;
+
+
+    this.showChart = false;
+
+    //Re-generate and reload the chart.
+    //This portion should be able to be done using this.chart.load() but
+    //issues with c3 cause the chart to improperly regenerate without
+    //re-rendering and removing unloaded datasets.  Specifically,
+    //this.chart.load successfully loads new datasets and unloads requested
+    //datasets, but the re-render process doesn't un-render removed datasets.
+    this.chart = c3.generate({
+      bindto: '#rmslinear-chart',
+      data: {
+        xs: {},
+        xFormat: '%Y-%m-%dT%H:%M:%S.000Z',
+        columns: [],
+        type: 'scatter'
+      },
+      axis: {
+        x: {
+          label: 'Datetime',
+          type: 'timeseries',
+          tick: {
+            rotate: 60,
+            fit: true,
+            multiline: true,
+            format: '%Y-%m-%d %H:%M:%S'
+          }
+        },
+        y: {
+          label: 'RMS'
+        }
+      }
+    });
+
     this.chart.load({
-      unload: hivesToRemove,
-      columns: [data.audio.UTCStartDate, data.audio.AverageRMSLinear],
-      xs: xs,
-    })
+      unload: true,
+      columns: this.columns,
+      xs: this.xs
+    });
 
     //update the chart's key with the method of aggregation
     if (aggregateMethod) {
