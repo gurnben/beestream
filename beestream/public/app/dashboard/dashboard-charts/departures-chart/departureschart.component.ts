@@ -14,7 +14,7 @@ require('../../c3.styles.css');
 })
 export class DeparturesChartComponent implements ChartComponent, AfterViewInit {
 
-  private chart:any;
+  private chart: any;
   private showChart: boolean;
   private columns: Array<any> = [];
   private xs: any = {};
@@ -83,13 +83,15 @@ export class DeparturesChartComponent implements ChartComponent, AfterViewInit {
 
     //Remove any datasets that shouldn't be charted anymore, or that will be
     //replaced by this update.
+    let newCols = [];
     for (let index = 0; index < this.columns.length; index++) {
-      if ((this.columns[index][0] === dataKey)
+      if (!((this.columns[index][0] === dataKey)
           || (this.columns[index][0] === datesKey)
-          || (unusedDataSets.includes(this.columns[index][0]))) {
-        this.columns.splice(index, 2);
+          || (unusedDataSets.includes(this.columns[index][0])))) {
+        newCols.push(this.columns[index]);
       }
     }
+    this.columns = newCols;
 
     //push new datasets
     this.columns.push(data.video.UTCStartDate);
@@ -117,9 +119,9 @@ export class DeparturesChartComponent implements ChartComponent, AfterViewInit {
     this.chart = c3.generate({
       bindto: '#departures-chart',
       data: {
-        xs: {},
+        xs: this.xs,
         xFormat: '%Y-%m-%dT%H:%M:%S.000Z',
-        columns: [],
+        columns: this.columns,
         type: 'scatter'
       },
       axis: {
@@ -138,13 +140,6 @@ export class DeparturesChartComponent implements ChartComponent, AfterViewInit {
         }
       }
     });
-
-    this.chart.load({
-      unload: true,
-      columns: this.columns,
-      xs: this.xs
-    });
-    console.log(this.chart.data());
 
     //update the chart's key with the method of aggregation
     if (aggregateMethod) {
