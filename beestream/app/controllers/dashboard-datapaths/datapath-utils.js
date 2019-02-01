@@ -42,11 +42,26 @@ const queryFromView = function(video_model, audio_model, hives, start, stop,
       );
     }
     else {
-      model.find({
-        HiveName: hive
-      }, viewQuerySelection, (err, data) => {
-        viewCallback(err, data, callback, aggregateMethod);
-      });
+      async.parallel(
+        {
+          video: function(callback) {
+            video_model.find({
+              HiveName: hive
+            }, viewQuerySelection.video, (err, data) => {
+              callback(err, data);
+            });
+          },
+          audio: function(callback) {
+            audio_model.find({
+              HiveName: hive
+            }, viewQuerySelection.audio, (err, data) => {
+              callback(err, data);
+            });
+          }
+        }, (err, data) => {
+          viewCallback(err, data, callback, aggregateMethod);
+        }
+      );
     }
   }
 }
