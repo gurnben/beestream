@@ -36,29 +36,51 @@ module.exports = function(io, socket) {
   socket.on('getData', (message) => {
 
     //build query conditions from client's message request.
-    let viewQuerySelection = { audio: {}, video: {} };
-    message.dataSets.video.forEach((dataset) => {
-      if (config.dataSets.video.includes(dataset)) {
-        viewQuerySelection.video[dataset] = 1;
-      }
-      else {
-        console.log(`${dataset} is not an avaliable dataSet`);
-      }
-    });
-    message.dataSets.audio.forEach((dataset) => {
-      if (config.dataSets.audio.includes(dataset)) {
-        viewQuerySelection.audio[dataset] = 1;
-      }
-      else {
-        console.log(`${dataset} is not an avaliable dataSet`);
-      }
-    });
+    let viewQuerySelection = { audio: {}, video: {}, weather: {} };
+    if (message.dataSets.video) {
+      message.dataSets.video.forEach((dataset) => {
+        if (config.dataSets.video.includes(dataset)) {
+          viewQuerySelection.video[dataset] = 1;
+        }
+        else {
+          console.log(`${dataset} is not an avaliable dataSet`);
+        }
+      });
+    }
+    if (message.dataSets.audio) {
+      message.dataSets.audio.forEach((dataset) => {
+        if (config.dataSets.audio.includes(dataset)) {
+          viewQuerySelection.audio[dataset] = 1;
+        }
+        else {
+          console.log(`${dataset} is not an avaliable dataSet`);
+        }
+      });
+    }
+    if (message.dataSets.weather) {
+      message.dataSets.weather.forEach((dataset) => {
+        if (config.dataSets.weather.includes(dataset)) {
+          viewQuerySelection.weather[dataset] = 1;
+        }
+        else {
+          console.log(`${dataset} is not an avaliable dataSet`);
+        }
+      });
+    }
 
-    //TODO: Required query fields here.
-    viewQuerySelection.video._id = 0;
-    viewQuerySelection.audio._id = 0;
-    viewQuerySelection.video.HiveName = 1;
-    viewQuerySelection.audio.HiveName = 1;
+    //TODO: Required query fields here. Only populate if we have other fields
+    if (Object.keys(viewQuerySelection.audio).length > 0) {
+      viewQuerySelection.audio._id = 0;
+      viewQuerySelection.audio.HiveName = 1;
+    }
+    if (Object.keys(viewQuerySelection.video).length > 0) {
+      viewQuerySelection.video._id = 0;
+      viewQuerySelection.video.HiveName = 1;
+    }
+    if (Object.keys(viewQuerySelection.weather).length > 0) {
+      viewQuerySelection.weather._id = 0;
+      viewQuerySelection.weather.HiveName = 1;
+    }
 
     //Set our data counting conditions based on start and stop date.
     let countConditions = {

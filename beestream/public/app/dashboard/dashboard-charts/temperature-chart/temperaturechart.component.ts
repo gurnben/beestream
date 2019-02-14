@@ -8,17 +8,19 @@ require('../../c3.styles.css');
 * This component will be our dashboard for beemon analytics.
 */
 @Component({
-  selector: 'rmslinear-chart',
-  template: require('./rmslinearchart.template.html'),
+  selector: 'temperature-chart',
+  template: require('./temperaturechart.template.html'),
   styles: [ '../../c3.styles.css' ]
 })
-export class RMSLinearChartComponent implements ChartComponent, AfterViewInit {
+export class TemperatureChartComponent implements ChartComponent, AfterViewInit {
 
   private chart:any;
   private showChart: boolean;
   private columns: Array<any> = [];
   private xs: any = {};
-  requiredDataSet: any = {audio: ['AverageRMSLinear', 'UTCStartDate', 'UTCEndDate']};
+  requiredDataSet: any = {
+    weather: ['AverageTemperature', 'UTCStartDate', 'UTCEndDate']
+  };
 
   /*ngAfterViewInit()
   * This method overrides the ngAfterViewInit method to add functionality,
@@ -26,7 +28,7 @@ export class RMSLinearChartComponent implements ChartComponent, AfterViewInit {
   */
   public ngAfterViewInit() {
     this.chart = c3.generate({
-      bindto: '#rmslinear-chart',
+      bindto: '#temperature-chart',
       data: {
         xs: {},
         xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
@@ -45,7 +47,7 @@ export class RMSLinearChartComponent implements ChartComponent, AfterViewInit {
           }
         },
         y: {
-          label: 'RMS Linear'
+          label: 'Temperature'
         }
       }
     });
@@ -68,16 +70,16 @@ export class RMSLinearChartComponent implements ChartComponent, AfterViewInit {
     }
 
     //Process data by appending a hivename or hivename with date appended.
-    let data = { video: {}, audio: {
+    let data = { video: {}, audio: {}, weather: {
       UTCStartDate: [],
-      AverageRMSLinear: []
+      AverageTemperature: []
     } };
-    for (let field in res.audio) {
+    for (let field in res.weather) {
       if (field.includes('Date')) {
-        (data['audio'])[field] = [datesKey].concat(res.audio[field]);
+        (data['weather'])[field] = [datesKey].concat(res.weather[field]);
       }
       else if (field != 'HiveName') {
-        (data['audio'])[field] = [dataKey].concat(res.audio[field]);
+        (data['weather'])[field] = [dataKey].concat(res.weather[field]);
       }
     }
 
@@ -94,8 +96,8 @@ export class RMSLinearChartComponent implements ChartComponent, AfterViewInit {
     this.columns = newCols;
 
     //push new datasets
-    this.columns.push(data.audio.UTCStartDate);
-    this.columns.push(data.audio.AverageRMSLinear);
+    this.columns.push(data.weather.UTCStartDate);
+    this.columns.push(data.weather.AverageTemperature);
 
     //Load our new XS key-value pair
     let newXS = {};
@@ -117,7 +119,7 @@ export class RMSLinearChartComponent implements ChartComponent, AfterViewInit {
     //this.chart.load successfully loads new datasets and unloads requested
     //datasets, but the re-render process doesn't un-render removed datasets.
     this.chart = c3.generate({
-      bindto: '#rmslinear-chart',
+      bindto: '#temperature-chart',
       data: {
         xs: this.xs,
         xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
@@ -136,14 +138,14 @@ export class RMSLinearChartComponent implements ChartComponent, AfterViewInit {
           }
         },
         y: {
-          label: 'RMS'
+          label: 'Temperature'
         }
       }
     });
 
     //update the chart's key with the method of aggregation
     if (aggregateMethod) {
-      this.chart.axis.labels({y: 'RMS' + aggregateMethod});
+      this.chart.axis.labels({y: 'Temperature' + aggregateMethod});
     }
 
     //show the chart!
@@ -153,7 +155,7 @@ export class RMSLinearChartComponent implements ChartComponent, AfterViewInit {
   /*requiredDataSets
   * returns a list of required data sets.
   */
-  public requiredDataSets(): { audio: [], video: [] } {
+  public requiredDataSets(): { audio: [], video: [], weather: [] } {
     return this.requiredDataSet;
   }
 }

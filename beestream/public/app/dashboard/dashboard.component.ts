@@ -5,6 +5,7 @@ import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DeparturesChartComponent } from './dashboard-charts/departures-chart/departureschart.component';
 import { ArrivalsChartComponent } from './dashboard-charts/arrivals-chart/arrivalschart.component';
 import { RMSLinearChartComponent } from './dashboard-charts/rmslinear-chart/rmslinearchart.component';
+import { TemperatureChartComponent } from './dashboard-charts/temperature-chart/temperaturechart.component';
 import { ChartComponent } from './dashboard-charts/chart.interface.component';
 import * as c3 from 'c3';
 require('./c3.styles.css');
@@ -26,6 +27,8 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
     private arrivalsChart: ChartComponent;
   @ViewChild(RMSLinearChartComponent)
     private rmsLinearChart: ChartComponent;
+  @ViewChild(TemperatureChartComponent)
+    private temperatureChart: ChartComponent;
   private checkboxGroup = null;
   private hiddenControl = null;
   private form = null;
@@ -72,6 +75,8 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
       var response = {};
       response['video'] = message.video;
       response['audio'] = message.audio;
+      response['weather'] = message.weather;
+      //TODO: Add new datasets here
       this.aggregateMethod = message.aggregateMethod;
       this.updateChartData(response,
         message.video.HiveName, message.video.HiveName + 'Dates');
@@ -110,6 +115,7 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
     this.charts.push(this.departuresChart);
     this.charts.push(this.arrivalsChart);
     this.charts.push(this.rmsLinearChart)
+    this.charts.push(this.temperatureChart);
   }
 
   /*ngOnDestroy
@@ -170,9 +176,9 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   private startDateSelected(date: Date) {
     this.beginStartAt = date;
     this.endDateFilter = (d: Date): boolean => {
-      let threshold_date = new Date(date);
+      let threshold_date = new Date(this.beginStartAt);
       return d >= this.activeRange.startDate && d <= this.activeRange.endDate &&
-        this.dateFilterDates.includes(d.toISOString()) && d > threshold_date;
+        this.dateFilterDates.includes(d.toISOString()) && d >= threshold_date;
     }
   }
 
@@ -187,9 +193,9 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   private endDateSelected(date: Date) {
     this.endStartAt = date;
     this.startDateFilter = (d: Date): boolean => {
-      let threshold_date = new Date(date);
+      let threshold_date = new Date(this.endStartAt);
       return d >= this.activeRange.startDate && d <= this.activeRange.endDate &&
-        this.dateFilterDates.includes(d.toISOString()) && d < threshold_date;
+        this.dateFilterDates.includes(d.toISOString()) && d <= threshold_date;
     }
   }
 
@@ -201,47 +207,56 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   *   form: NgForm the angular form object
   */
   private getAnalysis(form: NgForm) {
+    if (form.valid) {
+      //Set the datetime bounds time fields to 0 and 23:59:59
+      let startDate = new Date(form.value.startDate);
+      startDate.setHours(0);
+      startDate.setMinutes(0);
+      startDate.setSeconds(0);
+      let endDate = new Date(form.value.endDate);
+      endDate.setHours(23);
+      endDate.setMinutes(59);
+      endDate.setSeconds(59);
 
-    //Get a list of selected hives to get data for
-    let hiveRequestList = [];
-    for (let name of Object.keys(form.value)) {
-      if (this.hives.includes(name) && form.value[name]) {
-        hiveRequestList.push(name);
-      }
-    }
-
-    //Update the list of currently requested hives
-    this.unchartedHives = [];
-    for (let hive of this.hives) {
-      if (!hiveRequestList.includes(hive)) {
-        this.unchartedHives.push(hive);
-      }
-    }
-
-    //Get a list of datasets that our charts require
-    let requestDataSet = { audio: [], video: [] };
-    for (let chart of this.charts) {
-      let dataSetList = chart.requiredDataSets();
-      if (dataSetList.audio) {
-        for (let audiodataset of dataSetList.audio) {
-          requestDataSet.audio.push(audiodataset);
+      //Get a list of selected hives to get data for
+      let hiveRequestList = [];
+      for (let name of Object.keys(form.value)) {
+        if (this.hives.includes(name) && form.value[name]) {
+          hiveRequestList.push(name);
         }
       }
-      if (dataSetList.video) {
-        for (let videodataset of dataSetList.video) {
-          requestDataSet.video.push(videodataset);
+
+      //Update the list of currently requested hives
+      this.unchartedHives = [];
+      for (let hive of this.hives) {
+        if (!hiveRequestList.includes(hive)) {
+          this.unchartedHives.push(hive);
         }
       }
-    }
 
-    this._ioService.emit('getData', {
-      hives: hiveRequestList,
-      count: this.MAX_VALUES_PER_HIVE,
-      startDate: form.value.startDate,
-      stopDate: form.value.endDate,
-      dataSets: requestDataSet
-    });
-    this.dataLoading = true;
+      //Get a list of datasets that our charts require
+      let requestDataSet = {};
+      for (let chart of this.charts) {
+        let dataSetList = chart.requiredDataSets();
+        for (let datatype of Object.keys(dataSetList)) {
+          for (let dataset of dataSetList[datatype]) {
+            if (!requestDataSet[datatype]) {
+              requestDataSet[datatype] = [];
+            }
+            (requestDataSet[datatype]).push(dataset);
+          }
+        }
+      }
+
+        this._ioService.emit('getData', {
+          hives: hiveRequestList,
+          count: this.MAX_VALUES_PER_HIVE,
+          startDate: startDate,
+          stopDate: endDate,
+          dataSets: requestDataSet
+        });
+      this.dataLoading = true;
+    }
   }
 
   private dataSetAvailableForChart(y: any, chart: ChartComponent): boolean {

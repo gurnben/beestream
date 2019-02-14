@@ -2,6 +2,7 @@ const async = require('async');
 const mongoose = require('mongoose');
 const VideoFile = mongoose.model('VideoFile');
 const AudioFile = mongoose.model('AudioFiles');
+const Weather = mongoose.model('Weather');
 const utils = require('./datapath-utils.js');
 
 var alldata = {
@@ -14,11 +15,8 @@ var alldata = {
         HiveName: hive
       }
       if (startDate && stopDate) {
-        queryConditions = {
-          HiveName: hive,
-          UTCDate: { "$gte": new Date(startDate),
-            "$lte": new Date(stopDate) }
-        }
+        queryConditions['UTCDate'] = { "$gte": new Date(startDate),
+                                      "$lte": new Date(stopDate) };
       }
       async.parallel(
         {
@@ -42,11 +40,21 @@ var alldata = {
             (err, data) => {
               callback(err, data);
             });
+          },
+          weather: function(callback) {
+            let weatherQueryConditions = Object.assign({}, queryConditions)
+            delete weatherQueryConditions.HiveName;
+            Weather.find(weatherQueryConditions, {},
+            (err, data) => {
+              callback(err, data);
+            })
           }
         }, (err, data) => {
           response = {
             audio: {
               AverageRMSLinear: [],
+              MinimumRMSLinear: [],
+              MaximumRMSLinear: [],
               UTCStartDate: [],
               UTCEndDate: [],
               HiveName: ""
@@ -54,14 +62,36 @@ var alldata = {
             video: {
               AverageArrivals: [],
               AverageDepartures: [],
+              MinimumArrivals: [],
+              MinimumDepartures: [],
+              MaximumArrivals: [],
+              MaximumDepartures: [],
               UTCStartDate: [],
               UTCEndDate: [],
               HiveName: ""
+            },
+            weather: {
+              AverageTemperature: [],
+              AverageHumidity: [],
+              AverageWindspeed: [],
+              AveragePrecipitation: [],
+              MinimumTemperature: [],
+              MinimumHumidity: [],
+              MinimumWindspeed: [],
+              MinimumPrecipitation: [],
+              MaximumTemperature: [],
+              MaximumHumidity: [],
+              MaximumWindspeed: [],
+              MaximumPrecipitation: [],
+              UTCStartDate: [],
+              UTCEndDate: []
             }
           }
           data.audio.map((analysis, index) => {
             response.audio.HiveName = analysis.HiveName;
             response.audio.AverageRMSLinear[index] = analysis.RMSLinear;
+            response.audio.MinimumRMSLinear[index] = analysis.RMSLinear;
+            response.audio.MaximumRMSLinear[index] = analysis.RMSLinear;
             response.audio.UTCStartDate[index] = new Date(analysis.UTCDate);
             response.audio.UTCEndDate[index] = new Date(analysis.UTCDate);
           });
@@ -69,8 +99,28 @@ var alldata = {
             response.video.HiveName = analysis.HiveName;
             response.video.AverageArrivals[index] = analysis.ArrivalsTriangle;
             response.video.AverageDepartures[index] = analysis.DeparturesTriangle;
+            response.video.MinimumArrivals[index] = analysis.ArrivalsTriangle;
+            response.video.MinimumDepartures[index] = analysis.DeparturesTriangle;
+            response.video.MaximumArrivals[index] = analysis.ArrivalsTriangle;
+            response.video.MaximumDepartures[index] = analysis.DeparturesTriangle;
             response.video.UTCStartDate[index] = new Date(analysis.UTCDate);
             response.video.UTCEndDate[index] = new Date(analysis.UTCDate);
+          });
+          data.weather.map((analysis, index) => {
+            response.weather.AverageTemperature[index] = analysis["2m Air Temperature (F)"];
+            response.weather.AverageHumidity[index] = analysis["2m Relative Humidity (percent)"];
+            response.weather.AverageWindspeed[index] = analysis["10m Wind Speed (mph)"];
+            response.weather.AveragePrecipitation[index] = analysis["2m Hourly Precipitation (in)"];
+            response.weather.MinimumTemperature[index] = analysis["2m Air Temperature (F)"];
+            response.weather.MinimumHumidity[index] = analysis["2m Relative Humidity (percent)"];
+            response.weather.MinimumWindspeed[index] = analysis["10m Wind Speed (mph)"];
+            response.weather.MinimumPrecipitation[index] = analysis["2m Hourly Precipitation (in)"];
+            response.weather.MaximumTemperature[index] = analysis["2m Air Temperature (F)"];
+            response.weather.MaximumHumidity[index] = analysis["2m Relative Humidity (percent)"];
+            response.weather.MaximumWindspeed[index] = analysis["10m Wind Speed (mph)"];
+            response.weather.MaximumPrecipitation[index] = analysis["2m Hourly Precipitation (in)"];
+            response.weather.UTCStartDate[index] = new Date(analysis.UTCDate);
+            response.weather.UTCEndDate[index] = new Date(analysis.UTCDate);
           });
 
           response['HiveName'] = (response.audio.HiveName) ?
@@ -79,48 +129,6 @@ var alldata = {
           callbackFunction(response, "");
         }
       );
-      // VideoFile.find(queryConditions, {
-      //   _id: 0,
-      //   HiveName: 1,
-      //   ArrivalsTriangle: 1,
-      //   DeparturesTriangle: 1,
-      //   FileSize: 1,
-      //   UTCDate: 1
-      // }, (err, data) => {
-      //   if (err) {
-      //     console.log(`Error retrieving data from view: ${err}`);
-      //   }
-      //   else {
-      //     let hivename = hive;
-      //     let averageArrivals = [];
-      //     let averageDepartures = [];
-      //     let averageFileSize = [];
-      //     let dates = [];
-      //     data.map((analysis, index) => {
-      //         averageArrivals[index] = analysis.ArrivalsTriangle;
-      //         averageDepartures[index] = analysis.DeparturesTriangle;
-      //         averageFileSize[index] = analysis.FileSize;
-      //         dates[index] = new Date(analysis.UTCDate);
-      //       }
-      //     );
-      //
-      //     let response = {
-      //       AverageArrivals: averageArrivals,
-      //       AverageDepartures: averageDepartures,
-      //       AverageFileSize: averageFileSize,
-      //       MinimumArrivals: averageArrivals,
-      //       MinimumDepartures: averageDepartures,
-      //       MinimumFileSize: averageFileSize,
-      //       MaximumArrivals: averageArrivals,
-      //       MaximumDepartures: averageDepartures,
-      //       MaximumFileSize: averageFileSize,
-      //       StartDates: dates,
-      //       StopDates: dates,
-      //       HiveName: hivename
-      //     };
-      //     callback(response, '');
-      //   }
-      // });
     }
   }
 }

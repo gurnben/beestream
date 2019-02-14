@@ -29,7 +29,7 @@ export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
       bindto: '#arrivals-chart',
       data: {
         xs: {},
-        xFormat: '%Y-%m-%dT%H:%M:%S.000Z',
+        xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
         columns: [],
         type: 'scatter'
       },
@@ -123,7 +123,7 @@ export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
       bindto: '#arrivals-chart',
       data: {
         xs: this.xs,
-        xFormat: '%Y-%m-%dT%H:%M:%S.000Z',
+        xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
         columns: this.columns,
         type: 'scatter'
       },

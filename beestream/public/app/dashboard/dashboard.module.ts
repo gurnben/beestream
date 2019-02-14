@@ -16,7 +16,8 @@ import { DashboardComponent } from './dashboard.component';
 import { VideoService } from '../video/video.service';
 import { DeparturesChartComponent } from './dashboard-charts/departures-chart/departureschart.component';
 import { ArrivalsChartComponent } from './dashboard-charts/arrivals-chart/arrivalschart.component';
-import { RMSLinearChartComponent } from './dashboard-charts/rmslinear-chart/rmslinearchart.component.ts';
+import { RMSLinearChartComponent } from './dashboard-charts/rmslinear-chart/rmslinearchart.component';
+import { TemperatureChartComponent } from './dashboard-charts/temperature-chart/temperaturechart.component';
 
 @NgModule({
   imports: [
@@ -38,7 +39,8 @@ import { RMSLinearChartComponent } from './dashboard-charts/rmslinear-chart/rmsl
     DashboardComponent,
     DeparturesChartComponent,
     ArrivalsChartComponent,
-    RMSLinearChartComponent
+    RMSLinearChartComponent,
+    TemperatureChartComponent
   ],
   providers: [
     VideoService
