@@ -11,6 +11,7 @@ import {  MatInputModule,
           MatNativeDateModule,
           MatProgressSpinnerModule
        } from '@angular/material';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DashboardRoutes } from './dashboard.routes';
 import { DashboardComponent } from './dashboard.component';
 import { VideoService } from '../video/video.service';
@@ -18,6 +19,7 @@ import { DeparturesChartComponent } from './dashboard-charts/departures-chart/de
 import { ArrivalsChartComponent } from './dashboard-charts/arrivals-chart/arrivalschart.component';
 import { RMSLinearChartComponent } from './dashboard-charts/rmslinear-chart/rmslinearchart.component';
 import { TemperatureChartComponent } from './dashboard-charts/temperature-chart/temperaturechart.component';
+import { WeatherWidget } from './dashboard-charts/weather-widget/weatherwidget.component';
 
 @NgModule({
   imports: [
@@ -33,6 +35,7 @@ import { TemperatureChartComponent } from './dashboard-charts/temperature-chart/
     MatDatepickerModule,
     MatNativeDateModule,
     MatProgressSpinnerModule,
+    FontAwesomeModule,
     RouterModule.forChild(DashboardRoutes)
   ],
   declarations: [
@@ -40,7 +43,8 @@ import { TemperatureChartComponent } from './dashboard-charts/temperature-chart/
     DeparturesChartComponent,
     ArrivalsChartComponent,
     RMSLinearChartComponent,
-    TemperatureChartComponent
+    TemperatureChartComponent,
+    WeatherWidget
   ],
   providers: [
     VideoService

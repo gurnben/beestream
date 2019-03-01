@@ -6,9 +6,10 @@ import { DeparturesChartComponent } from './dashboard-charts/departures-chart/de
 import { ArrivalsChartComponent } from './dashboard-charts/arrivals-chart/arrivalschart.component';
 import { RMSLinearChartComponent } from './dashboard-charts/rmslinear-chart/rmslinearchart.component';
 import { TemperatureChartComponent } from './dashboard-charts/temperature-chart/temperaturechart.component';
+import { WeatherWidget } from './dashboard-charts/weather-widget/weatherwidget.component';
 import { ChartComponent } from './dashboard-charts/chart.interface.component';
 import * as c3 from 'c3';
-require('./c3.styles.css');
+import '../c3.styles.css';
 
 /*DashboardComponent
 * This component will be our dashboard for beemon analytics.
@@ -18,7 +19,7 @@ require('./c3.styles.css');
   template: require('./dashboard.template.html'),
   providers: [VideoService],
   encapsulation: ViewEncapsulation.None,
-  styles: [ './c3.styles.css' ]
+  styles: [ '../c3.styles.css' ]
 })
 export class DashboardComponent implements OnDestroy, AfterViewInit {
   @ViewChild(DeparturesChartComponent)
@@ -29,6 +30,8 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
     private rmsLinearChart: ChartComponent;
   @ViewChild(TemperatureChartComponent)
     private temperatureChart: ChartComponent;
+  @ViewChild(WeatherWidget)
+    private weatherWidget: ChartComponent;
   private checkboxGroup = null;
   private hiddenControl = null;
   private form = null;
@@ -52,6 +55,7 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   private beginStartAt: any = new Date();
   private endStartAt: any = new Date();
   private color = 'primary';
+  private focusedData: any = null;
 
   /*constructor
   * Constructor for DashbordComponent
@@ -116,6 +120,7 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
     this.charts.push(this.arrivalsChart);
     this.charts.push(this.rmsLinearChart)
     this.charts.push(this.temperatureChart);
+    this.charts.push(this.weatherWidget);
   }
 
   /*ngOnDestroy
@@ -281,5 +286,12 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         chart.updateData(res, dataKey, datesKey, this.aggregateMethod, this.unchartedHives);
       }
     }
+  }
+
+  /*newFocusedData
+  * a hook that is called when the focused data on a child chart is updated
+  */
+  private newFocusedData(focusedData: any) {
+    this.focusedData = focusedData;
   }
 }

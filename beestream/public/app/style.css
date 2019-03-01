@@ -327,3 +327,21 @@ p{
   margin-top: 15px;
   margin-bottom: 15px;
 }
+.weather-icon {
+  font-size: 48px;
+  text-align: center;
+  margin: 10px;
+}
+.weather-widget-div {
+  display: block;
+  margin: auto;
+  text-align: center;
+  margin-top: 10px;
+}
+.weather-widget-temperature {
+  font-size: 48px;
+}
+.weather-widget-text {
+  text-align: center;
+  margin: 0px;
+}

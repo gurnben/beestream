@@ -71,6 +71,8 @@ var alldata = {
               HiveName: ""
             },
             weather: {
+              Weather: [],
+              Clouds: [],
               AverageTemperature: [],
               AverageHumidity: [],
               AverageWindspeed: [],
@@ -107,6 +109,8 @@ var alldata = {
             response.video.UTCEndDate[index] = new Date(analysis.UTCDate);
           });
           data.weather.map((analysis, index) => {
+            response.weather.Weather[index] = analysis["Weather"];
+            response.weatehr.Clouds[index] = analysis["Level 1 clouds"];
             response.weather.AverageTemperature[index] = analysis["2m Air Temperature (F)"];
             response.weather.AverageHumidity[index] = analysis["2m Relative Humidity (percent)"];
             response.weather.AverageWindspeed[index] = analysis["10m Wind Speed (mph)"];

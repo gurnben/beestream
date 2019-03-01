@@ -25,6 +25,7 @@ import { AnalysisModule } from '../analysis/analysis.module';
     FontAwesomeModule,
     MatButtonModule,
     ShareModule,
+    FontAwesomeModule,
     RouterModule.forChild(ArchiveRoutes)
   ],
   declarations: [

@@ -22,7 +22,12 @@ module.exports = {
 			},
 			{
 				test: /\.css$/,
-				use: [ 'style-loader', 'css-loader' ]
+				use: [ 'style-loader', 'css-loader' ],
+				include: [
+					path.resolve('public/app/c3.styles.css'),
+					path.resolve('public/app/style.css'),
+					path.resolve('public/app/weather-icons.css')
+				]
 			},
 			{
 				test: /\.html$/,

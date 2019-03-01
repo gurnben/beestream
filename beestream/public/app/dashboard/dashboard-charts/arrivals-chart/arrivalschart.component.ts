@@ -1,8 +1,14 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component,
+         AfterViewInit,
+         Output,
+         Input,
+         EventEmitter,
+         OnChanges,
+         SimpleChange } from '@angular/core';
 import { ViewChild } from '@angular/core';
 import { ChartComponent } from '../chart.interface.component';
 import * as c3 from 'c3';
-require('../../c3.styles.css');
+require('../../../c3.styles.css');
 
 /*DashboardComponent
 * This component will be our dashboard for beemon analytics.
@@ -10,10 +16,12 @@ require('../../c3.styles.css');
 @Component({
   selector: 'arrivals-chart',
   template: require('./arrivalschart.template.html'),
-  styles: [ '../../c3.styles.css' ]
+  styles: [ '../../../c3.styles.css' ]
 })
-export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
+export class ArrivalsChartComponent implements ChartComponent, AfterViewInit, OnChanges {
 
+  @Output() public updateFocusedDate: EventEmitter<Date> = new EventEmitter<Date>();
+  @Input() private focused: any;
   private chart: any;
   private showChart: boolean;
   private columns: Array<any> = [];
@@ -31,7 +39,17 @@ export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
         xs: {},
         xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
         columns: [],
-        type: 'scatter'
+        type: 'scatter',
+        onmouseover: (elemData) => {
+          this.updateFocusedDate.emit(elemData);
+        },
+        onclick: (elemData) => {
+          this.updateFocusedDate.emit(elemData);
+        },
+        selection: {
+          enabled: true,
+          multiple: false
+        }
       },
       axis: {
         x: {
@@ -51,6 +69,31 @@ export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
     });
   }
 
+  /*ngOnChanges
+  * This method handles variable changes.
+  * Whenever the focused data point change, change our selected point.
+  *
+  * @params:
+  *   changes: SimpleChange - an array of key:value pairs holding the input
+  *                           variable changes.
+  */
+  public ngOnChanges(changes: {[propKey: string]: SimpleChange}) {
+    if (changes['focused'].currentValue != null) {
+      let focusChanges = changes['focused'].currentValue;
+      let x = this.chart.x()[focusChanges.name];
+      let minDiff = Infinity;
+      let minIndex = 0;
+      for (let i = 0; i < x.length; i++) {
+        let diff = Math.abs(x[i] - focusChanges.x);
+        if (diff < minDiff) {
+          minDiff = diff;
+          minIndex = i;
+        }
+      }
+      this.chart.select([focusChanges.name], [minIndex], true);
+    }
+  }
+
   /*updateChartData()
   * This method will update all chart data with our new data.  May need to be
   * specialized to deal with special types of charts later!
@@ -66,9 +109,6 @@ export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
       unusedDataSets.push(hive);
       unusedDataSets.push(hive + "Dates");
     }
-
-    //hide the chart while we update it.
-    // this.showChart = false;
 
     //Process data by appending a hivename or hivename with date appended.
     let data = { video: {
@@ -125,7 +165,17 @@ export class ArrivalsChartComponent implements ChartComponent, AfterViewInit {
         xs: this.xs,
         xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
         columns: this.columns,
-        type: 'scatter'
+        type: 'scatter',
+        onmouseover: (elemData) => {
+          this.updateFocusedDate.emit(elemData);
+        },
+        onclick: (elemData) => {
+          this.updateFocusedDate.emit(elemData);
+        },
+        selection: {
+          enabled: true,
+          multiple: false
+        }
       },
       axis: {
         x: {

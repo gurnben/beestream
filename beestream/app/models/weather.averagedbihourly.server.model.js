@@ -34,5 +34,7 @@ mongoose.model('Weather_AverageBiHourly', new Schema({
   },
   UTCEndDate: {
     type: Date
-  }
+  },
+  Weather: {},
+  Clouds: {}
 }), 'Weather_AverageBiHourly');

@@ -34,5 +34,7 @@ mongoose.model('Weather_AverageDaily', new Schema({
   },
   UTCEndDate: {
     type: Date
-  }
+  },
+  Weather: {},
+  Clouds: {}
 }), 'Weather_AverageDaily');

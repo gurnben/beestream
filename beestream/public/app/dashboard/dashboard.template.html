@@ -38,8 +38,25 @@
     *ngIf="(!(hives && startDateFilter && endDateFilter)) || dataLoading">
       <mat-spinner class=dashboard-loading diameter="50"></mat-spinner>
   </div>
+  <weather-widget
+    [focused]=focusedData
+    #WeatherWidget></weather-widget>
+  <div class="chart-div">
+    <arrivals-chart
+      (updateFocusedDate)="newFocusedData($event)"
+      [focused]=focusedData
+      #ArrivalsChart></arrivals-chart>
+    <departures-chart
+      (updateFocusedDate)="newFocusedData($event)"
+      [focused]=focusedData
+      #DeparturesChart></departures-chart>
+    <rmslinear-chart
+      (updateFocusedDate)="newFocusedData($event)"
+      [focused]=focusedData
+      #RMSLinearChart></rmslinear-chart>
+    <temperature-chart
+      (updateFocusedDate)="newFocusedData($event)"
+      [focused]=focusedData
+      #TemperatureChart></temperature-chart>
+  </div>
 </div>
-<arrivals-chart #ArrivalsChart></arrivals-chart>
-<departures-chart #DeparturesChart></departures-chart>
-<rmslinear-chart #RMSLinearChart></rmslinear-chart>
-<temperature-chart #TemperatureChart></temperature-chart>
