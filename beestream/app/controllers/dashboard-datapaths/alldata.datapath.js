@@ -50,22 +50,24 @@ var alldata = {
             })
           }
         }, (err, data) => {
+
+          //Set up reponse format/dataset
           response = {
             audio: {
               AverageRMSLinear: [],
-              MinimumRMSLinear: [],
               MaximumRMSLinear: [],
+              MinimumRMSLinear: [],
               UTCStartDate: [],
               UTCEndDate: [],
               HiveName: ""
             },
             video: {
-              AverageArrivals: [],
               AverageDepartures: [],
-              MinimumArrivals: [],
-              MinimumDepartures: [],
-              MaximumArrivals: [],
               MaximumDepartures: [],
+              MinimumDepartures: [],
+              AverageArrivals: [],
+              MaximumArrivals: [],
+              MinimumArrivals: [],
               UTCStartDate: [],
               UTCEndDate: [],
               HiveName: ""
@@ -74,59 +76,89 @@ var alldata = {
               Weather: [],
               Clouds: [],
               AverageTemperature: [],
-              AverageHumidity: [],
-              AverageWindspeed: [],
-              AveragePrecipitation: [],
               MinimumTemperature: [],
-              MinimumHumidity: [],
-              MinimumWindspeed: [],
-              MinimumPrecipitation: [],
               MaximumTemperature: [],
+              AverageHumidity: [],
+              MinimumHumidity: [],
               MaximumHumidity: [],
+              AverageWindspeed: [],
+              MinimumWindspeed: [],
               MaximumWindspeed: [],
+              AveragePrecipitation: [],
+              MinimumPrecipitation: [],
               MaximumPrecipitation: [],
               UTCStartDate: [],
               UTCEndDate: []
             }
           }
+
+          //Populate audio, video, and weather from query responses
           data.audio.map((analysis, index) => {
             response.audio.HiveName = analysis.HiveName;
-            response.audio.AverageRMSLinear[index] = analysis.RMSLinear;
-            response.audio.MinimumRMSLinear[index] = analysis.RMSLinear;
-            response.audio.MaximumRMSLinear[index] = analysis.RMSLinear;
+            if (analysis.RMSLinear) {
+              response.audio.AverageRMSLinear[index] = analysis.RMSLinear;
+              response.audio.MinimumRMSLinear[index] = analysis.RMSLinear;
+              response.audio.MaximumRMSLinear[index] = analysis.RMSLinear;
+            }
             response.audio.UTCStartDate[index] = new Date(analysis.UTCDate);
             response.audio.UTCEndDate[index] = new Date(analysis.UTCDate);
           });
           data.video.map((analysis, index) => {
             response.video.HiveName = analysis.HiveName;
-            response.video.AverageArrivals[index] = analysis.ArrivalsTriangle;
-            response.video.AverageDepartures[index] = analysis.DeparturesTriangle;
-            response.video.MinimumArrivals[index] = analysis.ArrivalsTriangle;
-            response.video.MinimumDepartures[index] = analysis.DeparturesTriangle;
-            response.video.MaximumArrivals[index] = analysis.ArrivalsTriangle;
-            response.video.MaximumDepartures[index] = analysis.DeparturesTriangle;
+            if (analysis.ArrivalsTriangle) {
+              response.video.AverageArrivals[index] = analysis.ArrivalsTriangle;
+              response.video.MinimumArrivals[index] = analysis.ArrivalsTriangle;
+              response.video.MaximumArrivals[index] = analysis.ArrivalsTriangle;
+            }
+            if (analysis.DeparturesTriangle) {
+              response.video.AverageDepartures[index] = analysis.DeparturesTriangle;
+              response.video.MinimumDepartures[index] = analysis.DeparturesTriangle;
+              response.video.MaximumDepartures[index] = analysis.DeparturesTriangle;
+            }
             response.video.UTCStartDate[index] = new Date(analysis.UTCDate);
             response.video.UTCEndDate[index] = new Date(analysis.UTCDate);
           });
           data.weather.map((analysis, index) => {
-            response.weather.Weather[index] = analysis["Weather"];
-            response.weatehr.Clouds[index] = analysis["Level 1 clouds"];
-            response.weather.AverageTemperature[index] = analysis["2m Air Temperature (F)"];
-            response.weather.AverageHumidity[index] = analysis["2m Relative Humidity (percent)"];
-            response.weather.AverageWindspeed[index] = analysis["10m Wind Speed (mph)"];
-            response.weather.AveragePrecipitation[index] = analysis["2m Hourly Precipitation (in)"];
-            response.weather.MinimumTemperature[index] = analysis["2m Air Temperature (F)"];
-            response.weather.MinimumHumidity[index] = analysis["2m Relative Humidity (percent)"];
-            response.weather.MinimumWindspeed[index] = analysis["10m Wind Speed (mph)"];
-            response.weather.MinimumPrecipitation[index] = analysis["2m Hourly Precipitation (in)"];
-            response.weather.MaximumTemperature[index] = analysis["2m Air Temperature (F)"];
-            response.weather.MaximumHumidity[index] = analysis["2m Relative Humidity (percent)"];
-            response.weather.MaximumWindspeed[index] = analysis["10m Wind Speed (mph)"];
-            response.weather.MaximumPrecipitation[index] = analysis["2m Hourly Precipitation (in)"];
+            if (analysis["Weather"]) {
+              response.weather.Weather[index] = analysis["Weather"];
+            }
+            if (analysis["Level 1 clouds"]) {
+               response.weather.Clouds[index] = analysis["Level 1 clouds"];
+            }
+            if (analysis["2m Air Temperature (F)"]) {
+              response.weather.AverageTemperature[index] = analysis["2m Air Temperature (F)"];
+              response.weather.MinimumTemperature[index] = analysis["2m Air Temperature (F)"];
+              response.weather.MaximumTemperature[index] = analysis["2m Air Temperature (F)"];
+            }
+            if (analysis["2m Relative Humidity (percent)"]) {
+              response.weather.AverageHumidity[index] = analysis["2m Relative Humidity (percent)"];
+              response.weather.MinimumHumidity[index] = analysis["2m Relative Humidity (percent)"];
+              response.weather.MaximumHumidity[index] = analysis["2m Relative Humidity (percent)"];
+            }
+            if (analysis["10m Wind Speed (mph)"]) {
+              response.weather.AverageWindspeed[index] = analysis["10m Wind Speed (mph)"];
+              response.weather.MinimumWindspeed[index] = analysis["10m Wind Speed (mph)"];
+              response.weather.MaximumWindspeed[index] = analysis["10m Wind Speed (mph)"];
+            }
+            if (analysis["2m Hourly Precipitation (in)"]) {
+              response.weather.AveragePrecipitation[index] = analysis["2m Hourly Precipitation (in)"];
+              response.weather.MinimumPrecipitation[index] = analysis["2m Hourly Precipitation (in)"];
+              response.weather.MaximumPrecipitation[index] = analysis["2m Hourly Precipitation (in)"];
+            }
             response.weather.UTCStartDate[index] = new Date(analysis.UTCDate);
             response.weather.UTCEndDate[index] = new Date(analysis.UTCDate);
           });
 
+          //Set empty datasets to null
+          for (let channel of Object.keys(response)) {
+            for (let key of Object.keys(response[channel])) {
+              if ((response[channel][key] == null) || (response[channel][key].length == 0)) {
+                response[channel][key] = null;
+              }
+            }
+          }
+
+          //Set a hivename field for all data
           response['HiveName'] = (response.audio.HiveName) ?
             response.audio.HiveName : response.video.HiveName;
 

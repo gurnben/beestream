@@ -78,7 +78,7 @@ export class RMSLinearChartComponent implements OnChanges, ChartComponent, After
   *                           variable changes.
   */
   public ngOnChanges(changes: {[propKey: string]: SimpleChange}) {
-    if (changes['focused'].currentValue != null) {
+    if (changes['focused'].currentValue != null && this.showChart) {
       let focusChanges = changes['focused'].currentValue;
       let x = this.chart.x()[focusChanges.name];
       let minDiff = Infinity;
@@ -101,6 +101,7 @@ export class RMSLinearChartComponent implements OnChanges, ChartComponent, After
   public updateData(res: any, dataKey: string,
                     datesKey: string, aggregateMethod: string,
                     unchartedHives: Array<string>) {
+    console.log(res);
     //Get a list of hives that aren't currently charted and their names with
     //'dates' appended to cover the dates datasets.  This is used to remove
     //previously charted datasets later.
