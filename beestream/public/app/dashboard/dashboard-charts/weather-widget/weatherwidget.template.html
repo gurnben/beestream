@@ -1,0 +1,7 @@
+<div *ngIf="showWidget" class="weather-widget-div">
+  <i class="{{icon}} weather-icon"></i>
+  <h4 class="weather-widget-text weather-widget-temperature">
+    {{focusedData.AverageTemperature}}° F</h4>
+  <h4 class="weather-widget-text">Humidity: {{focusedData.AverageHumidity}}%</h4>
+  <h4 class="weather-widget-text">{{formatDatetime(focusedDate)}}</h4>
+</div>
