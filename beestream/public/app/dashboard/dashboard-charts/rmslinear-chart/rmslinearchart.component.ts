@@ -101,7 +101,6 @@ export class RMSLinearChartComponent implements OnChanges, ChartComponent, After
   public updateData(res: any, dataKey: string,
                     datesKey: string, aggregateMethod: string,
                     unchartedHives: Array<string>) {
-    console.log(res);
     //Get a list of hives that aren't currently charted and their names with
     //'dates' appended to cover the dates datasets.  This is used to remove
     //previously charted datasets later.

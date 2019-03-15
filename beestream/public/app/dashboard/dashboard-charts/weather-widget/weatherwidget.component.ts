@@ -22,6 +22,7 @@ require('../../../weather-icons.css');
 export class WeatherWidget implements OnChanges, AfterViewInit {
 
   @Input() private focused: any;
+  @Input() private aggregateMethod: string;
   private icon: string = "wi wi-na";
   private showWidget: boolean = false;
   private data: any = {};
@@ -52,9 +53,11 @@ export class WeatherWidget implements OnChanges, AfterViewInit {
   *                           variable changes.
   */
   public ngOnChanges(changes: {[propKey: string]: SimpleChange}) {
-    let relaventChanges = changes['focused'].currentValue;
-    //If we have relavent changes
-    if ((relaventChanges != null) && this.data[relaventChanges.name]) {
+
+    //Handle FocusedData Changes
+    if (changes['focused'] && changes['focused'].currentValue
+          && this.data[changes['focused'].currentValue.name]) {
+      let relaventChanges = changes['focused'].currentValue;
       //find the closest date to the new focused date
       let focusDate = new Date(relaventChanges.x);
       //save the hivename we're looking for, used to index into the data object
@@ -91,6 +94,10 @@ export class WeatherWidget implements OnChanges, AfterViewInit {
       this.icon = this.processWeather(this.focusedData);
 
       this.showWidget = true;
+    }
+
+    if (changes['aggregateMethod'] && changes['aggregateMethod'].currentValue) {
+      this.aggregateMethod = changes['aggregateMethod'].currentValue;
     }
   }
 
@@ -210,13 +217,16 @@ export class WeatherWidget implements OnChanges, AfterViewInit {
         (datetime.getDate());
       datestring += '/';
       datestring += (datetime.getFullYear() + ' ');
-      datestring += (datetime.getHours() < 10) ? '0' : '';
-      datestring += (datetime.getHours() < 13) ? datetime.getHours() :
-        datetime.getHours() - 12;
-      datestring += ':';
-      datestring += (datetime.getMinutes() < 10) ? ('0' + datetime.getMinutes()) :
-        datetime.getMinutes();
-      datestring += (datetime.getHours() < 13) ? "AM" : 'PM'
+      //Only include time if it's averaged with hours as a unit
+      if (!(this.aggregateMethod && this.aggregateMethod.includes("Daily"))) {
+        datestring += (datetime.getHours() < 10) ? '0' : '';
+        datestring += (datetime.getHours() < 13) ? datetime.getHours() :
+          datetime.getHours() - 12;
+        datestring += ':';
+        datestring += (datetime.getMinutes() < 10) ? ('0' + datetime.getMinutes()) :
+          datetime.getMinutes();
+        datestring += (datetime.getHours() < 13) ? "AM" : 'PM'
+      }
       return datestring;
     }
     else {
