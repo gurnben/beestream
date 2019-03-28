@@ -19,7 +19,7 @@ require('../../../weather-icons.css');
   template: require('./weatherwidget.template.html'),
   styles: [ '../../c3.styles.css', '../../../weather-icons.css' ]
 })
-export class WeatherWidget implements OnChanges, AfterViewInit {
+export class WeatherWidget implements OnChanges, AfterViewInit, ChartComponent {
 
   @Input() private focused: any;
   @Input() private aggregateMethod: string;
@@ -232,5 +232,13 @@ export class WeatherWidget implements OnChanges, AfterViewInit {
     else {
       return 'No Focused Date';
     }
+  }
+
+  /*noData
+  * The noData hook will be called when new data is received, but no data is
+  * available for the chart.  In this case, the chart will hide itself!
+  */
+  public noData() {
+    this.showWidget = false;
   }
 }

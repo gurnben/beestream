@@ -285,6 +285,9 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
       if (this.dataSetAvailableForChart(res, chart)) {
         chart.updateData(res, dataKey, datesKey, this.aggregateMethod, this.unchartedHives);
       }
+      else {
+        chart.noData();
+      }
     }
   }
 

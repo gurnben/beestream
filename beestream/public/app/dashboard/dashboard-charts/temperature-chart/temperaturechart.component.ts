@@ -59,7 +59,7 @@ export class TemperatureChartComponent implements OnChanges, ChartComponent, Aft
           type: 'timeseries',
           tick: {
             rotate: 60,
-            fit: true,
+            fit: false,
             multiline: true,
             format: '%Y-%m-%d %H:%M:%S'
           }
@@ -185,7 +185,7 @@ export class TemperatureChartComponent implements OnChanges, ChartComponent, Aft
           type: 'timeseries',
           tick: {
             rotate: 60,
-            fit: true,
+            fit: false,
             multiline: true,
             format: '%Y-%m-%d %H:%M:%S'
           }
@@ -203,6 +203,14 @@ export class TemperatureChartComponent implements OnChanges, ChartComponent, Aft
 
     //show the chart!
     this.showChart = true;
+  }
+
+  /*noData
+  * The noData hook will be called when new data is received, but no data is
+  * available for the chart.  In this case, the chart will hide itself!
+  */
+  public noData() {
+    this.showChart = false;
   }
 
   /*requiredDataSets
