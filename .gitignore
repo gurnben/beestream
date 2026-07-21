@@ -42,7 +42,6 @@ Thumbs.db
 **env/production.js
 **env/development.js
 node_modules
-package-lock.json
 videotmp/
 video/
 beetlog.txt
