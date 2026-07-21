@@ -3,6 +3,7 @@ const fs = require('fs');
 const AverageTrafficByDay = mongoose.model('AverageTrafficByDay');
 const HivesWithAnalysis = mongoose.model('HivesWithAnalysis');
 const config = require('../../config/config');
+const { isStringArray } = require('../middleware/validate.js');
 const AVERAGE_VIDEOS_PER_DAY = 120
 let datapaths = {};
 path = require('path').resolve("app/controllers/dashboard-datapaths/");
@@ -34,6 +35,14 @@ module.exports = function(io, socket) {
 
   //Socket handler to return analysis data for a hive.
   socket.on('getData', (message) => {
+    if (!message || typeof message !== 'object') return;
+    if (!message.dataSets || typeof message.dataSets !== 'object' ||
+        !Array.isArray(message.dataSets.video) || !Array.isArray(message.dataSets.audio) ||
+        !isStringArray(message.dataSets.video, 50) || !isStringArray(message.dataSets.audio, 50)) {
+      return;
+    }
+    if (!isStringArray(message.hives, 100)) return;
+    if (message.count !== undefined && (typeof message.count !== 'number' || !isFinite(message.count))) return;
 
     //build query conditions from client's message request.
     let viewQuerySelection = { audio: {}, video: {} };

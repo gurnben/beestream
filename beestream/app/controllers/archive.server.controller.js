@@ -6,6 +6,7 @@ const {join} = require('path');
 const mongoose = require('mongoose');
 const VideoFile = mongoose.model('VideoFile');
 const ffmpegPath = config.ffmpegPath;
+const { isNonEmptyString, sanitizeString } = require('../middleware/validate.js');
 
 
 /*This file handles all socket.io configurations for the article service.
@@ -74,6 +75,9 @@ module.exports = function(io, socket) {
   * an empty list.
   */
   socket.on('getDate', (message) => {
+    if (!message || typeof message !== 'object') return;
+    var hive = sanitizeString(message.hive);
+    if (!hive || hive.length > 200) return;
     VideoFile.aggregate([
       { "$project": {
           "year": { "$year": "$UTCDate" },
@@ -82,7 +86,7 @@ module.exports = function(io, socket) {
           "HiveName": 1
       }},
       { "$match": {
-          "HiveName": message.hive
+          "HiveName": hive
         }
       },
       { "$group": {
@@ -114,15 +118,20 @@ module.exports = function(io, socket) {
   * respond with an empty list.
   */
   socket.on('getTime', (message) => {
+    if (!message || typeof message !== 'object') return;
+    var hive = sanitizeString(message.hive);
+    if (!hive || hive.length > 200) return;
+    if (!isNonEmptyString(message.date, 20)) return;
     //get the date we're looking for at time 00:00:00
     var date = new Date(message.date);
+    if (isNaN(date.getTime())) return;
     date.setHours(0, 0, 0, 0);
     date.setDate(date.getDate() + 1);
     //get the date after the date we're looking for (for a less-than value)
     var nextDate = new Date(date);
     nextDate.setDate(nextDate.getDate() + 1);
     //query and respond
-    VideoFile.find({$and:[{UTCDate:{$lt:nextDate}},{UTCDate:{$gte:date}}], HiveName: message.hive}, {_id: 0, FilePath: 1}, (err, videos) => {
+    VideoFile.find({$and:[{UTCDate:{$lt:nextDate}},{UTCDate:{$gte:date}}], HiveName: hive}, {_id: 0, FilePath: 1}, (err, videos) => {
       if (err) {
         console.log(`Error getting times: ${err}.`);
       }

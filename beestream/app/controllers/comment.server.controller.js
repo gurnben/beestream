@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Comment = mongoose.model('Comment');
 const config = require('../../config/config');
 const { isAuthEnabled } = require('../middleware/auth.js');
+const { isNonEmptyString, sanitizeString } = require('../middleware/validate.js');
 
 /*This file handles all socket.io configurations for the comment component.
 * This includes creating the listeners and sending the appropriate emit
@@ -42,6 +43,20 @@ module.exports = function(io, socket) {
   socket.on('newComment', (message) => {
     if (isAuthEnabled() && !socket.authenticated) {
       socket.emit('commentError', { message: 'Authentication required' });
+      return;
+    }
+    if (!message || typeof message !== 'object') {
+      socket.emit('commentError', { message: 'Invalid message format.' });
+      return;
+    }
+    if (!isNonEmptyString(message.username, 100) ||
+        !isNonEmptyString(message.comment, 5000) ||
+        !isNonEmptyString(message.hive, 200)) {
+      socket.emit('commentError', { message: 'Invalid input. Username, comment, and hive are required strings.' });
+      return;
+    }
+    if (!message.datetime || isNaN(new Date(message.datetime).getTime())) {
+      socket.emit('commentError', { message: 'Invalid datetime.' });
       return;
     }
     var commentData = JSON.parse(JSON.stringify(message));
@@ -88,8 +103,16 @@ module.exports = function(io, socket) {
   *               be accompanied by an error message in the field message.
   */
   socket.on('getComments', (message) => {
+    if (!message || typeof message !== 'object') {
+      socket.emit('commentError', { message: 'Invalid message format.' });
+      return;
+    }
     var parsedMessage = JSON.parse(JSON.stringify(message));
-    var hive = parsedMessage.hive;
+    var hive = sanitizeString(parsedMessage.hive);
+    if (!hive || !parsedMessage.datetime || isNaN(new Date(parsedMessage.datetime).getTime())) {
+      socket.emit('commentError', { message: 'Invalid hive or datetime.' });
+      return;
+    }
     var date = new Date(parsedMessage.datetime);
     Comment.find({UTCDate: date, Hive: hive}, {_id: 0}).sort({Created: 'desc', Username: 'desc'}).exec((err, comments) => {
       if (err) {
