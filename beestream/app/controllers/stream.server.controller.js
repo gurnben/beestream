@@ -5,6 +5,7 @@ const {join} = require('path');
 const mongoose = require('mongoose');
 const VideoFile = mongoose.model('VideoFile');
 const ffmpegPath = config.ffmpegPath;
+const {isSafeName} = require('../utils/input-validation');
 
 /*getDate
 * Helper function to get the current date in the correct format: YYYY-MM-DD
@@ -113,6 +114,11 @@ module.exports = function(io, socket) {
   */
   socket.on('getStreamVideo', (message) => {
     if (message.hive != null) {
+
+      if (!isSafeName(message.hive)) {
+        socket.emit('error', {message: 'Invalid hive name.'});
+        return;
+      }
 
       //get today's date we're at time 00:00:00
       var date = new Date();

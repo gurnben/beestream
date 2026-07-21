@@ -6,6 +6,7 @@ const {join} = require('path');
 const mongoose = require('mongoose');
 const VideoFile = mongoose.model('VideoFile');
 const ffmpegPath = config.ffmpegPath;
+const {isSafeName, isSafeDate} = require('../utils/input-validation');
 
 
 /*This file handles all socket.io configurations for the article service.
@@ -169,12 +170,21 @@ module.exports = function(io, socket) {
   *             the URL to use to get the video.
   */
   socket.on('getVideo', (message) => {
-    //Build the path of the requested video
-    var requestPath = `${config.videoPath}/${message.hive}/${message.date}/video/${message.time}.h264`;
-
-    //If the user has selected a hive, date, and time and the video exists, serve it.
+    //If the user has selected a hive, date, and time, validate and serve.
     if ((message.hive != null) && (message.date != null) &&
-        (message.time != null) && fs.existsSync(requestPath)) {
+        (message.time != null)) {
+
+      if (!isSafeName(message.hive) || !isSafeDate(message.date) || !isSafeName(message.time)) {
+        socket.emit('error', {message: 'Invalid hive, date, or time value.'});
+        return;
+      }
+
+      //Build the path of the requested video
+      var requestPath = `${config.videoPath}/${message.hive}/${message.date}/video/${message.time}.h264`;
+
+      if (!fs.existsSync(requestPath)) {
+        return;
+      }
       //Tell the client their request was recieved and is processing.
       socket.emit('videoRequestRecieved', {
         text: `Peparing to serve ${message.time}`
