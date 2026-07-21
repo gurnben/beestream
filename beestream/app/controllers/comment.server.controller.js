@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Comment = mongoose.model('Comment');
 const config = require('../../config/config');
+const { isAuthEnabled } = require('../middleware/auth.js');
 
 /*This file handles all socket.io configurations for the comment component.
 * This includes creating the listeners and sending the appropriate emit
@@ -39,6 +40,10 @@ module.exports = function(io, socket) {
   *
   */
   socket.on('newComment', (message) => {
+    if (isAuthEnabled() && !socket.authenticated) {
+      socket.emit('commentError', { message: 'Authentication required' });
+      return;
+    }
     var commentData = JSON.parse(JSON.stringify(message));
     var date = new Date(commentData.datetime);
     var month = (date.getMonth() + 1 < 10) ? `0${date.getMonth() + 1}` : `${date.getMonth() + 1}`;

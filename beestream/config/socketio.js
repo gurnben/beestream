@@ -7,10 +7,13 @@ const configureComment = require('../app/controllers/comment.server.controller.j
 const configureAnalysis = require('../app/controllers/analysis.server.controller.js');
 const configureTags = require('../app/controllers/tag.server.controller.js');
 const configureDash = require('../app/controllers/dashboard.server.controller.js');
+const { socketAuthMiddleware } = require('../app/middleware/auth.js');
 /* TODO: Add SocketIO component controllers here */
 
 // Define the Socket.io configuration method
 module.exports = function(server, io) {
+	io.use(socketAuthMiddleware);
+
 	// Add an event listener to the 'connection' event
   io.on('connection', (socket) => {
       configureArchive(io, socket);

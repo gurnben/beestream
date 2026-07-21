@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Tag = mongoose.model('Tag');
 const AvailableTag = mongoose.model('AvailableTag');
 const config = require('../../config/config.js');
+const { isAuthEnabled } = require('../middleware/auth.js');
 
 /*This file handles all socket.io configurations for the tag component.
 * This includes creating the listeners and sending the appropriate emit
@@ -36,6 +37,10 @@ module.exports = function(io, socket) {
   *              by a list of Tags.
   */
   socket.on('newTag', (message) => {
+    if (isAuthEnabled() && !socket.authenticated) {
+      socket.emit('tagError', { message: 'Authentication required' });
+      return;
+    }
     var hive = message.hive;
     var date = new Date(message.datetime);
     var tag = message.tag;
@@ -120,6 +125,10 @@ module.exports = function(io, socket) {
   *              by a list of Tags.
   */
   socket.on('decrementTag', (message) => {
+    if (isAuthEnabled() && !socket.authenticated) {
+      socket.emit('tagError', { message: 'Authentication required' });
+      return;
+    }
     var hive = message.hive;
     var date = new Date(message.datetime);
     var tag = message.tag;
