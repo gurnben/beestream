@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 /* This file will add functions to handle video requests and serve video files*/
 
@@ -28,7 +29,21 @@ exports.serve = function(req, res) {
 };
 
 /* This function handles the videoName parameter and sets req.video to it. */
+const VIDEO_DIR = path.resolve('./video');
+
 exports.videoName = function(req, res, next, vidName) {
-  req.video = vidName;
+  if (!vidName || vidName.indexOf('..') !== -1 || vidName.indexOf('/') !== -1 || vidName.indexOf('\\') !== -1 || vidName.indexOf('\0') !== -1) {
+    res.writeHead(400, {});
+    res.end();
+    return;
+  }
+  var safeName = path.basename(vidName, '.mp4');
+  var resolved = path.resolve(VIDEO_DIR, safeName + '.mp4');
+  if (!resolved.startsWith(VIDEO_DIR + path.sep)) {
+    res.writeHead(400, {});
+    res.end();
+    return;
+  }
+  req.video = safeName;
   next();
 };
